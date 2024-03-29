@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-
 [Serializable]
 public struct BoolData
 {
@@ -13,8 +12,6 @@ public struct BoolData
         Value = value;
     }
 }
-
-using System;
 
 [Serializable]
 public struct BoolList
@@ -29,7 +26,6 @@ public struct BoolList
     }
 }
 
-using System;
 
 [Serializable]
 public struct ColorData
@@ -44,7 +40,6 @@ public struct ColorData
     }
 }
 
-using System;
 
 [Serializable]
 public struct ColorList
@@ -59,8 +54,6 @@ public struct ColorList
     }
 }
 
-using System;
-
 [Serializable]
 public struct FloatData
 {
@@ -73,8 +66,6 @@ public struct FloatData
         Value = value;
     }
 }
-
-using System;
 
 [Serializable]
 public struct FloatList
@@ -89,8 +80,6 @@ public struct FloatList
     }
 }
 
-using System;
-
 [Serializable]
 public struct IDData
 {
@@ -102,8 +91,6 @@ public struct IDData
     }
 }
 
-using System;
-
 [Serializable]
 public struct IDList
 {
@@ -114,8 +101,6 @@ public struct IDList
         IDs = iDs;
     }
 }
-
-using System;
 
 [Serializable]
 public struct IDListBoolData
@@ -130,8 +115,6 @@ public struct IDListBoolData
     }
 }
 
-using System;
-
 [Serializable]
 public struct IDListBoolList
 {
@@ -145,7 +128,6 @@ public struct IDListBoolList
     }
 }
 
-using System;
 
 [Serializable]
 public struct IDListColorData
@@ -160,7 +142,6 @@ public struct IDListColorData
     }
 }
 
-using System;
 
 [Serializable]
 public struct IDListColorList
@@ -175,8 +156,6 @@ public struct IDListColorList
     }
 }
 
-using System;
-
 [Serializable]
 public struct IDListFloatData
 {
@@ -189,8 +168,6 @@ public struct IDListFloatData
         Value = value;
     }
 }
-
-using System;
 
 [Serializable]
 public struct IDListFloatList
@@ -205,8 +182,6 @@ public struct IDListFloatList
     }
 }
 
-using System;
-
 [Serializable]
 public struct IDListIntData
 {
@@ -219,8 +194,6 @@ public struct IDListIntData
         Value = value;
     }
 }
-
-using System;
 
 [Serializable]
 public struct IDListIntList
@@ -235,8 +208,6 @@ public struct IDListIntList
     }
 }
 
-using System;
-
 [Serializable]
 public struct IDListStringData
 {
@@ -249,8 +220,6 @@ public struct IDListStringData
         Value = value;
     }
 }
-
-using System;
 
 [Serializable]
 public struct IDListStringList
@@ -265,7 +234,6 @@ public struct IDListStringList
     }
 }
 
-using System;
 
 [Serializable]
 public struct IDListVector3Data
@@ -280,7 +248,6 @@ public struct IDListVector3Data
     }
 }
 
-using System;
 
 [Serializable]
 public struct IDListVector3List
@@ -295,8 +262,6 @@ public struct IDListVector3List
     }
 }
 
-using System;
-
 [Serializable]
 public struct IntData
 {
@@ -309,8 +274,6 @@ public struct IntData
         Value = value;
     }
 }
-
-using System;
 
 [Serializable]
 public struct IntList
@@ -325,8 +288,6 @@ public struct IntList
     }
 }
 
-using System;
-
 [Serializable]
 public struct StringData
 {
@@ -339,8 +300,6 @@ public struct StringData
         Value = value;
     }
 }
-
-using System;
 
 [Serializable]
 public struct StringList
@@ -355,7 +314,6 @@ public struct StringList
     }
 }
 
-using System;
 
 [Serializable]
 public struct Vector3Data
@@ -370,7 +328,6 @@ public struct Vector3Data
     }
 }
 
-using System;
 
 [Serializable]
 public struct Vector3List

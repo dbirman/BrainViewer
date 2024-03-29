@@ -1,5 +1,4 @@
 using System;
-
 [Serializable]
 public struct BucketModel
 {
@@ -13,8 +12,6 @@ public struct BucketModel
     }
 }
 
-using System;
-
 [Serializable]
 public struct DownloadModel
 {
@@ -25,8 +22,6 @@ public struct DownloadModel
         Password = password;
     }
 }
-
-using System;
 
 [Serializable]
 public struct LoadModel
@@ -41,8 +36,6 @@ public struct LoadModel
     }
 }
 
-using System;
-
 [Serializable]
 public struct SaveModel
 {
@@ -55,8 +48,6 @@ public struct SaveModel
         Password = password;
     }
 }
-
-using System;
 
 [Serializable]
 public struct UploadModel

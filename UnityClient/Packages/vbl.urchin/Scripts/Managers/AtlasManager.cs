@@ -126,9 +126,9 @@ namespace Urchin.Managers
             }
 
             // Check for colormap
-            if (data.Colormap != "")
+            if (data.Colormap.Name != "")
             {
-                SetAreaColormap(data.Colormap);
+                SetAreaColormap(data.Colormap.Name);
             }
 
             foreach (var structure in data.Areas)
@@ -271,7 +271,7 @@ namespace Urchin.Managers
             else
                 _colormapEnabled = false;
 
-            ColormapChangedEvent.Invoke(_localColormap.Value, _colormapEnabled, 0f, 1f);
+            ColormapChangedEvent.Invoke(_localColormap.Value, _colormapEnabled, Data.Colormap.Min, Data.Colormap.Max);
         }
 
 
