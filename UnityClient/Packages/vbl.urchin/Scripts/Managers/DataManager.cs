@@ -38,16 +38,20 @@ public class DataManager : MonoBehaviour
                 Password = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
             };
 
-            string json = JsonUtility.ToJson(uploadModel);
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            Debug.Log(_managers[i].ToSerializedData());
 
-            UnityWebRequest request = new UnityWebRequest($"{apiURL}/{data.Bucket}/{type}/data", "POST");
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.SetRequestHeader("Content-Type", "application/json");
+            yield return null;
 
-            yield return request.SendWebRequest();
+            //string json = JsonUtility.ToJson(uploadModel);
+            //byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
 
-            Debug.Log($"Response code{request.responseCode}");
+            //UnityWebRequest request = new UnityWebRequest($"{apiURL}/{data.Bucket}/{type}/data", "POST");
+            //request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            //request.SetRequestHeader("Content-Type", "application/json");
+
+            //yield return request.SendWebRequest();
+
+            //Debug.Log($"Response code{request.responseCode}");
         }
     }
 

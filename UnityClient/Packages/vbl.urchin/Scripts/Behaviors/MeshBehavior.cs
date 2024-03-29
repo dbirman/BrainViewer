@@ -49,8 +49,8 @@ public class MeshBehavior : MonoBehaviour
         // Update all settings
         _SetPosition();
         _SetScale();
-        _SetColor();
         _SetMaterial();
+        _SetColor();
     }
 
     public void SetPosition(Vector3 coordAtlasU)

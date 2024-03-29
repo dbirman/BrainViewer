@@ -11,6 +11,9 @@ import numpy as np
 import io
 import json
 import asyncio
+
+from vbl_aquarium.models.urchin import CameraRotationModel
+from vbl_aquarium.models.generic import FloatData
 		  
 receive_totalBytes = {}
 receive_bytes = {}
@@ -359,16 +362,18 @@ class Camera:
 
 		n_frames = frame_rate * duration
 
-		rotation_change = [end_rotation[0]-start_rotation[0],
-					 end_rotation[1]-start_rotation[1],
-					 end_rotation[2]-start_rotation[2]]
+		client.sio.emit('SetCameraLerpRotation', CameraRotationModel(
+			start_rotation=utils.formatted_vector3(start_rotation),
+			end_rotation=utils.formatted_vector3(end_rotation)
+		).to_string())
 
 		for frame in range(n_frames):
 			perc = frame / n_frames
 
-			self.set_rotation([start_rotation[0] + perc * rotation_change[0],
-					 start_rotation[1] + perc * rotation_change[1],
-					 start_rotation[2] + perc * rotation_change[2]])
+			client.sio.emit('SetCameraLerp', FloatData(
+				id=self.id,
+				value=perc
+			).to_string())
 			
 			img = await self.screenshot([size[0], size[1]])
 			image_array = np.array(img)

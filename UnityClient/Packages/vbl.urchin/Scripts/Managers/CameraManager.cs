@@ -27,6 +27,9 @@ namespace Urchin.Managers
         #region Variables
         private Dictionary<string, CameraBehavior> _cameras; //directly access the camera nested within the prefab
         private Stack<RenderTexture> textures = new();
+
+        private Quaternion _startRotation;
+        private Quaternion _endRotation;
         #endregion
 
         #region Unity functions
@@ -44,6 +47,8 @@ namespace Urchin.Managers
 
         private void Start()
         {
+            Client_SocketIO.SetCameraLerpRotation += SetLerpStartEnd;
+            Client_SocketIO.SetCameraLerp += SetLerp;
 
             Client_SocketIO.SetCameraTarget += SetCameraTarget;
             Client_SocketIO.SetCameraRotation += SetCameraRotation;
@@ -117,6 +122,28 @@ namespace Urchin.Managers
                     Vector3 yawPitchRoll = new Vector3(kvp.Value[0], kvp.Value[1], kvp.Value[2]);
                     _cameras[kvp.Key].SetCameraRotation(yawPitchRoll);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Set the startRotation/endRotation quaternions
+        /// </summary>
+        /// <param name="data"></param>
+        public void SetLerpStartEnd(CameraRotationModel data)
+        {
+            _startRotation = Quaternion.Euler(data.StartRotation);
+            _endRotation = Quaternion.Euler(data.EndRotation);
+        }
+
+        /// <summary>
+        /// Interpolate between the active startRotation and endRotation values 0->1
+        /// </summary>
+        /// <param name="data">(string ID, Vector3 Value)</param>
+        public void SetLerp(FloatData data)
+        {
+            if (_cameras.ContainsKey(data.ID))
+            {
+                _cameras[data.ID].ActiveCamera.transform.rotation = Quaternion.Lerp(_startRotation, _endRotation, data.Value);
             }
         }
 

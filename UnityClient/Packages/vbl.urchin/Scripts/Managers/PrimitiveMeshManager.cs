@@ -48,7 +48,6 @@ namespace Urchin.Managers
 
         public void UpdateData(MeshModel data)
         {
-            Debug.Log(JsonUtility.ToJson(data));
             if (_meshBehaviors.ContainsKey(data.ID))
             {
                 // Update
@@ -139,7 +138,7 @@ namespace Urchin.Managers
         {
             Clear();
 
-            PrimitiveMeshData data = JsonUtility.FromJson<PrimitiveMeshData>(serializedData);
+            PrimitiveMeshModel data = JsonUtility.FromJson<PrimitiveMeshModel>(serializedData);
 
             foreach (MeshModel modelData in data.Data)
                 Create(modelData);
@@ -147,7 +146,7 @@ namespace Urchin.Managers
 
         public override string ToSerializedData()
         {
-            PrimitiveMeshData data = new();
+            PrimitiveMeshModel data = new();
             data.Data = new MeshModel[_meshBehaviors.Count];
 
             MeshBehavior[] meshBehaviors = _meshBehaviors.Values.ToArray();
@@ -158,10 +157,6 @@ namespace Urchin.Managers
             return JsonUtility.ToJson(data);
         }
 
-        private struct PrimitiveMeshData
-        {
-            public MeshModel[] Data;
-        }
         #endregion
     }
 }

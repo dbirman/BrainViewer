@@ -2,11 +2,14 @@
 import numpy as np
 from enum import Enum
 
+from vbl_aquarium.models.unity import *
+
 ### ENUMS
 class Side(Enum):
     LEFT = -1
     FULL = 0
     RIGHT = 1
+    ALL = 3
 
 ### SANITIZING FUNCTIONS
 
@@ -41,32 +44,20 @@ def sanitize_vector3(vector):
 
 
 def sanitize_color(color):
-    if isinstance(color, str): #if color is string
-        if(color[0] == '#'): #if color has # prefix
-            return(color)
-        else: #adding # prefix if not present
-            color = '#' + color
-            return(color)    
-    
-    if isinstance(color, list) or isinstance(color, tuple):#if list
-        # check first if you're dealing with floats between 0 and 1
-        if isinstance(color[0], float):
-            # we have floats, check which range we have
-            if all([(x <= 1 and x >= 0) for x in color]):
-                # range 0->1, re-scale to 0->255 as ints
-                color = [int(255*x) for x in color]
-            elif all([(x <= 255 and x >= 0) for x in color]):
-                # range 0->255, round to ints
-                color = [int(np.rint(x)) for x in color]
-            else:
-                raise Exception('Color value ranges need to conform to [R,G,B] formatted either as 0->1 or 0->255')
+    """Does nothing right now
 
-        # convert list of ints to a hex string
-        hex_color = '#' + ('{:02X}' * 3).format(color[0], color[1], color[2])
-        return(hex_color)
+    Parameters
+    ----------
+    color : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
+    return color
     
-    else:
-        raise Exception('Failed to re-format color input as a hex code. Please enter either an RGB list or tuple, or a hex code')
 
 def sanitize_float(value):
     if isinstance(value, float):
@@ -127,37 +118,49 @@ def rgba_to_hex(rgba):
     return '#%02x%02x%02x%02x' % rgba
 
 def list_of_list2vector3(list_of_list):
-    """Convert a list of lists to a list of vector3 {"x","y","z"} objects
+    """Convert a list of lists to a list of Vector3 objects
 
     Parameters
     ----------
     list_of_list : list of length 3 lists
         _description_
     """
-    return [{"x":str(data[0]), "y":str(data[1]), "z":str(data[2])} for data in list_of_list]
+    return [formatted_vector3(data) for data in list_of_list]
 
 def formatted_vector3(list_of_float):
-    """Convert a list of floats to a formatted vector3 dict
+    """Convert a list of floats to a Vector3
 
     Parameters
     ----------
     list_of_float : list
     """
-    return {"x":str(list_of_float[0]), "y":str(list_of_float[1]), "z":str(list_of_float[2])}
+    return Vector3(
+        x = list_of_float[0],
+        y = list_of_float[1],
+        z = list_of_float[2]
+    )
 
 def formatted_color(list_of_float):
-    """Converts a list of floats to a formatted color dict. Values should be 0->1
+    """Converts a list of floats to a Color. Values should be 0->1
 
     Parameters
     ----------
     list_of_float : list
         Length 3 for RGB, 4 for RGBA
     """
+
     if len(list_of_float) == 3:
-        return {'r':str(list_of_float[0]), 'g':str(list_of_float[1]), 'b':str(list_of_float[2]),
-                        'a':'1'}
+        return Color(
+            r = list_of_float[0],
+            g = list_of_float[1],
+            b = list_of_float[2]
+        )
     elif len(list_of_float) == 4:
-        return {'r':str(list_of_float[0]), 'g':str(list_of_float[1]), 'b':str(list_of_float[2]),
-                        'a':str(list_of_float[3])}
+        return Color(
+            r = list_of_float[0],
+            g = list_of_float[1],
+            b = list_of_float[2],
+            a = list_of_float[3]
+        )
     else:
         raise Exception('Colors should be length 3 or 4')

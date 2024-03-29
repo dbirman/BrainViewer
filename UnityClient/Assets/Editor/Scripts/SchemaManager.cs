@@ -7,36 +7,18 @@ public class SchemaManager
     [MenuItem("Tools/Update Schemas")]
     public static void UpdateSchemas()
     {
+        string aqFolder = "C:\\proj\\VBL\\vbl-aquarium\\models\\csharp\\";
+        string unityFolder = "Packages/vbl.urchin/Scripts/JSON/";
 
-        GetSchemas("C:\\proj\\VBL\\vbl-aquarium\\models\\csharp\\urchin",
-            "Packages/vbl.urchin/Scripts/JSON/Urchin");
-
-        GetSchemas("C:\\proj\\VBL\\vbl-aquarium\\models\\csharp\\generic",
-            "Packages/vbl.urchin/Scripts/JSON/Generic");
-
-        GetSchemas("C:\\proj\\VBL\\vbl-aquarium\\models\\csharp\\dock",
-            "Packages/vbl.urchin/Scripts/JSON/Dock");
-
-        Debug.Log("Schemas updated successfully!");
-    }
-
-    private static void GetSchemas(string inFolder, string outFolder)
-    {
-
-        if (!Directory.Exists(outFolder))
-        {
-            Directory.CreateDirectory(outFolder);
-        }
-
-        string[] files = Directory.GetFiles(inFolder, "*.cs");
+        string[] files = { "UrchinModels.cs", "GenericModels.cs", "DockModels.cs" };
 
         foreach (string file in files)
         {
-            string fileName = Path.GetFileName(file);
-            string destFilePath = Path.Combine(outFolder, fileName);
-            File.Copy(file, destFilePath, true);
+            File.Copy(Path.Combine(aqFolder, file),
+                Path.Combine(unityFolder, file), true);
         }
 
+        Debug.Log("Schemas updated successfully!");
         AssetDatabase.Refresh();
     }
 }

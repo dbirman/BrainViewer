@@ -160,7 +160,8 @@ class Mesh:
     self._update()
 
 
-
+def clear():
+  client.sio.emit('Clear', 'mesh')
 
 #actually initializes each object(s), doesn't use any parameters other than how many to initialize (uses all defaults)
 def create(num_objects, position= [0.0,0.0,0.0], scale= [1,1,1], color=[1,1,1],

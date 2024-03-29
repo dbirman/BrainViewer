@@ -1794,6 +1794,86 @@ PrefabInstance:
       propertyPath: _primitiveMeshManager
       value: 
       objectReference: {fileID: 431647799}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.data[0]
+      value: ccf25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.data[1]
+      value: waxholm39
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.data[2]
+      value: waxholm78
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.data[0]
+      value: allen_mouse_25um
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.data[1]
+      value: whs_sd_rat_39um
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.data[2]
+      value: whs_sd_rat_78um
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _availableOnWebGL.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _availableOnWebGL.Array.data[0]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _availableOnWebGL.Array.data[2]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: NodeVisibleEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: ColormapChangedEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: NodeVisibleEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: NodeVisibleEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: ColormapChangedEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 116938375}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: ColormapChangedEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: ColormapChangedEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ColormapChanged
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: ColormapChangedEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ColormapPanel, urchin.unity
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: ColormapChangedEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
