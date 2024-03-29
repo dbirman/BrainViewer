@@ -42,7 +42,7 @@ class Mesh:
     self.data = MeshModel(
       id = str(counter),
       shape = 'cube',
-      position = utils.formatted_vector3(position),
+      position = utils.formatted_vector3(position/1000),
       color = utils.formatted_color(color),
       scale = utils.formatted_vector3(scale),
       material = material,
@@ -221,7 +221,7 @@ def set_positions(meshes_list, positions_list):
   meshes_list : list of mesh objects
 	  list of meshes being set
   positions_list : list of list of three floats
-    vertex positions of each mesh
+    vertex positions of each mesh in um
       
 	Examples
 	--------
