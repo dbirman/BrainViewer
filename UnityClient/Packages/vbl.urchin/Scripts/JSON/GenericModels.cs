@@ -1,4 +1,5 @@
 using UnityEngine;
+[Serializable]
 public struct BoolData
 {
     public string ID;
@@ -11,6 +12,7 @@ public struct BoolData
     }
 }
 
+[Serializable]
 public struct BoolList
 {
     public string ID;
@@ -24,6 +26,7 @@ public struct BoolList
 }
 
 
+[Serializable]
 public struct ColorData
 {
     public string ID;
@@ -37,6 +40,7 @@ public struct ColorData
 }
 
 
+[Serializable]
 public struct ColorList
 {
     public string ID;
@@ -49,6 +53,7 @@ public struct ColorList
     }
 }
 
+[Serializable]
 public struct FloatData
 {
     public string ID;
@@ -61,6 +66,7 @@ public struct FloatData
     }
 }
 
+[Serializable]
 public struct FloatList
 {
     public string ID;
@@ -73,6 +79,7 @@ public struct FloatList
     }
 }
 
+[Serializable]
 public struct IDData
 {
     public string ID;
@@ -83,6 +90,7 @@ public struct IDData
     }
 }
 
+[Serializable]
 public struct IDList
 {
     public string[] IDs;
@@ -93,6 +101,7 @@ public struct IDList
     }
 }
 
+[Serializable]
 public struct IDListBoolData
 {
     public string[] IDs;
@@ -105,6 +114,7 @@ public struct IDListBoolData
     }
 }
 
+[Serializable]
 public struct IDListBoolList
 {
     public string[] IDs;
@@ -118,6 +128,7 @@ public struct IDListBoolList
 }
 
 
+[Serializable]
 public struct IDListColorData
 {
     public string[] IDs;
@@ -131,6 +142,7 @@ public struct IDListColorData
 }
 
 
+[Serializable]
 public struct IDListColorList
 {
     public string[] IDs;
@@ -143,6 +155,7 @@ public struct IDListColorList
     }
 }
 
+[Serializable]
 public struct IDListFloatData
 {
     public string[] IDs;
@@ -155,6 +168,7 @@ public struct IDListFloatData
     }
 }
 
+[Serializable]
 public struct IDListFloatList
 {
     public string[] IDs;
@@ -167,6 +181,7 @@ public struct IDListFloatList
     }
 }
 
+[Serializable]
 public struct IDListIntData
 {
     public string[] IDs;
@@ -179,6 +194,7 @@ public struct IDListIntData
     }
 }
 
+[Serializable]
 public struct IDListIntList
 {
     public string[] IDs;
@@ -191,6 +207,7 @@ public struct IDListIntList
     }
 }
 
+[Serializable]
 public struct IDListStringData
 {
     public string[] IDs;
@@ -203,6 +220,7 @@ public struct IDListStringData
     }
 }
 
+[Serializable]
 public struct IDListStringList
 {
     public string[] IDs;
@@ -216,6 +234,7 @@ public struct IDListStringList
 }
 
 
+[Serializable]
 public struct IDListVector3Data
 {
     public string[] IDs;
@@ -229,6 +248,7 @@ public struct IDListVector3Data
 }
 
 
+[Serializable]
 public struct IDListVector3List
 {
     public string[] IDs;
@@ -241,6 +261,7 @@ public struct IDListVector3List
     }
 }
 
+[Serializable]
 public struct IntData
 {
     public string ID;
@@ -253,6 +274,7 @@ public struct IntData
     }
 }
 
+[Serializable]
 public struct IntList
 {
     public string ID;
@@ -265,6 +287,7 @@ public struct IntList
     }
 }
 
+[Serializable]
 public struct StringData
 {
     public string ID;
@@ -277,6 +300,7 @@ public struct StringData
     }
 }
 
+[Serializable]
 public struct StringList
 {
     public string ID;
@@ -290,6 +314,7 @@ public struct StringList
 }
 
 
+[Serializable]
 public struct Vector3Data
 {
     public string ID;
@@ -303,6 +328,7 @@ public struct Vector3Data
 }
 
 
+[Serializable]
 public struct Vector3List
 {
     public string ID;

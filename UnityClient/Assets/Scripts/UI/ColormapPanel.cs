@@ -1,9 +1,13 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ColormapPanel : MonoBehaviour
 {
+    [SerializeField] TMP_Text _lowText;
+    [SerializeField] TMP_Text _highText;
+
     private RawImage _colormapImage;
     private Texture2D _colormapTexture2D;
 
@@ -20,10 +24,13 @@ public class ColormapPanel : MonoBehaviour
         SetColormapVisibility(false);
     }
 
-    public void ColormapChanged(Converter<float, Color> func, bool state)
+    public void ColormapChanged(Converter<float, Color> func, bool state, float low, float high)
     {
         SetColormap(func);
         SetColormapVisibility(state);
+
+        _lowText.text = low.ToString();
+        _highText.text = high.ToString();
     }
 
     public void SetColormap(Converter<float,Color> colormapFunc)

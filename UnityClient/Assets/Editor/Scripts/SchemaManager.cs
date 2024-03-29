@@ -15,7 +15,7 @@ public class SchemaManager
         foreach (string file in files)
         {
             File.Copy(Path.Combine(aqFolder, file),
-                Path.Combine(unityFolder, file));
+                Path.Combine(unityFolder, file), true);
         }
 
         Debug.Log("Schemas updated successfully!");

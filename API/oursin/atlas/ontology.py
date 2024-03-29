@@ -3,7 +3,7 @@ from .. import utils
 from pathlib import Path
 
 import json
-from vbl_aquarium.models.urchin import AtlasModel, StructureModel
+from vbl_aquarium.models.urchin import AtlasModel, StructureModel, ColormapModel
 from vbl_aquarium.models.generic import *
 
 class CustomAtlas:
@@ -164,7 +164,7 @@ class Atlas:
         if push:
             self._update()
         
-    def set_colormap(self, colormap_name):
+    def set_colormap(self, colormap_name, min = 0, max = 1):
         """Set colormap used for mapping area *intensity* values to colors
 
 
@@ -181,7 +181,11 @@ class Atlas:
         colormap_name : string
             colormap name
         """
-        self.data.colormap = colormap_name
+        self.data.colormap = ColormapModel(
+            name = colormap_name,
+            min = min,
+            max = max
+        )
         self._update()
 
     def set_color_intensity(self, area_list, area_intensities, push = True):

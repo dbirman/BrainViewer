@@ -7,9 +7,9 @@ public struct AtlasModel
     public string Name;
     public Vector3 ReferenceCoord;
     public StructureModel[] Areas;
-    public string Colormap;
+    public ColormapModel Colormap;
 
-    public AtlasModel(string name, Vector3 referenceCoord, StructureModel[] areas, string colormap)
+    public AtlasModel(string name, Vector3 referenceCoord, StructureModel[] areas, ColormapModel colormap)
     {
         Name = name;
         ReferenceCoord = referenceCoord;
@@ -19,6 +19,7 @@ public struct AtlasModel
 }
 
 
+[Serializable]
 public struct CameraModel
 {
     public float Id;
@@ -55,6 +56,7 @@ public enum CameraMode
 }
 
 
+[Serializable]
 public struct CameraRotationModel
 {
     public Vector3 StartRotation;
@@ -67,7 +69,23 @@ public struct CameraRotationModel
     }
 }
 
+[Serializable]
+public struct ColormapModel
+{
+    public string Name;
+    public float Min;
+    public float Max;
 
+    public ColormapModel(string name, float min, float max)
+    {
+        Name = name;
+        Min = min;
+        Max = max;
+    }
+}
+
+
+[Serializable]
 public struct CustomAtlasModel
 {
     public string Name;
@@ -83,6 +101,7 @@ public struct CustomAtlasModel
 }
 
 
+[Serializable]
 public struct CustomMeshData
 {
     public string ID;
@@ -100,6 +119,7 @@ public struct CustomMeshData
 }
 
 
+[Serializable]
 public struct CustomMeshModel
 {
     public string ID;
@@ -121,6 +141,7 @@ public struct CustomMeshModel
 }
 
 
+[Serializable]
 public struct MeshModel
 {
     public string ID;
@@ -144,6 +165,7 @@ public struct MeshModel
 }
 
 
+[Serializable]
 public struct ParticleGroupModel
 {
     public string ID;
@@ -168,6 +190,7 @@ public struct ParticleGroupModel
     }
 }
 
+[Serializable]
 public struct PrimitiveMeshModel
 {
     public MeshModel[] Data;

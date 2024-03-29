@@ -45,7 +45,7 @@ namespace Urchin.Managers
 
         #region Events
         public UnityEvent<OntologyNode> NodeVisibleEvent;
-        public UnityEvent<Converter<float, Color>, bool> ColormapChangedEvent;
+        public UnityEvent<Converter<float, Color>, bool, float, float> ColormapChangedEvent;
         #endregion
 
         #region Unity
@@ -271,7 +271,7 @@ namespace Urchin.Managers
             else
                 _colormapEnabled = false;
 
-            ColormapChangedEvent.Invoke(_localColormap.Value, _colormapEnabled);
+            ColormapChangedEvent.Invoke(_localColormap.Value, _colormapEnabled, 0f, 1f);
         }
 
 
@@ -358,6 +358,11 @@ namespace Urchin.Managers
             foreach (OntologyNode node in VisibleNodes)
                 node.SetVisibility(false, OntologyNode.OntologyNodeSide.All);
             VisibleNodes.Clear();
+
+            if (_colormapEnabled)
+            {
+                SetAreaColormap("");
+            }
         }
 
         /// <summary>
