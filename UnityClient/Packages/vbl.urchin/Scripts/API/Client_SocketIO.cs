@@ -335,7 +335,7 @@ namespace Urchin.API
             {
                 case "all":
                     foreach (var action in ClearAll)
-                        action.Invoke();
+                        action?.Invoke();
                     break;
                 case "probe":
                     ClearProbes.Invoke();

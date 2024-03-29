@@ -25,7 +25,8 @@ class Atlas:
         self.loaded = False
         self.data = AtlasModel(
             name = atlas_name,
-            areas = []
+            areas = [],
+            colormap=ColormapModel()
         )
 
         current_script_directory = Path(__file__).resolve().parent

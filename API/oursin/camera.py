@@ -365,7 +365,7 @@ class Camera:
 		client.sio.emit('SetCameraLerpRotation', CameraRotationModel(
 			start_rotation=utils.formatted_vector3(start_rotation),
 			end_rotation=utils.formatted_vector3(end_rotation)
-		))
+		).to_string())
 
 		for frame in range(n_frames):
 			perc = frame / n_frames
@@ -373,7 +373,7 @@ class Camera:
 			client.sio.emit('SetCameraLerp', FloatData(
 				id=self.id,
 				value=perc
-			))
+			).to_string())
 			
 			img = await self.screenshot([size[0], size[1]])
 			image_array = np.array(img)
