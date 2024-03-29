@@ -1,5 +1,5 @@
-using System;
 using UnityEngine;
+using System;
 
 [Serializable]
 public struct AtlasModel
@@ -18,6 +18,7 @@ public struct AtlasModel
     }
 }
 
+using System;
 
 [Serializable]
 public struct CameraModel
@@ -55,6 +56,7 @@ public enum CameraMode
     perspective = 1,
 }
 
+using System;
 
 [Serializable]
 public struct CameraRotationModel
@@ -68,6 +70,8 @@ public struct CameraRotationModel
         EndRotation = endRotation;
     }
 }
+
+using System;
 
 [Serializable]
 public struct ColormapModel
@@ -84,6 +88,7 @@ public struct ColormapModel
     }
 }
 
+using System;
 
 [Serializable]
 public struct CustomAtlasModel
@@ -100,6 +105,7 @@ public struct CustomAtlasModel
     }
 }
 
+using System;
 
 [Serializable]
 public struct CustomMeshData
@@ -118,6 +124,7 @@ public struct CustomMeshData
     }
 }
 
+using System;
 
 [Serializable]
 public struct CustomMeshModel
@@ -140,6 +147,7 @@ public struct CustomMeshModel
     }
 }
 
+using System;
 
 [Serializable]
 public struct MeshModel
@@ -164,6 +172,7 @@ public struct MeshModel
     }
 }
 
+using System;
 
 [Serializable]
 public struct ParticleGroupModel
@@ -190,6 +199,8 @@ public struct ParticleGroupModel
     }
 }
 
+using System;
+
 [Serializable]
 public struct PrimitiveMeshModel
 {
@@ -201,6 +212,7 @@ public struct PrimitiveMeshModel
     }
 }
 
+using System;
 
 [Serializable]
 public struct StructureModel
