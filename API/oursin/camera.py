@@ -409,5 +409,18 @@ def set_light_camera(camera_name = None):
 		client.sio.emit('ResetLightLink')
 	else:
 		client.sio.emit('SetLightLink', camera_name)
+
+def set_brain_rotation(yaw):
+	"""Set the brain's rotation, independent of the camera. This is useful when you want to animate
+	a brain rotating for a video. You can set the camera angle you want, and then on each frame
+	update the brain rotation, as needed.
+
+	Parameters
+	----------
+	yaw : float
+		Yaw angle for the brain, independent of the camera
+	"""
+
+	client.sio.emit('urchin-brain-yaw', FloatData(id='', value=yaw))
 	
 main = Camera(main = True)

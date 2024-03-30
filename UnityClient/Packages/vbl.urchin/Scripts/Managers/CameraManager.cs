@@ -21,6 +21,9 @@ namespace Urchin.Managers
         [SerializeField] private AtlasManager _areaManager;
         [SerializeField] private Canvas _uiCanvas;
 
+        // Used for doing independent brain Yaw rotations
+        [SerializeField] private Transform _brainTransform;
+
         [SerializeField] private List<GameObject> _cameraUIGOs;
         #endregion
 
@@ -49,6 +52,7 @@ namespace Urchin.Managers
         {
             Client_SocketIO.SetCameraLerpRotation += SetLerpStartEnd;
             Client_SocketIO.SetCameraLerp += SetLerp;
+            Client_SocketIO.CameraBrainYaw += SetBrainYaw;
 
             Client_SocketIO.SetCameraTarget += SetCameraTarget;
             Client_SocketIO.SetCameraRotation += SetCameraRotation;
@@ -262,6 +266,11 @@ namespace Urchin.Managers
             //set everything to false except for given camera
             foreach (var kvp in _cameras)
                 kvp.Value.SetCameraControl(kvp.Key == cameraName);
+        }
+
+        public void SetBrainYaw(FloatData data)
+        {
+            _brainTransform.rotation = Quaternion.Euler(0f, data.Value, 0f);
         }
         #endregion
 

@@ -167,6 +167,7 @@ namespace Urchin.API
         // New Camera
         public static Action<CameraRotationModel> SetCameraLerpRotation;
         public static Action<FloatData> SetCameraLerp;
+        public static Action<FloatData> CameraBrainYaw;
 
         // Old Camera
         public static Action<Dictionary<string, List<float>>> SetCameraTarget;
@@ -187,6 +188,8 @@ namespace Urchin.API
             //New
             manager.Socket.On<string>("SetCameraLerpRotation", x => SetCameraLerpRotation.Invoke(JsonUtility.FromJson<CameraRotationModel>(x)));
             manager.Socket.On<string>("SetCameraLerp", x => SetCameraLerp.Invoke(JsonUtility.FromJson<FloatData>(x)));
+
+            manager.Socket.On<string>("urchin-brain-yaw", x => CameraBrainYaw.Invoke(JsonUtility.FromJson<FloatData>(x)));
 
             //Old
             manager.Socket.On<Dictionary<string, List<float>>>("SetCameraTarget", x => SetCameraTarget.Invoke(x));
