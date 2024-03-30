@@ -421,6 +421,6 @@ def set_brain_rotation(yaw):
 		Yaw angle for the brain, independent of the camera
 	"""
 
-	client.sio.emit('urchin-brain-yaw', FloatData(id='', value=yaw))
+	client.sio.emit('urchin-brain-yaw', FloatData(id='', value=yaw).to_string())
 	
 main = Camera(main = True)
