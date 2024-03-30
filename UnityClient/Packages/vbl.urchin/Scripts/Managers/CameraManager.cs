@@ -198,7 +198,7 @@ namespace Urchin.Managers
             {
                 if (_cameras.ContainsKey(kvp.Key))
                 {
-                    _cameras[kvp.Key].SetCameraYAngle(kvp.Value);
+                    _cameras[kvp.Key].IncrementRoll(kvp.Value);
                 }
             }
         }
