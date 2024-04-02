@@ -22,7 +22,7 @@ namespace Urchin.Managers
         [SerializeField] private Canvas _uiCanvas;
 
         // Used for doing independent brain Yaw rotations
-        [SerializeField] private Transform _brainTransform;
+        [SerializeField] private List<Transform> _yawTransforms;
 
         [SerializeField] private List<GameObject> _cameraUIGOs;
         #endregion
@@ -270,7 +270,8 @@ namespace Urchin.Managers
 
         public void SetBrainYaw(FloatData data)
         {
-            _brainTransform.rotation = Quaternion.Euler(0f, data.Value, 0f);
+            foreach (Transform t in _yawTransforms)
+                t.rotation = Quaternion.Euler(0f, data.Value, 0f);
         }
         #endregion
 

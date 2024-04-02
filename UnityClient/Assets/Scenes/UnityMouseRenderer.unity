@@ -1547,6 +1547,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 756099984625368948, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _yawTransforms.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 756099984625368948, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _cameraUIGOs.Array.data[0]
       value: 
       objectReference: {fileID: 1475529114}
@@ -1562,6 +1566,14 @@ PrefabInstance:
       propertyPath: _cameraUIGOs.Array.data[3]
       value: 
       objectReference: {fileID: 126242954}
+    - target: {fileID: 756099984625368948, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _yawTransforms.Array.data[0]
+      value: 
+      objectReference: {fileID: 1755260412}
+    - target: {fileID: 756099984625368948, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _yawTransforms.Array.data[1]
+      value: 
+      objectReference: {fileID: 1244276139}
     - target: {fileID: 1424787917973710077, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -7906,6 +7918,11 @@ MeshFilter:
 --- !u!20 &1754766756 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 3007811191311767224, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+  m_PrefabInstance: {fileID: 431647798}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1755260412 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2757818260648243688, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
   m_PrefabInstance: {fileID: 431647798}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1756174612

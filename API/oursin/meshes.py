@@ -41,8 +41,8 @@ class Mesh:
 
     self.data = MeshModel(
       id = str(counter),
-      shape = 'cube',
-      position = utils.formatted_vector3(position/1000),
+      shape = 'sphere',
+      position = utils.formatted_vector3([x/1000 for x in position]),
       color = utils.formatted_color(color),
       scale = utils.formatted_vector3(scale),
       material = material,
