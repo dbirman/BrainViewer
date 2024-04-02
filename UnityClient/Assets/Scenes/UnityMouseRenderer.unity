@@ -1539,6 +1539,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 858013925}
     - target: {fileID: 756099984625368948, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _brainTransform
+      value: 
+      objectReference: {fileID: 1244276139}
+    - target: {fileID: 756099984625368948, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _cameraUIGOs.Array.size
       value: 4
       objectReference: {fileID: 0}
@@ -4216,34 +4220,6 @@ PrefabInstance:
       value: BrainAtlas
       objectReference: {fileID: 0}
     - target: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
@@ -5092,6 +5068,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1239162977}
   m_Mesh: {fileID: -2432090755550338912, guid: 6b3d369182b6b8f459d95e036971b2af, type: 3}
+--- !u!4 &1244276139 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3131845913727300861, guid: ee09154d7a7870a419882ff36080d765, type: 3}
+  m_PrefabInstance: {fileID: 1040005262}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1271370572
 GameObject:
   m_ObjectHideFlags: 0

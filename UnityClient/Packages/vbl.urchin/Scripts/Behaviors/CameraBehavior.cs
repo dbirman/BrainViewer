@@ -16,14 +16,10 @@ namespace Urchin.Behaviors
 
         [SerializeField] Camera _orthoCamera;
         [SerializeField] Camera _perspectiveCamera;
-
         #endregion
 
+        #region Properties
         public string Name;
-
-        private RenderTexture _renderTexture;
-
-
         public RenderTexture RenderTexture
         {
             get
@@ -53,11 +49,11 @@ namespace Urchin.Behaviors
                 }
             }
         }
+        #endregion
 
-        private void Update()
-        {
-            //Debug.Log(_cropWindowRT.rect.position);
-        }
+        #region Variables
+        private RenderTexture _renderTexture;
+        #endregion
 
         #region Public functions
 
@@ -189,7 +185,7 @@ namespace Urchin.Behaviors
             public byte[] data;
         }
 
-        public void SetCameraYAngle(float yaw)
+        public void IncrementRoll(float yaw)
         {
             Vector3 angles = _cameraControl.PitchYawRoll;
             angles.y += yaw;

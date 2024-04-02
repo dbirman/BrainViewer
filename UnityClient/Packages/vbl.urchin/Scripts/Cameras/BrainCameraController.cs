@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -202,13 +199,23 @@ public class BrainCameraController : MonoBehaviour
             }
         }
     }
-
     void ApplyBrainCameraPositionAndRotation()
     {
-        _mainCameraRotator.transform.localRotation = _initialRotation * Quaternion.Euler(_pitchYawRoll);
+        //See the bottom example for that.Yaw locally, pitch globally is the order you want if you're manipulating a spinning globe,
+        //and you want it to always yaw around ITS north & south poles, but pitch toward/away from YOU (here taken as a fixed
+        //observer in global space). When controlling the viewpoint, you want to do the opposite: pitch around YOUR x axis
+        //(running from your left to right ear, for example), but yaw around the WORLD's y axis(parallel to the gravity vector)
+
+        _mainCameraRotator.transform.rotation = _initialRotation;
+
+        _mainCameraRotator.transform.Rotate(_mainCameraRotator.transform.right, _pitchYawRoll.x);
+        _mainCameraRotator.transform.Rotate(Vector3.up, _pitchYawRoll.y);
+        _mainCameraRotator.transform.Rotate(Vector3.forward, _pitchYawRoll.z);
+        
+
+        //_mainCameraRotator.transform.rotation = _initialRotation * Quaternion.Euler(_pitchYawRoll);
         RotationChangedEvent.Invoke(_pitchYawRoll);
     }
-
     void ClearMouseDown()
     {
         mouseDownOverBrain = false;
