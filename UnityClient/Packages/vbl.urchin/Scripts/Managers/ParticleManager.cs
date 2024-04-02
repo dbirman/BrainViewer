@@ -13,6 +13,8 @@ public class ParticleManager : MonoBehaviour
     private Dictionary<string, int> _particleMapping;
     private Dictionary<string, Material> _particleMaterials;
 
+    private ParticleSystem.Particle[] _particles;
+
     #region Unity
     private void Awake()
     {
@@ -34,6 +36,8 @@ public class ParticleManager : MonoBehaviour
         //Client_SocketIO.SetParticleShape += SetShape;
         Client_SocketIO.SetParticleColor += SetColor;
         Client_SocketIO.SetParticleMaterial += SetMaterial;
+
+        // Note to self: you can delete particles by setting lifetime to -1
 
         Client_SocketIO.ClearParticles += Clear;
     }
@@ -57,6 +61,8 @@ public class ParticleManager : MonoBehaviour
 
             _particleMapping.Add(particleName, _particleSystem.particleCount - 1);
         }
+
+        _particleSystem.GetParticles(_particles);
     }
 
     public void Clear()
@@ -67,47 +73,43 @@ public class ParticleManager : MonoBehaviour
 
     public void SetPosition(Dictionary<string, float[]> particlePositions)
     {
-        ParticleSystem.Particle[] particles = new ParticleSystem.Particle[_particleSystem.particleCount];
-        int nParticles = _particleSystem.GetParticles(particles);
+        //ParticleSystem.Particle[] particles = new ParticleSystem.Particle[_particleSystem.particleCount];
+        //int nParticles = _particleSystem.GetParticles(particles);
 
         foreach (var kvp in particlePositions)
         {
             Vector3 coordU = new Vector3(kvp.Value[0], kvp.Value[1], kvp.Value[2]);
-            particles[_particleMapping[kvp.Key]].position = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(coordU, false);
+            _particles[_particleMapping[kvp.Key]].position = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(coordU, false);
         }
 
-        _particleSystem.SetParticles(particles);
+        _particleSystem.SetParticles(_particles);
     }
 
-    public void SetSize(Dictionary<string, float> particleSizes)
+    public void SetSize(IDListFloatList particleSizes)
     {
-        ParticleSystem.Particle[] particles = new ParticleSystem.Particle[_particleSystem.particleCount];
-        int nParticles = _particleSystem.GetParticles(particles);
 
-        foreach (var kvp in particleSizes)
+        for (int i = 0; i < particleSizes.IDs.Length; i++)
         {
             // TODO: Replace with vertex stream size property in Shader Graph
-            particles[_particleMapping[kvp.Key]].startSize = kvp.Value;
+            _particles[_particleMapping[particleSizes.IDs[i]]].startSize = particleSizes.Values[i];
         }
 
-        _particleSystem.SetParticles(particles);
+        _particleSystem.SetParticles(_particles);
     }
 
     public void SetColor(Dictionary<string, string> particleColors)
     {
-        ParticleSystem.Particle[] particles = new ParticleSystem.Particle[_particleSystem.particleCount];
-        int nParticles = _particleSystem.GetParticles(particles);
 
         foreach (var kvp in particleColors)
         {
             Color newColor;
             if (ColorUtility.TryParseHtmlString(kvp.Value, out newColor))
             {
-                particles[_particleMapping[kvp.Key]].startColor = newColor;
+                _particles[_particleMapping[kvp.Key]].startColor = newColor;
             }
         }
 
-        _particleSystem.SetParticles(particles);
+        _particleSystem.SetParticles(_particles);
     }
 
     public void SetMaterial(string materialName)

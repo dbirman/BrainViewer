@@ -4,6 +4,8 @@ from . import client
 import warnings
 from . import utils
 
+from vbl_aquarium.models.generic import IDListFloatList
+
 ## Particle system
 counter = 0
 class Particle:
@@ -184,26 +186,31 @@ def set_sizes(particles_list, sizes_list):
 	particles_list = utils.sanitize_list(particles_list)
 	sizes_list = utils.sanitize_list(sizes_list)
 
-	neurons_sizes = {}
+	data = IDListFloatList(
+		ids = [],
+		values= []
+	)
+
 	for i in range(len(particles_list)):
 		neuron = particles_list[i]
 		if neuron.in_unity:
-			neurons_sizes[neuron.id] = utils.sanitize_float(sizes_list[i])
+			data.ids.append(neuron.id)
+			data.values.append(utils.sanitize_float(sizes_list[i]))
 		else:
 			warnings.warn(f"Particle with id {neuron.id} does not exist in Unity, call create method first.")
 	
-	_set_sizes(neurons_sizes)
+	_set_sizes(data)
 
 def _set_sizes(data):
 	"""Set particles sizes when already wrapped
 	
 	Parameters
 	----------
-	neurons_sizes: dictionaryy of neuron id: float of particle size
+	neurons_sizes: IDListFloatList
 	
 	Examples
 	--------
-	>>> urchin.particles._set_sizes({p1:0.01, p2:0.02, p3:0.03})
+	>>> urchin.particles._set_sizes(IDListFloatList(ids=[0,1,2], value=[1, 1, 1]))
 	"""   
 	client.sio.emit('SetParticleSize', data)
 
