@@ -25,9 +25,10 @@ from . import volumes
 from . import texture
 from . import custom
 from . import dock
-
+from . import ui
 # load the colors
 from . import colors
 
 # load the atlases
 from .atlas import *
+

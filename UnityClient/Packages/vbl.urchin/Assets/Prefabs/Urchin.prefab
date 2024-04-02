@@ -5266,7 +5266,7 @@ MonoBehaviour:
   IDChangedEvent:
     m_PersistentCalls:
       m_Calls: []
-  localhost: 0
+  localhost: 1
 --- !u!114 &2125811993335669634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5347,7 +5347,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54cf7c9e3abd4c54e876992ba07441ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _apiNames: []
+  _atlasNames: []
+  _availableOnWebGL: 
   NodeVisibleEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  ColormapChangedEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &5566263359961949564

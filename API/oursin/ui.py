@@ -1,7 +1,8 @@
 """Interactive components within notebooks"""
-
+from . import particles
 global_binned_spikes = None
 global_prepped_data = None
+neurons = None
 
 # def slider_widget(function_call, slider_parameters):
 #     """Creates a slider in the notebook, displays results of the input function
@@ -65,7 +66,7 @@ def spikes_bin_data(spike_times_raw_data, spike_clusters_data, bin_size=0.02):
     global_binned_spikes = binned_spikes
     return binned_spikes
 
-def spikes_binned_event_average(event_start, event_ids, binned_spikes = global_binned_spikes, bin_size_sec=0.02, window_start_sec = 0.1, window_end_sec = 0.5):
+def spikes_binned_event_average(event_start, event_ids, binned_spikes = None, bin_size_sec=0.02, window_start_sec = 0.1, window_end_sec = 0.5):
     """Prepares intermediate data table and averages binned spikes over a given time window
     
     Parameters
@@ -96,6 +97,10 @@ def spikes_binned_event_average(event_start, event_ids, binned_spikes = global_b
         import numpy as np
     except ImportError:
         raise ImportError("Numpy package is not installed. Please pip install numpy to use this function.")
+    global global_binned_spikes
+
+    if binned_spikes is None:
+        binned_spikes = global_binned_spikes
     
     bintime_prev = int(window_start_sec * 50)
     bintime_post = int(window_end_sec * 50 + 1)
@@ -131,7 +136,7 @@ def spikes_binned_event_average(event_start, event_ids, binned_spikes = global_b
     global_prepped_data = final_avg
     return final_avg
 
-def slope_viz_stimuli_per_neuron(prepped_data = global_prepped_data, t=-100, neuron_id = 0):
+def slope_viz_stimuli_per_neuron(prepped_data = None, t=-100, neuron_id = 0):
     """Visualizes and creates interactive plot for the average of each stimulus per neuron
     
     Parameters
@@ -156,6 +161,10 @@ def slope_viz_stimuli_per_neuron(prepped_data = global_prepped_data, t=-100, neu
     except ImportError:
         raise ImportError("Matplotlib package is not installed. Please pip install matplotlib to use this function.")
     
+    global global_prepped_data
+    if prepped_data is None:
+        prepped_data = global_prepped_data
+
     # Plotting data:
     for i in range(0,prepped_data.shape[1]):
         y = prepped_data[neuron_id][i]
@@ -179,8 +188,26 @@ def slope_viz_stimuli_per_neuron(prepped_data = global_prepped_data, t=-100, neu
    
     # plt.legend()
     plt.show()
+    
+def update_neuron_sizing(stim_id, t, prepped_data = None):
+        global neurons
+        global global_prepped_data
+    
+        if prepped_data is None:
+            prepped_data = global_prepped_data
 
-def slope_viz_neurons_per_stimuli(prepped_data = global_prepped_data, t=-100, stim_id = 0):
+        t_id = round((t+100)/20)
+            
+        size_list = []
+        for i in range(prepped_data.shape[0]):
+            size = round(prepped_data[i][stim_id][t_id]/100,1)
+            # size = (round(row.percentile_rank,1))
+            size_list.append(size)
+
+
+        particles.set_sizes(neurons, size_list)
+
+def slope_viz_neurons_per_stimuli(prepped_data = None, t=-100, stim_id = 0):
     """Visualizes and creates interactive plot for the average of every neuron per stimulus
     
     Parameters
@@ -204,6 +231,11 @@ def slope_viz_neurons_per_stimuli(prepped_data = global_prepped_data, t=-100, st
         import matplotlib.pyplot as plt
     except ImportError:
         raise ImportError("Matplotlib package is not installed. Please pip install matplotlib to use this function.")
+     
+    global global_prepped_data
+    if prepped_data is None:
+        prepped_data = global_prepped_data
+
      # Plotting data:
     for i in range(0,prepped_data.shape[0]):
         y = prepped_data[i][stim_id]
@@ -221,7 +253,9 @@ def slope_viz_neurons_per_stimuli(prepped_data = global_prepped_data, t=-100, st
 
     plt.show()
 
-def plot_appropriate_interactive_graph(prepped_data = global_prepped_data, view = "stim", window_start_sec = 0.1, window_end_sec = 0.5):
+    update_neuron_sizing(stim_id, t)
+
+def plot_appropriate_interactive_graph(prepped_data = None, view = "stim", window_start_sec = 0.1, window_end_sec = 0.5):
     """Plots appropriate interactive graph based on view
     
     Parameters
@@ -244,7 +278,11 @@ def plot_appropriate_interactive_graph(prepped_data = global_prepped_data, view 
     except ImportError:
         raise ImportError("Widgets package is not installed. Please pip install ipywidgets to use this function.")
         
-    time_slider = widgets.IntSlider(value=-1e3 * window_start_sec, min=--1e3 * window_start_sec, max=5e3 * window_start_sec, step=5, description='Time')
+    global global_prepped_data
+    if prepped_data is None:
+        prepped_data = global_prepped_data
+    
+    time_slider = widgets.IntSlider(value=-1e3 * window_start_sec, min=-1e3 * window_start_sec, max=5e3 * window_start_sec, step=5, description='Time')
     time_slider.layout.width = '6.53in'
     time_slider.layout.margin = '0 -4px'
     
@@ -274,6 +312,8 @@ def plot_appropriate_interactive_graph(prepped_data = global_prepped_data, view 
         # Display the widgets and the output
         display(widgets.VBox([neuron_dropdown,time_slider]))
         display(output)
+
+    
 
 def plot_event_average_interaction(spiking_times, spiking_clusters, event_start, event_ids, view = "stim"):
     """Wrapper function that takes in raw data, and goes through entire process to return plots
