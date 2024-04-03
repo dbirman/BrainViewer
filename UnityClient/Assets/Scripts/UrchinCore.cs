@@ -225,7 +225,7 @@ public class UrchinCore : MonoBehaviour
     }
 
     public void KeyExplodeImplode(float explodeTime)
-    {
+    { 
         exploded = !exploded;
         if (exploded)
             StartCoroutine(AnimateExplodeHelper(explodeTime));
@@ -244,7 +244,8 @@ public class UrchinCore : MonoBehaviour
 
     public void SetMainCameraMode(bool orthographic)
     {
-        _mainCameraBehavior.SetCameraMode(orthographic);
+        _mainCameraBehavior.Data.Mode = orthographic ? CameraMode.orthographic : CameraMode.perspective;
+        _mainCameraBehavior.UpdateSettings();
         _uiCanvas.worldCamera = _mainCameraBehavior.ActiveCamera;
     }
 

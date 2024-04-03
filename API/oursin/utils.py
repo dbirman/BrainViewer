@@ -140,6 +140,18 @@ def formatted_vector3(list_of_float):
         z = list_of_float[2]
     )
 
+def formatted_vector2(list_of_float):
+  """Convert a list of floats to a Vector2
+
+  Parameters
+  ----------
+  list_of_float : list
+  """
+  return Vector2(
+      x = list_of_float[0],
+      y = list_of_float[1]
+  )
+
 def formatted_color(list_of_float):
     """Converts a list of floats to a Color. Values should be 0->1
 

@@ -33,6 +33,7 @@ namespace Urchin.Managers
 
         private Quaternion _startRotation;
         private Quaternion _endRotation;
+
         #endregion
 
         #region Unity functions
@@ -54,17 +55,6 @@ namespace Urchin.Managers
             Client_SocketIO.SetCameraLerp += SetLerp;
             Client_SocketIO.CameraBrainYaw += SetBrainYaw;
 
-            Client_SocketIO.SetCameraTarget += SetCameraTarget;
-            Client_SocketIO.SetCameraRotation += SetCameraRotation;
-            Client_SocketIO.SetCameraTargetArea += SetCameraTargetArea;
-            Client_SocketIO.SetCameraZoom += SetCameraZoom;
-            Client_SocketIO.SetCameraPan += SetCameraPan;
-            Client_SocketIO.SetCameraMode += SetCameraMode;
-            Client_SocketIO.SetCameraColor += SetCameraColor;
-            Client_SocketIO.SetCameraControl += SetCameraControl;
-            Client_SocketIO.RequestScreenshot += RequestScreenshot;
-            Client_SocketIO.SetCameraYAngle += SetCameraYAngle;
-            Client_SocketIO.CreateCamera += CreateCamera;
             Client_SocketIO.DeleteCamera += DeleteCamera;
         }
 
@@ -73,41 +63,56 @@ namespace Urchin.Managers
 
         #region Public camera functions
 
-        public void CreateCamera(List<string> cameraNames)
+        public void UpdateData(CameraModel data)
         {
-            
-            //instantiating game object w camera component
-            foreach (string cameraName in cameraNames)
+            if (_cameras.ContainsKey(data.ID))
             {
-                if (_cameras.ContainsKey(cameraName))
-                {
-                    Debug.LogWarning($"Camera {cameraName} was created twice. The camera will not be re-created");
-                    continue;
-                }
+                _cameras[data.ID].Data = data;
+                _cameras[data.ID].UpdateSettings();
+            }
+            else
+            {
+                CreateCamera(data);
+            }
+
+        }
+
+        public void CreateCamera(CameraModel data)
+        {
+            string cameraName = data.ID;
+            
+            if (_cameras.ContainsKey(cameraName))
+            {
+                Debug.LogWarning($"Camera {cameraName} was created twice. The camera will not be re-created");
+                return;
+            }
 
 #if UNITY_EDITOR
-                Debug.Log($"{cameraName} created");
+            Debug.Log($"{cameraName} created");
 #endif
-                GameObject tempObject = Instantiate(_cameraPrefab);
-                tempObject.name = $"camera_{cameraName}";
-                CameraBehavior cameraBehavior = tempObject.GetComponent<CameraBehavior>();
-                cameraBehavior.RenderTexture = textures.Pop();
-                cameraBehavior.Name = cameraName;
-                _cameras.Add(cameraName, cameraBehavior);
-            }
+            GameObject tempObject = Instantiate(_cameraPrefab);
+            tempObject.name = $"camera_{cameraName}";
+            CameraBehavior cameraBehavior = tempObject.GetComponent<CameraBehavior>();
+            cameraBehavior.RenderTexture = textures.Pop();
+            cameraBehavior.Name = cameraName;
+            _cameras.Add(cameraName, cameraBehavior);
+
             UpdateVisibleUI();
 
         }
 
-        public void DeleteCamera(List<string> cameraNames)
+        public void DeleteCamera(IDData data)
         {
-            foreach (string cameraName in cameraNames)
+            if (_cameras.ContainsKey(data.ID))
             {
-                textures.Push(_cameras[cameraName].RenderTexture);
-                GameObject.Destroy(_cameras[cameraName].gameObject);
-                _cameras.Remove(cameraName);
+                textures.Push(_cameras[data.ID].RenderTexture);
+                GameObject.Destroy(_cameras[data.ID].gameObject);
+                _cameras.Remove(data.ID);
+
+                UpdateVisibleUI();
             }
-            UpdateVisibleUI();
+            else
+                Client_SocketIO.LogError($"Cannot delete. Camera {data.ID} does not exist.");
         }
 
         private void UpdateVisibleUI()
@@ -116,18 +121,6 @@ namespace Urchin.Managers
                 _cameraUIGOs[i].SetActive(i < (_cameras.Count - 1));
         }
 
-        //each function below works by first checking if camera exits in dictionary, and then calling cameraBehavior function
-        public void SetCameraRotation(Dictionary<string, List<float>> cameraRotation)
-        {
-            foreach (var kvp in cameraRotation)
-            {
-                if (_cameras.ContainsKey(kvp.Key))
-                {
-                    Vector3 yawPitchRoll = new Vector3(kvp.Value[0], kvp.Value[1], kvp.Value[2]);
-                    _cameras[kvp.Key].SetCameraRotation(yawPitchRoll);
-                }
-            }
-        }
 
         /// <summary>
         /// Set the startRotation/endRotation quaternions
@@ -151,32 +144,6 @@ namespace Urchin.Managers
             }
         }
 
-        public void SetCameraZoom(Dictionary<string, float> cameraZoom)
-        {
-            foreach (var kvp in cameraZoom)
-            {
-                if (_cameras.ContainsKey(kvp.Key))
-                {
-                    _cameras[kvp.Key].SetCameraZoom(kvp.Value);
-                }
-            }
-        }
-
-        public void SetCameraMode(Dictionary<string, string> cameraMode)
-        {
-            foreach (var kvp in cameraMode)
-            {
-                if (_cameras.ContainsKey(kvp.Key))
-                {
-                    _cameras[kvp.Key].SetCameraMode(kvp.Value);
-                }
-
-                if (kvp.Key == "CameraMain")
-                {
-                    _uiCanvas.worldCamera = _cameras[kvp.Key].ActiveCamera;
-                }
-            }
-        }
 
         public void SetCameraColor(Dictionary<string, string> cameraColor)
         {
@@ -259,13 +226,6 @@ namespace Urchin.Managers
                     _cameras[kvp.Key].SetCameraPan(kvp.Value);
                 }
             }
-        }
-
-        public void SetCameraControl(string cameraName)
-        {
-            //set everything to false except for given camera
-            foreach (var kvp in _cameras)
-                kvp.Value.SetCameraControl(kvp.Key == cameraName);
         }
 
         public void SetBrainYaw(FloatData data)

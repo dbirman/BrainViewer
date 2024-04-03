@@ -316,6 +316,20 @@ public struct StringList
 
 
 [Serializable]
+public struct Vector2Data
+{
+    public string ID;
+    public Vector2 Value;
+
+    public Vector2Data(string id, Vector2 value)
+    {
+        ID = id;
+        Value = value;
+    }
+}
+
+
+[Serializable]
 public struct Vector3Data
 {
     public string ID;

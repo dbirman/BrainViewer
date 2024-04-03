@@ -49,6 +49,8 @@ namespace Urchin.Behaviors
                 }
             }
         }
+
+        public CameraModel Data;
         #endregion
 
         #region Variables
@@ -56,28 +58,15 @@ namespace Urchin.Behaviors
         #endregion
 
         #region Public functions
-
-        public void SetCameraControl(bool controllable)
+        public void UpdateSettings()
         {
-            _cameraControl.UserControllable = controllable;
+            _cameraControl.UserControllable = Data.Controllable;
+            _cameraControl.SetBrainAxisAngles(Data.Rotation);
+            _cameraControl.SetZoom(Data.Zoom);
+            SetCameraMode(Data.Mode.Equals("orthographic"));
         }
 
-        public void SetCameraRotation(Vector3 yawPitchRoll)
-        {
-            _cameraControl.SetBrainAxisAngles(yawPitchRoll);
-        }
-
-        public void SetCameraZoom(float obj)
-        {
-            _cameraControl.SetZoom(obj);
-        }
-
-        public void SetCameraMode(string mode)
-        {
-            SetCameraMode(mode.Equals("orthographic"));
-        }
-
-        public void SetCameraMode(bool orthographic)
+        private void SetCameraMode(bool orthographic)
         {
             if (orthographic)
             {

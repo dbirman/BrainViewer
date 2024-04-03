@@ -12,9 +12,9 @@ import io
 import json
 import asyncio
 
-from vbl_aquarium.models.urchin import CameraRotationModel, CameraModel
-from vbl_aquarium.models.generic import FloatData
-		  
+from vbl_aquarium.models.urchin import CameraRotationModel, CameraModel, CameraMode
+from vbl_aquarium.models.generic import FloatData, IDData, Vector2Data
+			
 receive_totalBytes = {}
 receive_bytes = {}
 receive_camera = {}
@@ -70,8 +70,10 @@ class Camera:
 		counter += 1	
 
 		self.data = CameraModel(
-			id = 'CameraMain' if main else f'Camera{counter}
+			id = 'CameraMain' if main else f'Camera{counter}'
 		)
+		
+		self._update()
 
 		self.in_unity = True
 		self.image_received_event = asyncio.Event()
@@ -80,32 +82,19 @@ class Camera:
 		self.background_color = '#ffffff'
 
 	def _update(self):
-		client.sio.emit('UpdateCamera', self.data.to_string())
-
-	def create(self):
-		"""Creates camera
-		
-		Parameters
-		---------- 
-		none
-
-		Examples
-		>>>c1 = urchin.camera.Camera()
-		"""
+		client.sio.emit('urchin-camera-update', self.data.to_string())
 
 	def delete(self):
 		"""Deletes camera
 		
-		Parameters
-		---------- 
-		references object being deleted
-
 		Examples
+		--------
 		>>>c1.delete()
 		"""
 		if self.in_unity == False:
 			raise Exception("Camera is not created. Please create camera before calling method.")
-		client.sio.emit('DeleteCamera', [self.id])
+			
+		client.sio.emit('urchin-camera-delete', IDData(id = self.data.id).to_string())
 		self.in_unity = False
 
 	def set_target_coordinate(self,camera_target_coordinate):
@@ -114,7 +103,7 @@ class Camera:
 		Parameters
 		----------
 		camera_target_coordinate : float list
-		  list of coordinates in ap, ml, dv in um
+			list of coordinates in ap, ml, dv in um
 
 		Examples
 		--------
@@ -122,34 +111,9 @@ class Camera:
 		"""
 		if self.in_unity == False:
 			raise Exception("Camera is not created. Please create camera before calling method.")
-		
-		camera_target_coordinate = utils.sanitize_vector3(camera_target_coordinate)
-		self.target = camera_target_coordinate
-		client.sio.emit('SetCameraTarget', {self.id: camera_target_coordinate})
-
-	# temporarily removed
-	# def set_position(self, position, preserve_target = True):
-	# 	"""Set the camera position in CCF space in um relative to CCF (0,0,0), coordinates can be outside CCF space. 
-
-	# 	Parameters
-	# 	----------
-	# 	position : float list
-	# 		list of coordinates in ml/ap/dv in um
-	# 	preserve_target : bool, optional
-	# 		when True keeps the camera aimed at the current target, when False preserves the camera rotation, by default True
-		
-	# 	Examples
-	# 	--------
-	# 	>>> c1.set_position([500,1500,1000])
-	# 	"""
-	# 	if self.in_unity == False:
-	# 		raise Exception("Camera is not created. Please create camera before calling method.")
-		
-	# 	position = utils.sanitize_vector3(position)
-	# 	self.position = position
-	# 	packet = position.copy()
-	# 	packet.append(preserve_target)
-	# 	client.sio.emit('SetCameraPosition', {self.id: packet})
+			
+		self.data.target= utils.formatted_vector3(utils.sanitize_vector3(camera_target_coordinate))
+		self._update()
 
 	def set_rotation(self, rotation):
 		"""Set the camera rotation (pitch, yaw, roll). The camera is locked to a target, so this rotation rotates around the target.
@@ -181,8 +145,9 @@ class Camera:
 			rotation = [22.5,22.5,225]
 		
 		rotation = utils.sanitize_vector3(rotation)
-		self.rotation = rotation
-		client.sio.emit('SetCameraRotation', {self.id: rotation})
+		self.data.rotation= utils.formatted_vector3(rotation)
+		
+		self._update()
 
 	def set_zoom(self,zoom):
 		"""Set the camera zoom. 
@@ -199,28 +164,28 @@ class Camera:
 		if self.in_unity == False:
 			raise Exception("Camera is not created. Please create camera before calling method.")
 		
-		self.zoom = zoom
-		client.sio.emit('SetCameraZoom', {self.id: zoom})
+		self.data.zoom=utils.sanitize_float(zoom)
+		self._update()
 
-	def set_target_area(self, camera_target_area):
-		"""Set the camera rotation to look towards a target area
+	# def set_target_area(self, camera_target_area):
+	# 	"""Set the camera rotation to look towards a target area
 
-		Note: some long/curved areas have mesh centers that aren't the 'logical' center. For these areas, calculate a center yourself and use set_camera_target.
+	# 	Note: some long/curved areas have mesh centers that aren't the 'logical' center. For these areas, calculate a center yourself and use set_camera_target.
 
-		Parameters
-		----------
-		camera_target_area : string
-			area ID or acronym, append "-lh" or "-rh" for one-sided meshes
-		Examples
-		--------
-		>>> c1.set_target_area("grey-l") 
-		"""
-		if self.in_unity == False:
-			raise Exception("Camera is not created. Please create camera before calling method.")
+	# 	Parameters
+	# 	----------
+	# 	camera_target_area : string
+	# 		area ID or acronym, append "-lh" or "-rh" for one-sided meshes
+	# 	Examples
+	# 	--------
+	# 	>>> c1.set_target_area("grey-l") 
+	# 	"""
+	# 	if self.in_unity == False:
+	# 		raise Exception("Camera is not created. Please create camera before calling method.")
 		
-		camera_target_area
-		self.target = camera_target_area
-		client.sio.emit('SetCameraTargetArea', {self.id: camera_target_area})
+	# 	camera_target_area
+	# 	self.target = camera_target_area
+	# 	client.sio.emit('SetCameraTargetArea', {self.id: camera_target_area})
 
 	def set_pan(self,pan_x, pan_y):
 		"""Set camera pan coordinates
@@ -239,8 +204,8 @@ class Camera:
 		if self.in_unity == False:
 			raise Exception("Camera is not created. Please create camera before calling method.")
 		
-		self.pan = [pan_x, pan_y]
-		client.sio.emit('SetCameraPan',{self.id: self.pan})
+		self.data.pan= utils.formatted_vector2([pan_x, pan_y])
+		self._update()
 
 	def set_mode(self, mode):
 		"""Set camera perspective mode
@@ -256,8 +221,13 @@ class Camera:
 		"""
 		if self.in_unity == False:
 			raise Exception("Camera is not created. Please create camera before calling method.")
-		self.mode = mode
-		client.sio.emit('SetCameraMode', {self.id: mode})
+		
+		if mode == 'orthographic':
+				self.data.mode= CameraModel.CameraMode.orthographic
+		else:
+				self.data.mode= CameraModel.CameraMode.perspective
+				
+		self._update()
 
 	def set_background_color(self, background_color):
 		"""Set camera background color
@@ -273,9 +243,9 @@ class Camera:
 		if self.in_unity == False:
 			raise Exception("Camera is not created. Please create camera before calling method.")
 		
-		self.background_color = utils.sanitize_color(background_color)
+		self.data.background_color= utils.formatted_color(background_color)
 
-		client.sio.emit('SetCameraColor', {self.id: self.background_color})
+		self._update()
 
 	def set_controllable(self):
 		"""Sets camera to controllable
@@ -286,8 +256,9 @@ class Camera:
 		"""
 		if self.in_unity == False:
 			raise Exception("Camera is not created. Please create camera before calling method.")
-		self.controllable = True
-		client.sio.emit('SetCameraControl', self.id)
+		
+		self.data.controllable=True
+		self._update()
 		
 	async def screenshot(self, size=[1024,768], filename = 'return'):
 		"""Capture a screenshot, must be awaited
@@ -310,8 +281,13 @@ class Camera:
 
 		if size[0] > 15000 or size[1] > 15000:
 			raise Exception('(urchin.camera) Screenshots can''t exceed 15000x15000')
+			
+		data = Vector2Data(
+			id = self.data.id,
+			value= utils.formatted_vector2(size)
+		)
 		
-		client.sio.emit('RequestCameraImg', json.dumps({"name":self.id, "size":size}))
+		client.sio.emit('urchin-camera-screenshot-request', data.to_string()))
 
 		while not self.image_received:
 			await asyncio.sleep(0.1)
@@ -331,7 +307,7 @@ class Camera:
 			return img
 		
 	async def capture_video(self, file_name, start_rotation, end_rotation, frame_rate = 30,
-				   duration = 5, size = (1024,768)):
+					 duration = 5, size = (1024,768)):
 		"""Capture a video and save it to a file, must be awaited
 
 		Warning: start and stop rotations are currently implemented in Euler angles
@@ -365,7 +341,7 @@ class Camera:
 
 		n_frames = frame_rate * duration
 
-		client.sio.emit('SetCameraLerpRotation', CameraRotationModel(
+		client.sio.emit('urchin-camera-lerp-set', CameraRotationModel(
 			start_rotation=utils.formatted_vector3(start_rotation),
 			end_rotation=utils.formatted_vector3(end_rotation)
 		).to_string())
@@ -373,7 +349,7 @@ class Camera:
 		for frame in range(n_frames):
 			perc = frame / n_frames
 
-			client.sio.emit('SetCameraLerp', FloatData(
+			client.sio.emit('urchin-camera-lerp', FloatData(
 				id=self.id,
 				value=perc
 			).to_string())

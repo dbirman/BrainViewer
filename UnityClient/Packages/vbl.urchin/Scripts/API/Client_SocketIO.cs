@@ -171,41 +171,21 @@ namespace Urchin.API
         public static Action<string> RequestScreenshot;
 
         public static Action<CameraModel> UpdateCamera;
-
-        // Old Camera
-        public static Action<Dictionary<string, List<float>>> SetCameraTarget;
-        public static Action<Dictionary<string, List<float>>> SetCameraRotation;
-        public static Action<Dictionary<string, string>> SetCameraTargetArea;
-        public static Action<Dictionary<string, float>> SetCameraZoom;
-        public static Action<Dictionary<string, List<float>>> SetCameraPan;
-        public static Action<Dictionary<string, string>> SetCameraMode;
-        public static Action<Dictionary<string, string>> SetCameraColor;
-        public static Action<string> SetCameraControl;
-        public static Action<Dictionary<string, float>> SetCameraYAngle;
-        public static Action<List<string>> CreateCamera;
-        public static Action<List<string>> DeleteCamera;
+        public static Action<IDData> DeleteCamera;
 
         private void Start_Camera()
         {
             //New
-            manager.Socket.On<string>("SetCameraLerpRotation", x => SetCameraLerpRotation.Invoke(JsonUtility.FromJson<CameraRotationModel>(x)));
-            manager.Socket.On<string>("SetCameraLerp", x => SetCameraLerp.Invoke(JsonUtility.FromJson<FloatData>(x)));
-            manager.Socket.On<string>("RequestCameraImg", x => RequestScreenshot.Invoke(x));
+            manager.Socket.On<string>("urchin-camera-update", x => UpdateCamera.Invoke(JsonUtility.FromJson<CameraModel>(x)));
+            manager.Socket.On<string>("urchin-camera-delete", x => DeleteCamera.Invoke(JsonUtility.FromJson<IDData>(x)));
+
+            manager.Socket.On<string>("urchin-camera-lerp-set", x => SetCameraLerpRotation.Invoke(JsonUtility.FromJson<CameraRotationModel>(x)));
+            manager.Socket.On<string>("urchin-camera-lerp", x => SetCameraLerp.Invoke(JsonUtility.FromJson<FloatData>(x)));
+            manager.Socket.On<string>("urchin-camera-screenshot-request", x => RequestScreenshot.Invoke(x));
+
 
             manager.Socket.On<string>("urchin-brain-yaw", x => CameraBrainYaw.Invoke(JsonUtility.FromJson<FloatData>(x)));
 
-            //Old
-            manager.Socket.On<Dictionary<string, List<float>>>("SetCameraTarget", x => SetCameraTarget.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetCameraRotation", x => SetCameraRotation.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetCameraTargetArea", x => SetCameraTargetArea.Invoke(x));
-            manager.Socket.On<Dictionary<string, float>>("SetCameraZoom", x => SetCameraZoom.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetCameraPan", x => SetCameraPan.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetCameraMode", x => SetCameraMode.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetCameraColor", x => SetCameraColor.Invoke(x));
-            manager.Socket.On<string>("SetCameraControl", x => SetCameraControl.Invoke(x));
-            manager.Socket.On<Dictionary<string, float>>("SetCameraYAngle", x => SetCameraYAngle.Invoke(x));
-            manager.Socket.On<List<string>>("CreateCamera", x => CreateCamera.Invoke(x));
-            manager.Socket.On<List<string>>("DeleteCamera", x => DeleteCamera.Invoke(x));
         }
 
         public static Action ResetLightLink;
@@ -236,17 +216,13 @@ namespace Urchin.API
             manager.Socket.On<Dictionary<string, List<float>>>("SetTextPositions", x => SetTextPositions.Invoke(x));
         }
 
-        public static Action<List<string>> CreateLine;
-        public static Action<Dictionary<string, List<List<float>>>> SetLinePosition;
-        public static Action<List<string>> DeleteLine;
-        public static Action<Dictionary<string, string>> SetLineColor;
+        public static Action<LineModel> UpdateLine;
+        public static Action<IDData> DeleteLine;
 
         private void Start_LineRenderer()
         {
-            manager.Socket.On<List<string>>("CreateLine", x => CreateLine.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<List<float>>>>("SetLinePosition", x => SetLinePosition.Invoke(x));
-            manager.Socket.On<List<string>>("DeleteLine", x => DeleteLine.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetLineColor", x => SetLineColor.Invoke(x));
+            manager.Socket.On<string>("urchin-line-update", x => UpdateLine.Invoke(JsonUtility.FromJson<LineModel>(x)));
+            manager.Socket.On<string>("urchin-line-delete", x => DeleteLine.Invoke(JsonUtility.FromJson<IDData>(x)));
         }
 
         #region Mesh

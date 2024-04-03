@@ -4,47 +4,39 @@ from . import client
 import warnings
 from . import utils
 
+from vbl_aquarium.models.urchin import LineModel
+from vbl_aquarium.models.generic import IDData
 
 counter = 0
 
 class Line:
-  def __init__(self, position= [[0.0,0.0,0.0]], color= '#FFFFFF'):
-    self.create()
-
-    self.set_position(position)
-    self.set_color(color)
-
-  def create(self):
-    """Creates lines
-    
-    Parameters
-    ---------- 
-    none
-
-    Examples
-    >>>l1 = urchin.lines.Line()
-    """
+  def __init__(self, positions= [[0.0,0.0,0.0]], color= [1, 1, 1]):
     global counter
     counter += 1
-    self.id = 'l' + str(counter)
-    client.sio.emit('CreateLine', [self.id])
+
+    self.data = LineModel(
+      id = f'l{counter}',
+      positions = positions,
+      color=utils.formatted_color(color)
+    )
+
+    self._update()
     self.in_unity = True
+
+  def _update(self):
+    client.sio.emit('urchin-line-update', self.data.to_string())
 
   def delete(self):
     """Deletes lines
-    
-    Parameters
-    ---------- 
-    references object being deleted
 
     Examples
     >>>l1.delete()
     """
-    client.sio.emit('DeleteLine', [self.id])
+    client.sio.emit('urchin-line-delete', IDData(id=self.data.id).to_string())
     self.in_unity = False
 
-  def set_position(self, position):
-    """Set the position of line renderer
+  def set_positions(self, positions):
+    """Set the positions of line renderer
     
     Parameters
     ---------- 
@@ -57,12 +49,12 @@ class Line:
     """
     if self.in_unity == False:
       raise Exception("Line does not exist in Unity, call create method first.")
+    
+    for i, vec3 in enumerate(positions):
+      positions[i] = utils.formatted_vector3(utils.sanitize_vector3(vec3))
+    self.data.positions = positions
 
-    for i, vec3 in enumerate(position):
-      position[i] = utils.sanitize_vector3(vec3)
-    self.position = position
-
-    client.sio.emit('SetLinePosition', {self.id: self.position})
+    self._update()
 
   def set_color(self, color):
     """Set the color of line renderer
@@ -78,10 +70,10 @@ class Line:
     """
     if self.in_unity == False:
       raise Exception("Line does not exist in Unity, call create method first.")
+    
+    self.data.color = utils.formatted_color(utils.sanitize_color(color))
 
-    color = utils.sanitize_color(color)
-    self.color = color
-    client.sio.emit('SetLineColor',{self.id: color})
+    self._update()
 
 def create (n):
   """Create Line objects
@@ -111,6 +103,6 @@ def delete (lines_list):
   --------
   >>> lines.delete()
   """
-  lines_list = utils.sanitize_list(lines_list)
-  lines_ids = [x.id for x in lines_list]
-  client.sio.emit("DeleteLine", lines_ids)
+  
+  for line in lines_list:
+    line.delete()
