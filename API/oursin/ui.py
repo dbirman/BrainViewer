@@ -1,5 +1,7 @@
 """Interactive components within notebooks"""
 from . import particles
+from vbl_aquarium.models.generic import IDListFloatList
+
 global_binned_spikes = None
 global_prepped_data = None
 neurons = None
@@ -198,14 +200,27 @@ def update_neuron_sizing(stim_id, t, prepped_data = None):
 
         t_id = round((t+100)/20)
             
-        size_list = []
+        # size_list = []
+        # for i in range(prepped_data.shape[0]):
+        #     size = round(prepped_data[i][stim_id][t_id]/100,1)
+        #     # size = (round(row.percentile_rank,1))
+        #     size_list.append(size)
+
+
+        # particles.set_sizes(neurons, size_list)
+
+
+        particle_size_list = IDListFloatList(
+            ids = [],
+            values= []
+        )
+
         for i in range(prepped_data.shape[0]):
-            size = round(prepped_data[i][stim_id][t_id]/100,1)
-            # size = (round(row.percentile_rank,1))
-            size_list.append(size)
-
-
-        particles.set_sizes(neurons, size_list)
+            neuron = f'n{str(i+1)}'
+            particle_size_list.ids.append(neuron)
+            particle_size_list.values.append(round(prepped_data[i][stim_id][t_id]/100,1))
+        
+        particles._set_sizes(particle_size_list)
 
 def slope_viz_neurons_per_stimuli(prepped_data = None, t=-100, stim_id = 0):
     """Visualizes and creates interactive plot for the average of every neuron per stimulus
