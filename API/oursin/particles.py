@@ -212,7 +212,7 @@ def _set_sizes(data):
 	--------
 	>>> urchin.particles._set_sizes(IDListFloatList(ids=[0,1,2], value=[1, 1, 1]))
 	"""   
-	client.sio.emit('SetParticleSize', data)
+	client.sio.emit('SetParticleSize', data.to_string())
 
 def set_colors(particles_list, colors_list):
 	"""Set neuron colors
