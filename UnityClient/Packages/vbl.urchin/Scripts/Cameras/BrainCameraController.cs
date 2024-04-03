@@ -206,6 +206,14 @@ public class BrainCameraController : MonoBehaviour
         //observer in global space). When controlling the viewpoint, you want to do the opposite: pitch around YOUR x axis
         //(running from your left to right ear, for example), but yaw around the WORLD's y axis(parallel to the gravity vector)
 
+        // Original code from vbl-core: how on earth did this ever work?
+        //Quaternion curRotation = Quaternion.Euler(totalYaw, totalSpin, totalPitch);
+        //// Move the camera back to zero, perform rotation, then offset back
+        //brainCameraRotator.transform.position = initialCameraRotatorPosition + cameraPositionOffset;
+        //brainCameraRotator.transform.LookAt(cameraTarget, Vector3.back);
+        //brainCameraRotator.transform.position = curRotation * (brainCameraRotator.transform.position - cameraTarget) + cameraTarget;
+        //brainCameraRotator.transform.rotation = curRotation * brainCameraRotator.transform.rotation;
+
         _mainCameraRotator.transform.rotation = _initialRotation;
 
         _mainCameraRotator.transform.Rotate(_mainCameraRotator.transform.right, _pitchYawRoll.x);
