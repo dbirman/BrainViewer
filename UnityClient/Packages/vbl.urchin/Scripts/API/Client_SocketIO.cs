@@ -168,6 +168,9 @@ namespace Urchin.API
         public static Action<CameraRotationModel> SetCameraLerpRotation;
         public static Action<FloatData> SetCameraLerp;
         public static Action<FloatData> CameraBrainYaw;
+        public static Action<string> RequestScreenshot;
+
+        public static Action<CameraModel> UpdateCamera;
 
         // Old Camera
         public static Action<Dictionary<string, List<float>>> SetCameraTarget;
@@ -178,7 +181,6 @@ namespace Urchin.API
         public static Action<Dictionary<string, string>> SetCameraMode;
         public static Action<Dictionary<string, string>> SetCameraColor;
         public static Action<string> SetCameraControl;
-        public static Action<string> RequestScreenshot;
         public static Action<Dictionary<string, float>> SetCameraYAngle;
         public static Action<List<string>> CreateCamera;
         public static Action<List<string>> DeleteCamera;
@@ -188,6 +190,7 @@ namespace Urchin.API
             //New
             manager.Socket.On<string>("SetCameraLerpRotation", x => SetCameraLerpRotation.Invoke(JsonUtility.FromJson<CameraRotationModel>(x)));
             manager.Socket.On<string>("SetCameraLerp", x => SetCameraLerp.Invoke(JsonUtility.FromJson<FloatData>(x)));
+            manager.Socket.On<string>("RequestCameraImg", x => RequestScreenshot.Invoke(x));
 
             manager.Socket.On<string>("urchin-brain-yaw", x => CameraBrainYaw.Invoke(JsonUtility.FromJson<FloatData>(x)));
 
@@ -200,7 +203,6 @@ namespace Urchin.API
             manager.Socket.On<Dictionary<string, string>>("SetCameraMode", x => SetCameraMode.Invoke(x));
             manager.Socket.On<Dictionary<string, string>>("SetCameraColor", x => SetCameraColor.Invoke(x));
             manager.Socket.On<string>("SetCameraControl", x => SetCameraControl.Invoke(x));
-            manager.Socket.On<string>("RequestCameraImg", x => RequestScreenshot.Invoke(x));
             manager.Socket.On<Dictionary<string, float>>("SetCameraYAngle", x => SetCameraYAngle.Invoke(x));
             manager.Socket.On<List<string>>("CreateCamera", x => CreateCamera.Invoke(x));
             manager.Socket.On<List<string>>("DeleteCamera", x => DeleteCamera.Invoke(x));

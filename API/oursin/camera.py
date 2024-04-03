@@ -12,7 +12,7 @@ import io
 import json
 import asyncio
 
-from vbl_aquarium.models.urchin import CameraRotationModel
+from vbl_aquarium.models.urchin import CameraRotationModel, CameraModel
 from vbl_aquarium.models.generic import FloatData
 		  
 receive_totalBytes = {}
@@ -65,19 +65,22 @@ def on_camera_img(data_str):
 counter = 0
 
 class Camera:
-	def __init__(self, main = False):		
-		if main:
-			self.id = 'CameraMain'
-		else:
-			global counter
-			counter += 1
-			self.id = f'Camera{counter}'
-			client.sio.emit('CreateCamera', [self.id])
+	def __init__(self, main = False):	
+		global counter
+		counter += 1	
+
+		self.data = CameraModel(
+			id = 'CameraMain' if main else f'Camera{counter}
+		)
+
 		self.in_unity = True
 		self.image_received_event = asyncio.Event()
 		self.loop = asyncio.get_event_loop()
 
 		self.background_color = '#ffffff'
+
+	def _update(self):
+		client.sio.emit('UpdateCamera', self.data.to_string())
 
 	def create(self):
 		"""Creates camera
