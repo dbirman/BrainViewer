@@ -62,6 +62,7 @@ public class ParticleManager : MonoBehaviour
             _particleMapping.Add(particleName, _particleSystem.particleCount - 1);
         }
 
+        _particles = new ParticleSystem.Particle[_particleSystem.particleCount];
         _particleSystem.GetParticles(_particles);
     }
 
