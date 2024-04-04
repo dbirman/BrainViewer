@@ -130,7 +130,7 @@ namespace Urchin.API
 
         public static Action<List<string>> CreateParticles;
         public static Action<Dictionary<string, float[]>> SetParticlePosition;
-        public static Action<Dictionary<string, float>> SetParticleSize;
+        public static Action<IDListFloatList> SetParticleSize;
         //public static Action<Dictionary<string, string>> SetParticleShape;
         public static Action<Dictionary<string, string>> SetParticleColor;
         public static Action<string> SetParticleMaterial;
@@ -139,7 +139,7 @@ namespace Urchin.API
         {
             manager.Socket.On<List<string>>("CreateParticles", x => CreateParticles.Invoke(x));
             manager.Socket.On<Dictionary<string, float[]>>("SetParticlePos", x => SetParticlePosition.Invoke(x));
-            manager.Socket.On<Dictionary<string, float>>("SetParticleSize", x => SetParticleSize.Invoke(x));
+            manager.Socket.On<string>("SetParticleSize", x => SetParticleSize.Invoke(JsonUtility.FromJson<IDListFloatList>(x)));
             //manager.Socket.On<Dictionary<string, string>>("SetParticleShape", x => SetParticleShape.Invoke(x));
             manager.Socket.On<Dictionary<string, string>>("SetParticleColor", x => SetParticleColor.Invoke(x));
             manager.Socket.On<string>("SetParticleMaterial", x => SetParticleMaterial.Invoke(x));
