@@ -185,16 +185,16 @@ public struct MeshModel
 public struct ParticleSystemModel
 {
     public string ID;
-    public string Shape;
+    public int N;
     public string Material;
     public Vector3[] Positions;
     public float[] Sizes;
     public Color[] Colors;
 
-    public ParticleSystemModel(string id, string shape, string material, Vector3[] positions, float[] sizes, Color[] colors)
+    public ParticleSystemModel(string id, int n, string material, Vector3[] positions, float[] sizes, Color[] colors)
     {
         ID = id;
-        Shape = shape;
+        N = n;
         Material = material;
         Positions = positions;
         Sizes = sizes;

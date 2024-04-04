@@ -26,11 +26,13 @@ public struct DownloadModel
 [Serializable]
 public struct LoadModel
 {
+    public string Filename;
     public string Bucket;
     public string Password;
 
-    public LoadModel(string bucket, string password)
+    public LoadModel(string filename, string bucket, string password)
     {
+        Filename = filename;
         Bucket = bucket;
         Password = password;
     }
@@ -39,11 +41,13 @@ public struct LoadModel
 [Serializable]
 public struct SaveModel
 {
+    public string Filename;
     public string Bucket;
     public string Password;
 
-    public SaveModel(string bucket, string password)
+    public SaveModel(string filename, string bucket, string password)
     {
+        Filename = filename;
         Bucket = bucket;
         Password = password;
     }

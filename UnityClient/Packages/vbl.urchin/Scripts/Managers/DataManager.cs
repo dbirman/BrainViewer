@@ -21,7 +21,7 @@ public class DataManager : MonoBehaviour
         _managers.Add(_primitiveMeshManager);
 
         Client_SocketIO.Save += x => StartCoroutine(Save(x));
-
+        Client_SocketIO.Load += Load;
     }
     #endregion
 
@@ -55,7 +55,7 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public void Load(string targetURL)
+    public void Load(LoadModel data)
     {
         throw new System.NotImplementedException();
 
