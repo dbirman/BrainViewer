@@ -4,58 +4,45 @@ from . import client
 import warnings
 from . import utils
 
+from vbl_aquarium.models.urchin import TextModel
+from vbl_aquarium.models.generic import IDData, IDListStringList, IDListColorList, IDListFloatList, IDListVector2List
+
 ## Text renderer
 
 counter = 0
+
 class Text:
   def __init__(self, text = "", color = "#FFFFFF", font_size = 12, position = [0,0]):
-    self.create()
-
-    self.set_text(text)
-
-    self.set_font_size(font_size)
-
-    color = utils.sanitize_color(color)
-    self.color = color
-    client.sio.emit('SetTextColors',{self.id: color})
-
-    position = utils.sanitize_list(position)
-    self.position = position
-    client.sio.emit('SetTextPositions',{self.id: position})
-
-
-  def create(self):
-    """Create a text object
-
-    Parameters
-    ----------
-    none
-        
-    Examples
-    --------
-    >>> t1 = urchin.text.Text()
-    """
     global counter
     counter +=1
-    self.id = 't' + str(counter)
-    client.sio.emit('CreateText',[self.id])
+
+    self.data = TextModel(
+      id = f't{counter}',
+      text = text,
+      color = utils.formatted_color(color),
+      font_size=font_size,
+      position=position
+    )
+
+    self._update()
     self.in_unity = True
+
+  def _update(self):
+    """Send serialized data to update this text object in Urchin
+    """
+    client.sio.emit('urchin-text-update', self.data.to_string())
   
   def delete(self):
     """Delete a text object
-
-    Parameters
-    ----------
-    references object being deleted
         
     Examples
     --------
     >>> t1.delete()
     """
-    client.sio.emit('DeleteText',[self.id])
+    client.sio.emit('urchin-text-delete', IDData(id=self.data.id).to_string())
     self.in_unity = False
 
-  def set_text(self, text_text):
+  def set_text(self, text):
     """Set the text in a set of text objects
 
     Parameters
@@ -69,17 +56,17 @@ class Text:
     """
     if self.in_unity == False:
       raise Exception("Object does not exist in Unity, call create method first.")
-    text_text = utils.sanitize_string(text_text)
-    self.text = text_text
-    client.sio.emit('SetTextText',{self.id: text_text})
+    
+    self.data.text = utils.sanitize_string(text)
+    self._update()
 
-  def set_color(self,text_color):
+  def set_color(self,color):
     """Set the color of a set of text objects
 
     Parameters
     ----------
-    text_colors : string hex color
-        hex colors as strings
+    color : color
+        hex code or [R,G,B]
         
     Examples
     --------
@@ -88,11 +75,10 @@ class Text:
     if self.in_unity == False:
       raise Exception("Object does not exist in Unity, call create method first.")
     
-    text_color = utils.sanitize_color(text_color)
-    self.color = text_color
-    client.sio.emit('SetTextColors',{self.id: text_color})
+    self.data.color = utils.formatted_color(color)
+    self._update()
 
-  def set_font_size(self,text_size):
+  def set_font_size(self, font_size):
     """Set the font size of a set of text objects
 
     Parameters
@@ -106,8 +92,9 @@ class Text:
     """
     if self.in_unity == False:
       raise Exception("Object does not exist in Unity, call create method first.")
-    self.size = text_size
-    client.sio.emit('SetTextSizes',{self.id: text_size})
+    
+    self.data.font_size = font_size
+    self._update()
 
   def set_position(self,position):
     """Set the positions of a set of text objects in UI canvas space
@@ -126,8 +113,9 @@ class Text:
     """
     if self.in_unity == False:
       raise Exception("Object does not exist in Unity, call create method first.")
-    self.position = utils.sanitize_list(position)
-    client.sio.emit('SetTextPositions',{self.id: self.position})
+    
+    self.data.position = utils.formatted_vector2(position)
+    self._update()
 
 
 def create(n):
@@ -153,14 +141,14 @@ def set_texts(text_list, str_list):
   str_list : _type_
       _description_
   """
-  text_list = utils.sanitize_list(text_list)
   str_list = utils.sanitize_list(str_list, len(text_list))
 
-  text_strs = {}
-  for i, text in enumerate(text_list):
-    text_strs[text.id] = str_list[i]
-  
-  client.sio.emit('SetTextText',text_strs)
+  data = IDListStringList(
+    ids = [text.data.id for text in text_list],
+    values= [string for string in str_list]
+  )
+
+  client.sio.emit('urchin-text-texts', data.to_string())
 
 def set_positions(text_list, pos_list):
   """Set the positions of multiple text objects
@@ -174,14 +162,14 @@ def set_positions(text_list, pos_list):
   pos_list : list of float
       [0,0] top left [1,1] bottom right
   """
-  text_list = utils.sanitize_list(text_list)
   pos_list = utils.sanitize_list(pos_list, len(text_list))
-
-  text_poss = {}
-  for i, text in enumerate(text_list):
-    text_poss[text.id] = pos_list[i]
   
-  client.sio.emit('SetTextPositions',text_poss)
+  data = IDListVector2List(
+    ids = [text.data.id for text in text_list],
+    values = [utils.formatted_vector2(x) for x in pos_list]
+  )
+
+  client.sio.emit('urchin-text-positions', data.to_string())
 
 def set_font_sizes(text_list, font_size_list):
   """_summary_
@@ -193,14 +181,13 @@ def set_font_sizes(text_list, font_size_list):
   font_size_list : _type_
       _description_
   """
-  text_list = utils.sanitize_list(text_list)
-  font_size_list = utils.sanitize_list(font_size_list, len(text_list))
-
-  text_font_sizes = {}
-  for i, text in enumerate(text_list):
-    text_font_sizes[text.id] = font_size_list[i]
   
-  client.sio.emit('SetTextSizes',text_font_sizes)
+  data = IDListFloatList(
+    ids = [text.data.id for text in text_list],
+    values= utils.sanitize_list(font_size_list, len(text_list))
+  )
+  
+  client.sio.emit('urchin-text-sizes', data.to_string())
 
 def set_colors(text_list, color_list):
   """_summary_
@@ -212,11 +199,11 @@ def set_colors(text_list, color_list):
   color_list : _type_
       _description_
   """
-  text_list = utils.sanitize_list(text_list)
   color_list = utils.sanitize_list(color_list, len(text_list))
 
-  text_colors = {}
-  for i, text in enumerate(text_list):
-    text_colors[text.id] = color_list[i]
+  data = IDListColorList(
+    ids = [text.data.id for text in text_list],
+    values= [utils.formatted_color(color) for color in color_list]
+  )
   
-  client.sio.emit('SetTextColors',text_colors)
+  client.sio.emit('urchin-text-colors', data.to_string())

@@ -265,3 +265,23 @@ public struct StructureModel
     }
 }
 
+
+[Serializable]
+public struct TextModel
+{
+    public string ID;
+    public string Text;
+    public Color Color;
+    public int FontSize;
+    public Vector2 Position;
+
+    public TextModel(string id, string text, Color color, int fontSize, Vector2 position)
+    {
+        ID = id;
+        Text = text;
+        Color = color;
+        FontSize = fontSize;
+        Position = position;
+    }
+}
+

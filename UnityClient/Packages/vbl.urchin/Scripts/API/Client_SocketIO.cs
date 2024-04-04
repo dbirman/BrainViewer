@@ -202,21 +202,23 @@ namespace Urchin.API
             manager.Socket.On<List<float>>("SetLightRotation", x => SetLightRotation.Invoke(x));
         }
 
-        public static Action<List<string>> CreateText;
-        public static Action<List<string>> DeleteText;
-        public static Action<Dictionary<string, string>> SetTextText;
-        public static Action<Dictionary<string, string>> SetTextColors;
-        public static Action<Dictionary<string, int>> SetTextSizes;
-        public static Action<Dictionary<string, List<float>>> SetTextPositions;
+
+
+        public static Action<TextModel> TextUpdate;
+        public static Action<IDData> TextDelete;
+        public static Action<IDListStringList> TextSetTexts;
+        public static Action<IDListColorList> TextSetColors;
+        public static Action<IDListFloatList> TextSetSizes;
+        public static Action<IDListVector2List> TextSetPositions;
 
         private void Start_Text()
         {
-            manager.Socket.On<List<string>>("CreateText", x => CreateText.Invoke(x));
-            manager.Socket.On<List<string>>("DeleteText", x => DeleteText.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetTextText", x => SetTextText.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetTextColors", x => SetTextColors.Invoke(x));
-            manager.Socket.On<Dictionary<string, int>>("SetTextSizes", x => SetTextSizes.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetTextPositions", x => SetTextPositions.Invoke(x));
+            manager.Socket.On<string>("urchin-text-update", x => TextUpdate.Invoke(JsonUtility.FromJson<TextModel>(x)));
+            manager.Socket.On<string>("urchin-text-delete", x => TextDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
+            manager.Socket.On<string>("urchin-text-texts", x => TextSetTexts.Invoke(JsonUtility.FromJson<IDListStringList>(x)));
+            manager.Socket.On<string>("urchin-text-colors", x => TextSetColors.Invoke(JsonUtility.FromJson<IDListColorList>(x)));
+            manager.Socket.On<string>("urchin-text-sizes", x => TextSetSizes.Invoke(JsonUtility.FromJson<IDListFloatList>(x)));
+            manager.Socket.On<string>("urchin-text-positions", x => TextSetPositions.Invoke(JsonUtility.FromJson<IDListVector2List>(x)));
         }
 
         public static Action<LineModel> UpdateLine;
