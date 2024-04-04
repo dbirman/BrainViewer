@@ -128,21 +128,20 @@ namespace Urchin.API
             manager.Socket.On<string>("DeleteVolume", x => DeleteVolume.Invoke(x));
         }
 
-        public static Action<List<string>> CreateParticles;
-        public static Action<Dictionary<string, float[]>> SetParticlePosition;
-        public static Action<IDListFloatList> SetParticleSize;
-        //public static Action<Dictionary<string, string>> SetParticleShape;
-        public static Action<Dictionary<string, string>> SetParticleColor;
-        public static Action<string> SetParticleMaterial;
+
+        public static Action<ParticleSystemModel> ParticlesUpdate;
+        public static Action<IDData> ParticlesDelete;
+        public static Action<Vector3List> ParticlesSetPositions;
+        public static Action<FloatList> ParticlesSetSizes;
+        public static Action<ColorList> ParticlesSetColors;
 
         private void Start_Particles()
         {
-            manager.Socket.On<List<string>>("CreateParticles", x => CreateParticles.Invoke(x));
-            manager.Socket.On<Dictionary<string, float[]>>("SetParticlePos", x => SetParticlePosition.Invoke(x));
-            manager.Socket.On<string>("SetParticleSize", x => SetParticleSize.Invoke(JsonUtility.FromJson<IDListFloatList>(x)));
-            //manager.Socket.On<Dictionary<string, string>>("SetParticleShape", x => SetParticleShape.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetParticleColor", x => SetParticleColor.Invoke(x));
-            manager.Socket.On<string>("SetParticleMaterial", x => SetParticleMaterial.Invoke(x));
+            manager.Socket.On<string>("urchin-particles-update", x => ParticlesUpdate.Invoke(JsonUtility.FromJson<ParticleSystemModel>(x)));
+            manager.Socket.On<string>("urchin-particles-delete", x => ParticlesDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
+            manager.Socket.On<string>("urchin-particles-positions", x => ParticlesSetPositions.Invoke(JsonUtility.FromJson<Vector3List>(x)));
+            manager.Socket.On<string>("urchin-particles-sizes", x => ParticlesSetSizes.Invoke(JsonUtility.FromJson<FloatList>(x)));
+            manager.Socket.On<string>("urchin-particles-colors", x => ParticlesSetColors.Invoke(JsonUtility.FromJson<ColorList>(x)));
         }
 
 
@@ -335,7 +334,7 @@ namespace Urchin.API
                 case "text":
                     ClearText.Invoke();
                     break;
-                case "particle":
+                case "particles":
                     ClearParticles.Invoke();
                     break;
                 case "mesh":

@@ -182,26 +182,22 @@ public struct MeshModel
 
 
 [Serializable]
-public struct ParticleGroupModel
+public struct ParticleSystemModel
 {
     public string ID;
-    public Vector3 Scale;
     public string Shape;
     public string Material;
-    public float[] Xs;
-    public float[] Ys;
-    public float[] Zs;
+    public Vector3[] Positions;
+    public float[] Sizes;
     public Color[] Colors;
 
-    public ParticleGroupModel(string id, Vector3 scale, string shape, string material, float[] xs, float[] ys, float[] zs, Color[] colors)
+    public ParticleSystemModel(string id, string shape, string material, Vector3[] positions, float[] sizes, Color[] colors)
     {
         ID = id;
-        Scale = scale;
         Shape = shape;
         Material = material;
-        Xs = xs;
-        Ys = ys;
-        Zs = zs;
+        Positions = positions;
+        Sizes = sizes;
         Colors = colors;
     }
 }
