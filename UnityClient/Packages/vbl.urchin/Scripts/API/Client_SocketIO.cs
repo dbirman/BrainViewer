@@ -145,6 +145,9 @@ namespace Urchin.API
             manager.Socket.On<string>("SetParticleMaterial", x => SetParticleMaterial.Invoke(x));
         }
 
+
+        //pubic statc Action<ProbeModel
+
         public static Action<List<string>> CreateProbes;
         public static Action<List<string>> DeleteProbes;
         public static Action<Dictionary<string, string>> SetProbeColors;

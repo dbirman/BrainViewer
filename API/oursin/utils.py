@@ -56,6 +56,15 @@ def sanitize_color(color):
     _type_
         _description_
     """
+    if len(color)==3 or len(color)==4:
+        try:
+            return list(map(float, color))
+        except (TypeError, ValueError):
+            raise ValueError("Input vector must be convertible to a list of three floats.")
+
+    if color[0] == '#':
+        color = hex_to_rgb(color)
+
     return color
     
 
@@ -117,6 +126,15 @@ def rgb_to_hex(rgb):
 def rgba_to_hex(rgba):
     return '#%02x%02x%02x%02x' % rgba
 
+def hex_to_rgb(hex_code):
+    # Remove '#' if present
+    hex_code = hex_code.lstrip('#')
+    # Convert hexadecimal to RGB
+    r = int(hex_code[0:2], 16)
+    g = int(hex_code[2:4], 16)
+    b = int(hex_code[4:6], 16)
+    return (r, g, b)
+
 def list_of_list2vector3(list_of_list):
     """Convert a list of lists to a list of Vector3 objects
 
@@ -134,6 +152,9 @@ def formatted_vector3(list_of_float):
     ----------
     list_of_float : list
     """
+
+    list_of_float = sanitize_vector3(list_of_float)
+
     return Vector3(
         x = list_of_float[0],
         y = list_of_float[1],
@@ -160,6 +181,8 @@ def formatted_color(list_of_float):
     list_of_float : list
         Length 3 for RGB, 4 for RGBA
     """
+
+    list_of_float = sanitize_color(list_of_float)
 
     if len(list_of_float) == 3:
         return Color(

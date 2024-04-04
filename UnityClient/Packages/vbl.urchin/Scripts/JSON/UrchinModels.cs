@@ -219,6 +219,28 @@ public struct PrimitiveMeshModel
 
 
 [Serializable]
+public struct ProbeModel
+{
+    public string ID;
+    public Vector3 Position;
+    public Color Color;
+    public Vector3 Angles;
+    public string Style;
+    public Vector3 Scale;
+
+    public ProbeModel(string id, Vector3 position, Color color, Vector3 angles, string style, Vector3 scale)
+    {
+        ID = id;
+        Position = position;
+        Color = color;
+        Angles = angles;
+        Style = style;
+        Scale = scale;
+    }
+}
+
+
+[Serializable]
 public struct StructureModel
 {
     public string Name;
