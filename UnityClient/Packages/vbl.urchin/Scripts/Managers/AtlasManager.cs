@@ -82,16 +82,6 @@ namespace Urchin.Managers
             Client_SocketIO.AtlasLoadDefaults += LoadDefaultAreasVoid;
 
             //Client_SocketIO.AtlasCreateCustom += CustomAtlas;
-
-            //Client_SocketIO.AtlasSetAreaVisibility += SetAreaVisibility;
-            //Client_SocketIO.AtlasSetAreaColors += SetAreaColors;
-            //Client_SocketIO.AtlasSetAreaIntensities += SetAreaIntensity;
-            //Client_SocketIO.AtlasSetColormap += SetAreaColormap;
-            //Client_SocketIO.AtlasSetAreaMaterials += SetAreaMaterial;
-            //Client_SocketIO.AtlasSetAreaAlphas += SetAreaAlpha;
-            //Client_SocketIO.AtlasSetAreaData += SetAreaData;
-            //Client_SocketIO.AtlasSetAreaDataIndex += SetAreaIndex;
-            //Client_SocketIO.AtlasLoadAreaDefaults += LoadDefaultAreasVoid;
         }
         #endregion
 

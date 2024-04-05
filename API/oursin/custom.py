@@ -93,4 +93,4 @@ class CustomMesh:
 def clear():
     """Clear all custom meshes
     """
-    client.sio.emit('Clear','custommesh')
+    client.sio.emit('Clear','custom')

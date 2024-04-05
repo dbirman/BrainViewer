@@ -312,8 +312,9 @@ namespace Urchin.API
         public static Action ClearMeshes;
         public static Action ClearFOV;
         public static Action ClearCustomMeshes;
+        public static Action ClearLines;
         public static List<Action> ClearAll = new List<Action> { ClearProbes, ClearAreas, ClearVolumes,
-            ClearText, ClearParticles, ClearMeshes, ClearFOV, ClearCustomMeshes};
+            ClearText, ClearParticles, ClearMeshes, ClearFOV, ClearCustomMeshes, ClearLines};
         private void Clear(string val)
         {
             switch (val)
@@ -322,30 +323,34 @@ namespace Urchin.API
                     foreach (var action in ClearAll)
                         action?.Invoke();
                     break;
-                case "probe":
-                    ClearProbes.Invoke();
+                case "probes":
+                    ClearProbes?.Invoke();
                     break;
                 case "area":
-                    ClearAreas.Invoke();
+                    ClearAreas?.Invoke();
                     break;
                 case "volume":
-                    ClearVolumes.Invoke();
+                    ClearVolumes?.Invoke();
                     break;
                 case "text":
-                    ClearText.Invoke();
+                    ClearText?.Invoke();
                     break;
                 case "particles":
-                    ClearParticles.Invoke();
+                    ClearParticles?.Invoke();
                     break;
                 case "mesh":
-                    ClearMeshes.Invoke();
+                    ClearMeshes?.Invoke();
                     break;
                 case "texture":
-                    ClearFOV.Invoke();
+                    ClearFOV?.Invoke();
                     break;
-                case "custommesh":
-                    ClearCustomMeshes.Invoke();
+                case "custom":
+                    ClearCustomMeshes?.Invoke();
                     break;
+                case "lines":
+                    ClearLines?.Invoke();
+                    break;
+                    
             }
         }
         #endregion

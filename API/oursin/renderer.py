@@ -59,23 +59,3 @@ def clear():
 	"""Clear the renderer scene of all objects
 	"""
 	client.sio.emit('Clear', 'all')
-
-def clear_probes():
-	"""Clear all probe objects
-	"""
-	client.sio.emit('Clear', 'probe')
-
-def clear_volumes():
-	"""Clear all 3D volumes
-	"""
-	client.sio.emit('Clear', 'volume')
-
-def clear_texts():
-	"""Clear all text
-	"""
-	client.sio.emit('Clear', 'text')
-
-def clear_meshes():
-	"""Clear all primitives
-	"""
-	client.sio.emit('Clear','mesh')

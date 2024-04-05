@@ -26,6 +26,8 @@ namespace Urchin.Managers
         {
             Client_SocketIO.UpdateLine += UpdateData;
             Client_SocketIO.DeleteLine += Delete;
+
+            Client_SocketIO.ClearLines += Clear;
         }
 
         public void UpdateData(LineModel data)
@@ -54,6 +56,13 @@ namespace Urchin.Managers
             }
             else
                 Client_SocketIO.LogError($"Cannot delete line {data.ID}, doesn't exist in Unity");
+        }
+
+        public void Clear()
+        {
+            foreach (var kvp in _lineBehaviors)
+                Destroy(kvp.Value.gameObject);
+            _lineBehaviors.Clear();
         }
     }
 }

@@ -34,10 +34,11 @@ def create_bucket(bucket_name, password, api_url = api_url):
 def save():
     """Save the current scene
     """
-    client.sio.emit('urchin-save')
+    client.sio.emit('urchin-save', SaveModel())
 
-def load(url):
-    client.sio.emit('urchin-load', url)
+def load(filename = '', bucket = '', password=''):
+    client.sio.emit('urchin-load', 
+                    LoadModel(filename=filename, bucket=bucket, password=password).to_string())
 
 
 

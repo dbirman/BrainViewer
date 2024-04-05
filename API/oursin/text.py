@@ -11,6 +11,11 @@ from vbl_aquarium.models.generic import IDData, IDListStringList, IDListColorLis
 
 counter = 0
 
+def clear():
+    """Clear all custom meshes
+    """
+    client.sio.emit('Clear','text')
+
 class Text:
   def __init__(self, text = "", color = "#FFFFFF", font_size = 12, position = [0,0]):
     global counter

@@ -9,6 +9,12 @@ from vbl_aquarium.models.generic import IDData, IDListVector3List, IDListColorLi
 
 ##Probes Renderer
 counter = 0
+
+def clear():
+    """Clear all custom meshes
+    """
+    client.sio.emit('Clear','probes')
+
 class Probe:
 	def __init__(self, color = 'FFFFFF', position = [0,0,0], angle = [0,0,0], style = 'line', scale = [0.070, 3.840, 0.020]):
 		
