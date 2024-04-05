@@ -57,7 +57,7 @@ class Mesh:
   def _update(self):
     """Serialize and update the data in the Urchin Renderer
     """
-    client.sio.emit('MeshUpdate', self.data.to_string())
+    client.sio.emit('urchin-meshes-update', self.data.to_string())
 
   def delete(self):
     """Deletes meshes
@@ -74,7 +74,7 @@ class Mesh:
     data = IDData
     data.id = self.data.id
 
-    client.sio.emit('MeshDelete', data.to_string())
+    client.sio.emit('urchin-meshes-delete', data.to_string())
     self.in_unity = False
   
   def set_position(self, position):
@@ -163,7 +163,6 @@ class Mesh:
 def clear():
   client.sio.emit('Clear', 'mesh')
 
-#actually initializes each object(s), doesn't use any parameters other than how many to initialize (uses all defaults)
 def create(num_objects, position= [0.0,0.0,0.0], scale= [1,1,1], color=[1,1,1],
                material = 'default', interactive = False):
   """Create multiple meshes
@@ -211,7 +210,7 @@ def delete(meshes_list):
     ids = [x.data.id for x in meshes_list]
   )
 
-  client.sio.emit('MeshDeletes', data.to_string())
+  client.sio.emit('urchin-meshes-deletes', data.to_string())
 
 def set_positions(meshes_list, positions_list):
   """Set the positions of mesh renderers
@@ -235,7 +234,7 @@ def set_positions(meshes_list, positions_list):
     values = [utils.formatted_vector3(utils.sanitize_vector3([x[0]/1000, x[1]/1000, x[2]/1000])) for x in positions_list]
   )
 
-  client.sio.emit('MeshPositions', data.to_string())
+  client.sio.emit('urchin-meshes-positions', data.to_string())
 
 def set_scales(meshes_list, scales_list):
   """Set scale of mesh renderers
@@ -259,7 +258,7 @@ def set_scales(meshes_list, scales_list):
     values = [utils.formatted_vector3(utils.sanitize_vector3(x)) for x in scales_list]
   )
 
-  client.sio.emit('MeshScales', data.to_string())
+  client.sio.emit('urchin-meshes-scales', data.to_string())
 
 def set_colors(meshes_list, colors_list):
   """Sets colors of mesh renderers
@@ -284,7 +283,7 @@ def set_colors(meshes_list, colors_list):
     values = [utils.formatted_color(utils.sanitize_vector3(x)) for x in colors_list]
   )
 
-  client.sio.emit('MeshColors', data.to_string())
+  client.sio.emit('urchin-meshes-colors', data.to_string())
 
 def set_materials(meshes_list, materials_list):
   """Sets materials of mesh renderers
@@ -309,4 +308,4 @@ def set_materials(meshes_list, materials_list):
     values = [utils.sanitize_material(x) for x in materials_list]
   )
       
-  client.sio.emit('MeshMaterials', data.to_string()) 
+  client.sio.emit('urchin-meshes-materials', data.to_string()) 

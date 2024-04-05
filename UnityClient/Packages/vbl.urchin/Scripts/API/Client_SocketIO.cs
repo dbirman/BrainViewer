@@ -244,15 +244,15 @@ namespace Urchin.API
         private void Start_Mesh()
         {
             // Singular
-            manager.Socket.On<string>("MeshUpdate", x => MeshUpdate.Invoke(JsonUtility.FromJson<MeshModel>(x)));
-            manager.Socket.On<string>("MeshDelete", x => MeshDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
+            manager.Socket.On<string>("urchin-meshes-update", x => MeshUpdate.Invoke(JsonUtility.FromJson<MeshModel>(x)));
+            manager.Socket.On<string>("urchin-meshes-delete", x => MeshDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
 
             // Plural
-            manager.Socket.On<string>("MeshDeletes", x => MeshDeletes.Invoke(JsonUtility.FromJson<IDList>(x)));
-            manager.Socket.On<string>("MeshPositions", x => MeshSetPositions.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
-            manager.Socket.On<string>("MeshScales", x => MeshSetScales.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
-            manager.Socket.On<string>("MeshColors", x => MeshSetColors.Invoke(JsonUtility.FromJson<IDListColorList>(x)));
-            manager.Socket.On<string>("MeshMaterials", x => MeshSetMaterials.Invoke(JsonUtility.FromJson<IDListStringList>(x)));
+            manager.Socket.On<string>("urchin-meshes-deletes", x => MeshDeletes.Invoke(JsonUtility.FromJson<IDList>(x)));
+            manager.Socket.On<string>("urchin-meshes-positions", x => MeshSetPositions.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
+            manager.Socket.On<string>("urchin-meshes-scales", x => MeshSetScales.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
+            manager.Socket.On<string>("urchin-meshes-colors", x => MeshSetColors.Invoke(JsonUtility.FromJson<IDListColorList>(x)));
+            manager.Socket.On<string>("urchin-meshes-materials", x => MeshSetMaterials.Invoke(JsonUtility.FromJson<IDListStringList>(x)));
         }
 
         #endregion
