@@ -12,7 +12,7 @@ import io
 import json
 import asyncio
 
-from vbl_aquarium.models.urchin import CameraRotationModel, CameraModel, CameraMode
+from vbl_aquarium.models.urchin import CameraRotationModel, CameraModel
 from vbl_aquarium.models.generic import FloatData, IDData, Vector2Data
 			
 receive_totalBytes = {}
@@ -306,30 +306,34 @@ class Camera:
 		else:
 			return img
 		
-	async def capture_video(self, file_name, start_rotation, end_rotation, frame_rate = 30,
-					 duration = 5, size = (1024,768)):
+	async def capture_video(self, file_name, callback = None,
+						 start_rotation = None, end_rotation = None,
+						 frame_rate = 30, duration = 5,
+						 size = (1024,768)):
 		"""Capture a video and save it to a file, must be awaited
 
-		Warning: start and stop rotations are currently implemented in Euler angles
-		any rotation that uses multiple axes will *not* look correct! This will be
-		updated in a future release.
+		Can be used in two modes, either by specifying a callback(frame#) or a start/end_rotation
 
 		Parameters
 		----------
 		file_name : string
-			File to save to, relative to local path
-		start_rotation : vector3
-			(yaw, pitch, roll) of camera at the start
-		end_rotation : vector3
-			(yaw, pitch, roll) of camera at the start
+			_description_
+		callback : function, optional
+			callback to execute *prior* to each frame, by default None
+		start_rotation : [yaw, pitch, roll], optional
+		end_rotation : [yaw, pitch, roll], optional
 		frame_rate : int, optional
-			by default 30
-		size : list, optional
-			width/height, by default [1024,768]
-			
+			frames per second, by default 30
+		duration : int, optional
+			seconds, by default 5
+		size : tuple, optional
+			screenshot size, by default (1024,768)
+
 		Examples
 		--------
+		>>> await urchin.camera.main.capture_video('output.mp4', callback=my_callback_function)
 		>>> await urchin.camera.main.capture_video('output.mp4', start_rotation=[22.5, 22.5, 225], end_rotation=[22.5, 22.5, 0])
+
 		"""
 		try:
 			import cv2
@@ -341,18 +345,24 @@ class Camera:
 
 		n_frames = frame_rate * duration
 
-		client.sio.emit('urchin-camera-lerp-set', CameraRotationModel(
-			start_rotation=utils.formatted_vector3(start_rotation),
-			end_rotation=utils.formatted_vector3(end_rotation)
-		).to_string())
+		if start_rotation is not None:
+			client.sio.emit('urchin-camera-lerp-set', CameraRotationModel(
+				start_rotation=utils.formatted_vector3(start_rotation),
+				end_rotation=utils.formatted_vector3(end_rotation)
+			).to_string())
 
 		for frame in range(n_frames):
-			perc = frame / n_frames
 
-			client.sio.emit('urchin-camera-lerp', FloatData(
-				id=self.id,
-				value=perc
-			).to_string())
+			if callback is not None:
+				callback(frame)
+
+			if start_rotation is not None:
+				perc = frame / n_frames
+
+				client.sio.emit('urchin-camera-lerp', FloatData(
+					id=self.id,
+					value=perc
+				).to_string())
 			
 			img = await self.screenshot([size[0], size[1]])
 			image_array = np.array(img)
