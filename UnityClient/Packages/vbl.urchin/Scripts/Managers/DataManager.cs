@@ -1,3 +1,4 @@
+using BrainAtlas;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -114,8 +115,19 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    private void ParseLoadData(LoadModel data)
+    private async void ParseLoadData(LoadModel data)
     {
+        // If any of the models are the atlas model, load that first
+        for (int i = 0; i < data.Types.Length; i++)
+        {
+            if ((ManagerType)data.Types[i] == ManagerType.AtlasManager)
+            {
+                _atlasManager.FromSerializedData(data.Data[i]);
+                await _atlasManager.LoadTask;
+            }
+        }
+
+        // Then load everything else (these are all independent)
         for (int i = 0; i < data.Types.Length; i++)
         {
             string managerData = data.Data[i];

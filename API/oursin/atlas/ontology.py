@@ -66,7 +66,7 @@ class Atlas:
             print("(Warning) Atlas was already loaded, the renderer can have issues if you try to load an atlas twice.")
         
         self.loaded = True
-        client.sio.emit('urchin-atlas-load', self.data.name)
+        client.sio.emit('urchin-atlas-load', self.data.to_string())
 
     def clear(self):
         """Clear all visible areas

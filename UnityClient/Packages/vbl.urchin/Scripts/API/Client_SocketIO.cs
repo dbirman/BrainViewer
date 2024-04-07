@@ -74,30 +74,28 @@ namespace Urchin.API
             Start_CustomMesh();
             Start_Dock();
 
+            _clearAll = new List<Action> { ClearProbes, ClearAreas, ClearVolumes,
+            ClearText, ClearParticles, ClearMeshes, ClearFOV, ClearCustomMeshes, ClearLines};
+
             // Misc
             manager.Socket.On<string>("Clear", Clear);
         }
 
         #region Socket setup by action group
         public static Action<AtlasModel> AtlasUpdate;
-        public static Action<string> AtlasLoad;
+        public static Action<AtlasModel> AtlasLoad;
         public static Action AtlasLoadDefaults;
 
         //public static Action<CustomAtlasData> AtlasCreateCustom;
         //public static Action<Vector3Data> AtlasSetReferenceCoord;
         //public static Action<AreaGroupData> AtlasSetAreaVisibility;
-        public static Action<Dictionary<string, string>> AtlasSetAreaColors;
-        public static Action<Dictionary<string, float>> AtlasSetAreaIntensities;
-        public static Action<string> AtlasSetColormap;
-        public static Action<Dictionary<string, string>> AtlasSetAreaMaterials;
-        public static Action<Dictionary<string, float>> AtlasSetAreaAlphas;
         public static Action<Dictionary<string, List<float>>> AtlasSetAreaData;
         public static Action<int> AtlasSetAreaDataIndex;
 
         private void Start_Atlas()
         {
             manager.Socket.On<string>("urchin-atlas-update", x => AtlasUpdate.Invoke(JsonUtility.FromJson<AtlasModel>(x)));
-            manager.Socket.On<string>("urchin-atlas-load", x => AtlasLoad.Invoke(x));
+            manager.Socket.On<string>("urchin-atlas-load", x => AtlasLoad.Invoke(JsonUtility.FromJson<AtlasModel>(x)));
             manager.Socket.On<string>("urchin-atlas-defaults", x => AtlasLoadDefaults.Invoke());
 
 
@@ -313,18 +311,25 @@ namespace Urchin.API
         public static Action ClearFOV;
         public static Action ClearCustomMeshes;
         public static Action ClearLines;
-        public static List<Action> _clearAll = new List<Action> { ClearProbes, ClearAreas, ClearVolumes,
-            ClearText, ClearParticles, ClearMeshes, ClearFOV, ClearCustomMeshes, ClearLines};
+        public static List<Action> _clearAll;
         private void Clear(string val)
         {
-            for (int i = 0; i < _clearAll.Count; i++)
-                Debug.Log(_clearAll[i]);
-
             switch (val)
             {
                 case "all":
-                    foreach (var action in _clearAll)
-                        action.Invoke();
+                    for (int i = 0; i < _clearAll.Count; i++)
+                    {
+                        try
+                        {
+                            _clearAll[i].Invoke();
+                        }
+                        catch
+                        {
+                            Debug.Log(i);
+                        }
+                    }
+                    //foreach (var action in _clearAll)
+                    //    action.Invoke();
                     break;
                 case "probes":
                     ClearProbes.Invoke();
