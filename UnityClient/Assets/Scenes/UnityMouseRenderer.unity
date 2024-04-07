@@ -1807,6 +1807,10 @@ PrefabInstance:
       value: http://localhost:5000
       objectReference: {fileID: 0}
     - target: {fileID: 6673900150076075548, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasManager
+      value: 
+      objectReference: {fileID: 926747821}
+    - target: {fileID: 6673900150076075548, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _primitiveMeshManager
       value: 
       objectReference: {fileID: 431647799}

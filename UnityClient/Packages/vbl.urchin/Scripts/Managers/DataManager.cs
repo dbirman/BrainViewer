@@ -1,8 +1,7 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
-using Unity.Entities.UniversalDelegates;
 using UnityEngine;
 using UnityEngine.Networking;
 using Urchin.API;
@@ -10,6 +9,7 @@ using Urchin.Managers;
 
 public class DataManager : MonoBehaviour
 {
+    [SerializeField] AtlasManager _atlasManager;
     [SerializeField] PrimitiveMeshManager _primitiveMeshManager;
 
     [SerializeField] private string apiURL;
@@ -20,6 +20,7 @@ public class DataManager : MonoBehaviour
     private void Awake()
     {
         _managers = new();
+        _managers.Add(_atlasManager);
         _managers.Add(_primitiveMeshManager);
 
         Client_SocketIO.Save += x => StartCoroutine(Save(x));
@@ -29,53 +30,87 @@ public class DataManager : MonoBehaviour
 
     public IEnumerator Save(SaveRequest data)
     {
+        // Generate a LoadModel holding the data
+        LoadModel allData = new LoadModel(new int[_managers.Count], new string[_managers.Count]);
+
         for (int i = 0; i < _managers.Count; i++)
         {
-            //// Push data up to the REST API
-            var uploadRequest = new UploadRequest
+            allData.Types[i] = (int)_managers[i].Type;
+            allData.Data[i] = _managers[i].ToSerializedData();
+        }
+
+
+        if (data.Filename != "")
+        {
+            // Save data to a local file
+            string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
+            string jsonData = JsonUtility.ToJson(allData);
+
+//#if !UNITY_WEBGL
+            File.WriteAllText(filePath, jsonData);
+            Client_SocketIO.Log($"File saved to {filePath}, re-load this file by passing just the filename, not the full path.");
+//#endif
+        }
+        else
+        {
+            // Load data to the cloud
+            for (int i = 0; i < _managers.Count; i++)
             {
-                Type = (int)_managers[i].Type,
-                Data = _managers[i].ToSerializedData(),
-                Password = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
-            };
+                //// Push data up to the REST API
+                var uploadRequest = new UploadRequest
+                {
+                    Type = allData.Types[i],
+                    Data = allData.Data[i],
+                    Password = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+                };
 
-            yield return null;
+                yield return null;
 
-            string json = JsonUtility.ToJson(uploadRequest);
-            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+                string json = JsonUtility.ToJson(uploadRequest);
+                byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest request = new UnityWebRequest($"{apiURL}/upload/{data.Bucket}", "POST");
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.SetRequestHeader("Content-Type", "application/json");
+                UnityWebRequest request = new UnityWebRequest($"{apiURL}/upload/{data.Bucket}", "POST");
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.SetRequestHeader("Content-Type", "application/json");
 
-            yield return request.SendWebRequest();
+                yield return request.SendWebRequest();
 
-            if (request.responseCode != 201)
-            {
-                Client_SocketIO.LogError(request.error);
+                if (request.responseCode != 201)
+                {
+                    Client_SocketIO.LogError(request.error);
+                }
             }
         }
     }
 
     public IEnumerator Load(LoadRequest data)
     {
-        string json = JsonUtility.ToJson(data);
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
-
-        UnityWebRequest request = new UnityWebRequest($"{apiURL}/{data.Bucket}/all", "GET");
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        yield return request.SendWebRequest();
-
-        if (request.result == UnityWebRequest.Result.Success)
+        if (data.Filename != "")
         {
-            ParseLoadData(JsonUtility.FromJson<LoadModel>(request.downloadHandler.text));
+            string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
+
+            ParseLoadData(JsonUtility.FromJson<LoadModel>(File.ReadAllText(filePath)));
         }
         else
         {
-            Client_SocketIO.LogError(request.error);
+            string json = JsonUtility.ToJson(data);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest request = new UnityWebRequest($"{apiURL}/{data.Bucket}/all", "GET");
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                ParseLoadData(JsonUtility.FromJson<LoadModel>(request.downloadHandler.text));
+            }
+            else
+            {
+                Client_SocketIO.LogError(request.error);
+            }
         }
     }
 

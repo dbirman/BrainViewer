@@ -313,42 +313,45 @@ namespace Urchin.API
         public static Action ClearFOV;
         public static Action ClearCustomMeshes;
         public static Action ClearLines;
-        public static List<Action> ClearAll = new List<Action> { ClearProbes, ClearAreas, ClearVolumes,
+        public static List<Action> _clearAll = new List<Action> { ClearProbes, ClearAreas, ClearVolumes,
             ClearText, ClearParticles, ClearMeshes, ClearFOV, ClearCustomMeshes, ClearLines};
         private void Clear(string val)
         {
+            for (int i = 0; i < _clearAll.Count; i++)
+                Debug.Log(_clearAll[i]);
+
             switch (val)
             {
                 case "all":
-                    foreach (var action in ClearAll)
-                        action?.Invoke();
+                    foreach (var action in _clearAll)
+                        action.Invoke();
                     break;
                 case "probes":
-                    ClearProbes?.Invoke();
+                    ClearProbes.Invoke();
                     break;
                 case "area":
-                    ClearAreas?.Invoke();
+                    ClearAreas.Invoke();
                     break;
                 case "volume":
-                    ClearVolumes?.Invoke();
+                    ClearVolumes.Invoke();
                     break;
                 case "text":
-                    ClearText?.Invoke();
+                    ClearText.Invoke();
                     break;
                 case "particles":
-                    ClearParticles?.Invoke();
+                    ClearParticles.Invoke();
                     break;
                 case "mesh":
-                    ClearMeshes?.Invoke();
+                    ClearMeshes.Invoke();
                     break;
                 case "texture":
-                    ClearFOV?.Invoke();
+                    ClearFOV.Invoke();
                     break;
                 case "custom":
-                    ClearCustomMeshes?.Invoke();
+                    ClearCustomMeshes.Invoke();
                     break;
                 case "lines":
-                    ClearLines?.Invoke();
+                    ClearLines.Invoke();
                     break;
                     
             }

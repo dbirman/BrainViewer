@@ -14,6 +14,15 @@ namespace Urchin.Managers
     public enum ManagerType
     {
         PrimitiveMeshManager = 0,
-
+        AtlasManager = 1,
+        CameraManager = 2,
+        CustomMeshManager = 3,
+        FOVManager = 4,
+        LightManager = 5,
+        LineRendererManager = 6,
+        ParticleManager = 7,
+        ProbeManager = 8,
+        TextManager = 9,
+        VolumeManager = 10
     }
 }

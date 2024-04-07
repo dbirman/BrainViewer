@@ -77,7 +77,7 @@ def save(filename = None, bucket_name = None, password = None):
     check_and_store(bucket_name, password)
 
     data = SaveRequest(
-        filename=filename,
+        filename= "" if filename is None else filename,
         bucket= active_bucket,
         password= password_hash
     )
@@ -104,7 +104,7 @@ def load(filename = None, bucket_name = None, password= None):
     check_and_store(bucket_name, password)
 
     data = LoadRequest(
-        filename=filename, 
+        filename= "" if filename is None else filename, 
         bucket= active_bucket,
         password= password_hash
     )

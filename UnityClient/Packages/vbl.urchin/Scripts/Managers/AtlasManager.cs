@@ -20,7 +20,7 @@ namespace Urchin.Managers
         #region static
         public static HashSet<OntologyNode> VisibleNodes { get; private set; }
 
-        public override ManagerType Type => throw new NotImplementedException();
+        public override ManagerType Type => ManagerType.AtlasManager;
 
         public static AtlasManager Instance;
         #endregion
