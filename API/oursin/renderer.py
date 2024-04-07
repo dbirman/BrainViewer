@@ -12,6 +12,7 @@ except ImportError:
 	pass
 
 from . import client
+from . import camera
 
 def is_running_in_colab():
 	return notebook and 'google.colab' in str(get_ipython())
@@ -50,6 +51,9 @@ def setup(localhost = False, standalone = False, verbose = True):
 			javascript_code = f'window.open("{url}", "_blank", "{window_features}");'
 			# Display the JavaScript code to open the new window
 			display(Javascript(javascript_code))
+
+	# Set up the main camera
+	camera.setup()
 
 ######################
 # CLEAR #

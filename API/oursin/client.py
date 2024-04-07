@@ -7,7 +7,6 @@ from . import camera
 from . import volumes
 from . import meshes
 
-from pydantic import from_json
 from vbl_aquarium.models.logging import *
 
 class bcolors:
@@ -28,17 +27,18 @@ def disconnect():
 
 @sio.on('log')
 def message(data):
-	out = from_json(data)
+	print(data)
+	out = Log.model_validate_json(data)
 	print('(Renderer) ' + out.msg)
 
 @sio.on('log-warning')
 def message(data):
-	out = from_json(data)
+	out = LogWarning.model_validate_json(data)
 	print('(Renderer) ' + bcolors.WARNING + out.msg)
 
 @sio.on('log-error')
 def message(data):
-	out = from_json(data)
+	out = LogError.model_validate_json(data)
 	print('(Renderer) ' + bcolors.FAIL + out.msg)
 
 ###### CALLBACKS #######

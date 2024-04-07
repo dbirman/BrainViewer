@@ -1,11 +1,11 @@
 using System;
 [Serializable]
-public struct BucketModel
+public struct BucketRequest
 {
     public string Token;
     public string Password;
 
-    public BucketModel(string token, string password)
+    public BucketRequest(string token, string password)
     {
         Token = token;
         Password = password;
@@ -13,24 +13,50 @@ public struct BucketModel
 }
 
 [Serializable]
-public struct DownloadModel
+public struct DownloadRequest
 {
     public string Password;
 
-    public DownloadModel(string password)
+    public DownloadRequest(string password)
     {
         Password = password;
+    }
+}
+
+[Serializable]
+public struct DownloadResponse
+{
+    public string Type;
+    public string Data;
+
+    public DownloadResponse(string type, string data)
+    {
+        Type = type;
+        Data = data;
     }
 }
 
 [Serializable]
 public struct LoadModel
 {
+    public int[] Types;
+    public string[] Data;
+
+    public LoadModel(int[] types, string[] data)
+    {
+        Types = types;
+        Data = data;
+    }
+}
+
+[Serializable]
+public struct LoadRequest
+{
     public string Filename;
     public string Bucket;
     public string Password;
 
-    public LoadModel(string filename, string bucket, string password)
+    public LoadRequest(string filename, string bucket, string password)
     {
         Filename = filename;
         Bucket = bucket;
@@ -39,13 +65,13 @@ public struct LoadModel
 }
 
 [Serializable]
-public struct SaveModel
+public struct SaveRequest
 {
     public string Filename;
     public string Bucket;
     public string Password;
 
-    public SaveModel(string filename, string bucket, string password)
+    public SaveRequest(string filename, string bucket, string password)
     {
         Filename = filename;
         Bucket = bucket;
@@ -54,13 +80,15 @@ public struct SaveModel
 }
 
 [Serializable]
-public struct UploadModel
+public struct UploadRequest
 {
+    public int Type;
     public string Data;
     public string Password;
 
-    public UploadModel(string data, string password)
+    public UploadRequest(int type, string data, string password)
     {
+        Type = type;
         Data = data;
         Password = password;
     }

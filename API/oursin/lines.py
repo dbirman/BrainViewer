@@ -9,6 +9,11 @@ from vbl_aquarium.models.generic import IDData
 
 counter = 0
 
+def clear():
+    """Clear all custom meshes
+    """
+    client.sio.emit('Clear','lines')
+
 class Line:
   def __init__(self, positions= [[0.0,0.0,0.0]], color= [1, 1, 1]):
     global counter

@@ -9,16 +9,6 @@ namespace Urchin.Managers
         public abstract string ToSerializedData();
         public abstract void FromSerializedData(string serializedData);
 
-
-        public static string Type2String(ManagerType type)
-        {
-            switch (type)
-            {
-                case ManagerType.PrimitiveMeshManager:
-                    return "meshes";
-            }
-            return "";
-        }
     }
 
     public enum ManagerType

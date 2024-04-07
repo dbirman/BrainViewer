@@ -291,13 +291,13 @@ namespace Urchin.API
             //manager.Socket.On<string>("CustomMeshScale", x => CustomMeshScale.Invoke(JsonUtility.FromJson<Vector3Data>(x)));
         }
 
-        public static Action<SaveModel> Save;
-        public static Action<LoadModel> Load;
+        public static Action<SaveRequest> Save;
+        public static Action<LoadRequest> Load;
 
         private void Start_Dock()
         {
-            manager.Socket.On<string>("urchin-save", x => Save.Invoke(JsonUtility.FromJson<SaveModel>(x)));
-            manager.Socket.On<string>("urchin-load", x => Load.Invoke(JsonUtility.FromJson<LoadModel>(x)));
+            manager.Socket.On<string>("urchin-save", x => Save.Invoke(JsonUtility.FromJson<SaveRequest>(x)));
+            manager.Socket.On<string>("urchin-load", x => Load.Invoke(JsonUtility.FromJson<LoadRequest>(x)));
         }
 
         #endregion
@@ -396,17 +396,17 @@ namespace Urchin.API
 
         public static void Log(string msg)
         {
-            manager.Socket.Emit("log", msg);
+            manager.Socket.Emit("log", JsonUtility.ToJson(new Log(msg)));
         }
 
         public static void LogWarning(string msg)
         {
-            manager.Socket.Emit("log-warning", msg);
+            manager.Socket.Emit("log-warning", JsonUtility.ToJson(new LogWarning(msg)));
         }
 
         public static void LogError(string msg)
         {
-            manager.Socket.Emit("log-error", $"{msg} -- errors can be reported at https://github.com/VirtualBrainLab/Urchin/issues");
+            manager.Socket.Emit("log-error", JsonUtility.ToJson(new LogError($"{msg} -- errors can be reported at https://github.com/VirtualBrainLab/Urchin/issues")));
         }
     }
 

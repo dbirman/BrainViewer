@@ -287,7 +287,7 @@ class Camera:
 			value= utils.formatted_vector2(size)
 		)
 		
-		client.sio.emit('urchin-camera-screenshot-request', data.to_string()))
+		client.sio.emit('urchin-camera-screenshot-request', data.to_string())
 
 		while not self.image_received:
 			await asyncio.sleep(0.1)
@@ -411,5 +411,6 @@ def set_brain_rotation(yaw):
 	"""
 
 	client.sio.emit('urchin-brain-yaw', FloatData(id='', value=yaw).to_string())
-	
-main = Camera(main = True)
+
+def setup():
+	main = Camera(main = True)
