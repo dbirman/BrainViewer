@@ -26,7 +26,7 @@ namespace Urchin.Managers
 
         private void Start()
         {
-            Client_SocketIO.TextUpdate += Create;
+            Client_SocketIO.TextUpdate += UpdateData;
             Client_SocketIO.TextDelete += Delete;
             Client_SocketIO.TextSetTexts += SetTexts;
             Client_SocketIO.TextSetColors += SetColors;
@@ -48,6 +48,7 @@ namespace Urchin.Managers
                 text.text = data.Text;
                 text.color = data.Color;
                 text.fontSize = data.FontSize;
+                SetPosition(_textGOs[data.ID], data.Position);
             }
             else
             {

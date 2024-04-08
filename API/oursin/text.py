@@ -17,7 +17,7 @@ def clear():
     client.sio.emit('Clear','text')
 
 class Text:
-  def __init__(self, text = "", color = "#FFFFFF", font_size = 12, position = [0,0]):
+  def __init__(self, text = "", color = [1, 1, 1], font_size = 12, position = [0,0]):
     global counter
     counter +=1
 
@@ -26,7 +26,7 @@ class Text:
       text = text,
       color = utils.formatted_color(color),
       font_size=font_size,
-      position=position
+      position=utils.formatted_vector2(position)
     )
 
     self._update()
@@ -148,6 +148,9 @@ def set_texts(text_list, str_list):
   """
   str_list = utils.sanitize_list(str_list, len(text_list))
 
+  for text, str, in zip(text_list, str_list):
+    text.data.text = str
+
   data = IDListStringList(
     ids = [text.data.id for text in text_list],
     values= [string for string in str_list]
@@ -169,9 +172,12 @@ def set_positions(text_list, pos_list):
   """
   pos_list = utils.sanitize_list(pos_list, len(text_list))
   
+  for text, pos, in zip(text_list, pos_list):
+    text.data.position = utils.formatted_vector2(pos)
+
   data = IDListVector2List(
     ids = [text.data.id for text in text_list],
-    values = [utils.formatted_vector2(x) for x in pos_list]
+    values = [text.data.position for text in text_list]
   )
 
   client.sio.emit('urchin-text-positions', data.to_string())
@@ -186,10 +192,15 @@ def set_font_sizes(text_list, font_size_list):
   font_size_list : _type_
       _description_
   """
+
+  font_size_list = utils.sanitize_list(font_size_list, len(text_list))
   
+  for text, font_size, in zip(text_list, font_size_list):
+    text.data.font_size = font_size
+
   data = IDListFloatList(
     ids = [text.data.id for text in text_list],
-    values= utils.sanitize_list(font_size_list, len(text_list))
+    values= [text.data.font_size for text in text_list]
   )
   
   client.sio.emit('urchin-text-sizes', data.to_string())
@@ -206,9 +217,12 @@ def set_colors(text_list, color_list):
   """
   color_list = utils.sanitize_list(color_list, len(text_list))
 
+  for text, color, in zip(text_list, color_list):
+    text.data.color = utils.formatted_color(color)
+
   data = IDListColorList(
     ids = [text.data.id for text in text_list],
-    values= [utils.formatted_color(color) for color in color_list]
+    values= [text.data.color for text in text_list]
   )
   
   client.sio.emit('urchin-text-colors', data.to_string())

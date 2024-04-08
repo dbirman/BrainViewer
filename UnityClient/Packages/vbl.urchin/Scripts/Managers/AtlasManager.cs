@@ -156,6 +156,12 @@ namespace Urchin.Managers
             }
 #endif
 
+            if (BrainAtlasManager.ActiveReferenceAtlas != null)
+            {
+                Client_SocketIO.LogWarning($"Atlas cannot be loaded twice, restart the renderer.");
+                return;
+            }
+
             await BrainAtlasManager.LoadAtlas(atlasName);
 
             BrainAtlasManager.SetReferenceCoord(Utils.Utils.BregmaDefaults[BrainAtlasManager.ActiveReferenceAtlas.Name]);

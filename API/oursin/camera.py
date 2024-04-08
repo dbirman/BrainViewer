@@ -19,6 +19,8 @@ receive_totalBytes = {}
 receive_bytes = {}
 receive_camera = {}
 
+main = []
+
 PIL.Image.MAX_IMAGE_PIXELS = 22500000
 
 # Handle receiving camera images back as screenshots
@@ -78,8 +80,6 @@ class Camera:
 		self.in_unity = True
 		self.image_received_event = asyncio.Event()
 		self.loop = asyncio.get_event_loop()
-
-		self.background_color = '#ffffff'
 
 	def _update(self):
 		client.sio.emit('urchin-camera-update', self.data.to_string())
@@ -413,4 +413,5 @@ def set_brain_rotation(yaw):
 	client.sio.emit('urchin-brain-yaw', FloatData(id='', value=yaw).to_string())
 
 def setup():
+	global main
 	main = Camera(main = True)

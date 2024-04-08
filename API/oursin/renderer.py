@@ -17,7 +17,7 @@ from . import camera
 def is_running_in_colab():
 	return notebook and 'google.colab' in str(get_ipython())
 
-def setup(localhost = False, standalone = False, verbose = True):
+def setup(localhost = False, standalone = False, id = None):
 	"""Connect the Unity Renderer for Neuroscience Python API to the web-based (or standalone) viewer
 
 	Parameters
@@ -31,8 +31,9 @@ def setup(localhost = False, standalone = False, verbose = True):
 	if client.connected():
 		print(f'(urchin) Client is already connected. Use ID: {client.ID}')
 		return
-		
-	log_messages = verbose
+	
+	if id is not None:
+		client.ID = id
 
 	if localhost:
 		client.sio.connect('http://localhost:5000')

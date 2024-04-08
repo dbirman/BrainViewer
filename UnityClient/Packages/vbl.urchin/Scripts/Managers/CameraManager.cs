@@ -51,6 +51,8 @@ namespace Urchin.Managers
 
         private void Start()
         {
+            Client_SocketIO.UpdateCamera += UpdateData;
+
             Client_SocketIO.SetCameraLerpRotation += SetLerpStartEnd;
             Client_SocketIO.SetCameraLerp += SetLerp;
             Client_SocketIO.CameraBrainYaw += SetBrainYaw;
