@@ -168,7 +168,7 @@ namespace Urchin.API
         public static Action<CameraRotationModel> SetCameraLerpRotation;
         public static Action<FloatData> SetCameraLerp;
         public static Action<FloatData> CameraBrainYaw;
-        public static Action<string> RequestScreenshot;
+        public static Action<Vector2Data> RequestScreenshot;
 
         public static Action<CameraModel> UpdateCamera;
         public static Action<IDData> DeleteCamera;
@@ -181,7 +181,7 @@ namespace Urchin.API
 
             manager.Socket.On<string>("urchin-camera-lerp-set", x => SetCameraLerpRotation.Invoke(JsonUtility.FromJson<CameraRotationModel>(x)));
             manager.Socket.On<string>("urchin-camera-lerp", x => SetCameraLerp.Invoke(JsonUtility.FromJson<FloatData>(x)));
-            manager.Socket.On<string>("urchin-camera-screenshot-request", x => RequestScreenshot.Invoke(x));
+            manager.Socket.On<string>("urchin-camera-screenshot-request", x => RequestScreenshot.Invoke(JsonUtility.FromJson<Vector2Data>(x)));
 
 
             manager.Socket.On<string>("urchin-brain-yaw", x => CameraBrainYaw.Invoke(JsonUtility.FromJson<FloatData>(x)));

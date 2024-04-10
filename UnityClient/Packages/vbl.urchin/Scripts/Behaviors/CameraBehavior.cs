@@ -102,7 +102,7 @@ namespace Urchin.Behaviors
         /// Take a screenshot and send it back via the ReceiveCameraImgMeta and ReceiveCameraImg messages
         /// </summary>
         /// <param name="size"></param>
-        public void Screenshot(int[] size)
+        public void Screenshot(Vector2 size)
         {
             StartCoroutine(ScreenshotHelper(size));
         }
@@ -111,29 +111,32 @@ namespace Urchin.Behaviors
         /// Capture the output from this camera into a texture
         /// </summary>
         /// <returns></returns>
-        private IEnumerator ScreenshotHelper(int[] size)
+        private IEnumerator ScreenshotHelper(Vector2 size)
         {
             RenderTexture originalTexture = ActiveCamera.targetTexture;
-            int originalCullingMask = ActiveCamera.cullingMask;
+            //int originalCullingMask = ActiveCamera.cullingMask;
 
             // Set the UI layer to not be rendered
             int uiLayer = LayerMask.NameToLayer("UI");
             ActiveCamera.cullingMask &= ~(1 << uiLayer);
 
-            RenderTexture captureTexture = new RenderTexture(size[0], size[1], 24);
+            int width = Mathf.RoundToInt(size.x);
+            int height = Mathf.RoundToInt(size.y);
+
+            RenderTexture captureTexture = new RenderTexture(width, height, 24);
             ActiveCamera.targetTexture = captureTexture;
 
             yield return new WaitForEndOfFrame();
 
             // Save to Texture2D
-            Texture2D screenshotTexture = new Texture2D(size[0], size[1], TextureFormat.RGB24, false);
+            Texture2D screenshotTexture = new Texture2D(width, height, TextureFormat.RGB24, false);
             RenderTexture.active = captureTexture;
-            screenshotTexture.ReadPixels(new Rect(0, 0, size[0], size[1]), 0, 0);
+            screenshotTexture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             screenshotTexture.Apply();
 
             // return the camera
             ActiveCamera.targetTexture = originalTexture;
-            ActiveCamera.cullingMask = originalCullingMask;
+            //ActiveCamera.cullingMask = originalCullingMask;
             RenderTexture.active = null;
             captureTexture.Release();
 

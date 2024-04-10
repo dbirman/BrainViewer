@@ -2,6 +2,7 @@ using BrainAtlas;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Urchin.API;
 using Urchin.Behaviors;
 using Urchin.Cameras;
@@ -19,7 +20,6 @@ namespace Urchin.Managers
         [SerializeField] private CameraBehavior mainCamera;
         [SerializeField] private LightBehavior _lightBehavior;
         [SerializeField] private AtlasManager _areaManager;
-        [SerializeField] private Canvas _uiCanvas;
 
         // Used for doing independent brain Yaw rotations
         [SerializeField] private List<Transform> _yawTransforms;
@@ -33,7 +33,6 @@ namespace Urchin.Managers
 
         private Quaternion _startRotation;
         private Quaternion _endRotation;
-
         #endregion
 
         #region Unity functions
@@ -56,6 +55,8 @@ namespace Urchin.Managers
             Client_SocketIO.SetCameraLerpRotation += SetLerpStartEnd;
             Client_SocketIO.SetCameraLerp += SetLerp;
             Client_SocketIO.CameraBrainYaw += SetBrainYaw;
+
+            Client_SocketIO.RequestScreenshot += RequestScreenshot;
 
             Client_SocketIO.DeleteCamera += DeleteCamera;
         }
@@ -158,11 +159,9 @@ namespace Urchin.Managers
             }
         }
 
-        public void RequestScreenshot(string data)
+        public void RequestScreenshot(Vector2Data data)
         {
-            ScreenshotData screenshotData = JsonUtility.FromJson<ScreenshotData>(data);
-
-            _cameras[screenshotData.name].Screenshot(screenshotData.size);
+            _cameras[data.ID].Screenshot(data.Value);
         }
 
         public void SetCameraYAngle(Dictionary<string, float> cameraYAngle)
@@ -266,16 +265,6 @@ namespace Urchin.Managers
             _lightBehavior.SetRotation(new Vector3(eulerAngles[0], eulerAngles[1], eulerAngles[2]));
         }
 
-        #endregion
-
-        #region JSON data definitions
-
-        [Serializable]
-        private struct ScreenshotData
-        {
-            public string name;
-            public int[] size;
-        }
         #endregion
     }
 }

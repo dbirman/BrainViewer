@@ -185,7 +185,7 @@ class Camera:
 		
 	# 	camera_target_area
 	# 	self.target = camera_target_area
-	# 	client.sio.emit('SetCameraTargetArea', {self.id: camera_target_area})
+	# 	client.sio.emit('SetCameraTargetArea', {self.data.id: camera_target_area})
 
 	def set_pan(self,pan_x, pan_y):
 		"""Set camera pan coordinates
@@ -277,7 +277,7 @@ class Camera:
 		global receive_totalBytes, receive_bytes, receive_camera
 		self.image_received_event.clear()
 		self.image_received = False
-		receive_camera[self.id] = self
+		receive_camera[self.data.id] = self
 
 		if size[0] > 15000 or size[1] > 15000:
 			raise Exception('(urchin.camera) Screenshots can''t exceed 15000x15000')
@@ -294,12 +294,12 @@ class Camera:
 		# await self.image_received_event.wait()
 
 		# image is here, reconstruct it
-		img = Image.open(io.BytesIO(receive_bytes[self.id]))
+		img = Image.open(io.BytesIO(receive_bytes[self.data.id]))
 		
-		print(f'(Camera receive) {self.id} complete')
-		del receive_totalBytes[self.id]
-		del receive_bytes[self.id]
-		del receive_camera[self.id]
+		print(f'(Camera receive) {self.data.id} complete')
+		del receive_totalBytes[self.data.id]
+		del receive_bytes[self.data.id]
+		del receive_camera[self.data.id]
 
 		if not filename == 'return':
 			img.save(filename)
@@ -309,7 +309,8 @@ class Camera:
 	async def capture_video(self, file_name, callback = None,
 						 start_rotation = None, end_rotation = None,
 						 frame_rate = 30, duration = 5,
-						 size = (1024,768)):
+						 size = (1024,768),
+						 test = False):
 		"""Capture a video and save it to a file, must be awaited
 
 		Can be used in two modes, either by specifying a callback(frame#) or a start/end_rotation
@@ -360,17 +361,18 @@ class Camera:
 				perc = frame / n_frames
 
 				client.sio.emit('urchin-camera-lerp', FloatData(
-					id=self.id,
+					id=self.data.id,
 					value=perc
 				).to_string())
 			
-			img = await self.screenshot([size[0], size[1]])
-			image_array = np.array(img)
-			image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
-			out.write(image_array)
+			if not test:
+				img = await self.screenshot([size[0], size[1]])
+				image_array = np.array(img)
+				image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2BGR)
+				out.write(image_array)
 		
 		out.release()
-		print(f'Video captured on {self.id} saved to {file_name}')
+		print(f'Video captured on {self.data.id} saved to {file_name}')
 
 
 def set_light_rotation(angles):
