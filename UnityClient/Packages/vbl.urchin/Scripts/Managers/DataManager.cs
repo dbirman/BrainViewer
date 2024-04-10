@@ -11,6 +11,8 @@ using Urchin.Managers;
 public class DataManager : MonoBehaviour
 {
     [SerializeField] AtlasManager _atlasManager;
+    [SerializeField] CameraManager _cameraManager;
+    [SerializeField] LineRendererManager _lineRendererManager;
     [SerializeField] PrimitiveMeshManager _primitiveMeshManager;
 
     [SerializeField] private string apiURL;
@@ -20,9 +22,13 @@ public class DataManager : MonoBehaviour
     #region Unity
     private void Awake()
     {
-        _managers = new();
-        _managers.Add(_atlasManager);
-        _managers.Add(_primitiveMeshManager);
+        _managers = new()
+        {
+            _atlasManager,
+            _primitiveMeshManager,
+            _cameraManager,
+            _lineRendererManager
+        };
 
         Client_SocketIO.Save += x => StartCoroutine(Save(x));
         Client_SocketIO.Load += x => StartCoroutine(Load(x));

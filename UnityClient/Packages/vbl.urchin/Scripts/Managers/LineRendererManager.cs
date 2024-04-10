@@ -1,13 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 using Urchin.API;
 
 namespace Urchin.Managers
 {
-    public class LineRendererManager : MonoBehaviour
+    public class LineRendererManager : Manager
     {
         #region Public
         [SerializeField] private GameObject _lineRendererPrefabGO;
@@ -17,6 +15,9 @@ namespace Urchin.Managers
         //Keep a dictionary that maps string names to line renderer components 
         private Dictionary<string, LineBehavior> _lineBehaviors;
 
+        public override ManagerType Type => ManagerType.LineRendererManager;
+
+        #region Unity
         private void Awake()
         {
             _lineBehaviors = new();
@@ -29,6 +30,31 @@ namespace Urchin.Managers
 
             Client_SocketIO.ClearLines += Clear;
         }
+        #endregion
+
+        #region Manager
+
+        public override string ToSerializedData()
+        {
+            return JsonUtility.ToJson(new LineManagerModel()
+            {
+                Data = _lineBehaviors.Values.Select(x => x.Data).ToArray(),
+            });
+        }
+
+        public override void FromSerializedData(string serializedData)
+        {
+            LineManagerModel lineManagerModel = JsonUtility.FromJson<LineManagerModel>(serializedData);
+
+            foreach (var data in lineManagerModel.Data)
+                UpdateData(data);
+        }
+
+        private struct LineManagerModel
+        {
+            public LineModel[] Data;
+        }
+        #endregion
 
         public void UpdateData(LineModel data)
         {

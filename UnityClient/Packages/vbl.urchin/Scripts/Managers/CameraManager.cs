@@ -9,7 +9,7 @@ using Urchin.Cameras;
 
 namespace Urchin.Managers
 {
-    public class CameraManager : MonoBehaviour
+    public class CameraManager : Manager
     {
         #region Exposed fields
         [SerializeField] private GameObject _cameraPrefab;
@@ -33,6 +33,8 @@ namespace Urchin.Managers
 
         private Quaternion _startRotation;
         private Quaternion _endRotation;
+
+        public override ManagerType Type => ManagerType.CameraManager;
         #endregion
 
         #region Unity functions
@@ -63,6 +65,33 @@ namespace Urchin.Managers
 
         #endregion
 
+        #region Manager functions
+        public override string ToSerializedData()
+        {
+            CameraManagerModel cameraManagerModel = new CameraManagerModel();
+            List<CameraModel> cameraModels = new List<CameraModel>();
+
+            foreach (var kvp in _cameras)
+                cameraModels.Add(kvp.Value.Data);
+
+            cameraManagerModel.Data = cameraModels.ToArray();
+
+            return JsonUtility.ToJson(cameraManagerModel);
+        }
+
+        public override void FromSerializedData(string serializedData)
+        {
+            CameraManagerModel cameraManagerModel = JsonUtility.FromJson<CameraManagerModel>(serializedData);
+
+            foreach (CameraModel data in cameraManagerModel.Data)
+                UpdateData(data);
+        }
+
+        private struct CameraManagerModel
+        {
+            public CameraModel[] Data;
+        }
+        #endregion
 
         #region Public camera functions
 

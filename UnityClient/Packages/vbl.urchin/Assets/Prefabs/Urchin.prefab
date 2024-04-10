@@ -471,7 +471,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68ebc6bd38932624caaa142ffb9d73b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _primitiveMeshManager: {fileID: 0}
+  _atlasManager: {fileID: 7683298792840207488}
+  _primitiveMeshManager: {fileID: 1366211727439126397}
+  _cameraManager: {fileID: 756099984625368948}
   apiURL: 
 --- !u!1 &5012633055188078402
 GameObject:
@@ -612,7 +614,6 @@ MonoBehaviour:
   mainCamera: {fileID: 3393775226113162772}
   _lightBehavior: {fileID: 6701840750721492199}
   _areaManager: {fileID: 7683298792840207488}
-  _uiCanvas: {fileID: 0}
   _yawTransforms: []
   _cameraUIGOs: []
 --- !u!1 &8426956946971419449
@@ -726,6 +727,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 1b5463b1e2e640845ab8f1005a84aafe, type: 2}
   - {fileID: 2100000, guid: 7864e8cafb9a00a4d9f06e4295d0df69, type: 2}
   - {fileID: 2100000, guid: a3621f25cab63014eb488d47d569cf72, type: 2}
+  _psystemPrefabGO: {fileID: 0}
+  _psystemParentT: {fileID: 0}
 --- !u!1001 &648514006979445990
 PrefabInstance:
   m_ObjectHideFlags: 0

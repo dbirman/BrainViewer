@@ -1859,14 +1859,6 @@ PrefabInstance:
       propertyPath: apiURL
       value: http://localhost:5000
       objectReference: {fileID: 0}
-    - target: {fileID: 6673900150076075548, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
-      propertyPath: _atlasManager
-      value: 
-      objectReference: {fileID: 926747821}
-    - target: {fileID: 6673900150076075548, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
-      propertyPath: _primitiveMeshManager
-      value: 
-      objectReference: {fileID: 431647799}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _apiNames.Array.size
       value: 3
@@ -1953,17 +1945,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
---- !u!114 &431647799 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1366211727439126397, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
-  m_PrefabInstance: {fileID: 431647798}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5c98e43f8f735543a2aa9aa6c5fdd2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &441444073
 PrefabInstance:
   m_ObjectHideFlags: 0

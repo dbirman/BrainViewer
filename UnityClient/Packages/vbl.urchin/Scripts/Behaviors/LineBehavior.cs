@@ -5,7 +5,7 @@ using UnityEngine;
 public class LineBehavior : MonoBehaviour
 {
     private LineRenderer _lineRenderer;
-    private LineModel _data;
+    public LineModel Data { get; private set; }
 
     private void Awake()
     {
@@ -14,9 +14,9 @@ public class LineBehavior : MonoBehaviour
 
     public void UpdateData(LineModel data)
     {
-        _data = data;
+        Data = data;
 
-        _lineRenderer.SetPositions(_data.Positions);
-        _lineRenderer.material.color = _data.Color;
+        _lineRenderer.SetPositions(Data.Positions);
+        _lineRenderer.material.color = Data.Color;
     }
 }
