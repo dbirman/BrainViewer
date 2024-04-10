@@ -6,6 +6,15 @@ global_binned_spikes = None
 global_prepped_data = None
 neurons = None
 neuron_colors = None
+stim_id = None
+
+n_fig = None
+n_ax = None
+n_vline = None
+
+s_fig = None
+s_ax = None
+s_vline = None
 # def slider_widget(function_call, slider_parameters):
 #     """Creates a slider in the notebook, displays results of the input function
     
@@ -140,7 +149,7 @@ def spikes_binned_event_average(event_start, event_ids, binned_spikes = None, bi
     global_prepped_data = final_avg
     return final_avg
 
-def slope_viz_stimuli_per_neuron(prepped_data = None, t=-100, neuron_id = 0):
+def slope_viz_stimuli_per_neuron(change, prepped_data = None, t=-100):
     """Visualizes and creates interactive plot for the average of each stimulus per neuron
     
     Parameters
@@ -166,32 +175,39 @@ def slope_viz_stimuli_per_neuron(prepped_data = None, t=-100, neuron_id = 0):
         raise ImportError("Matplotlib package is not installed. Please pip install matplotlib to use this function.")
     
     global global_prepped_data
+    global n_fig, n_ax, n_vline
     if prepped_data is None:
         prepped_data = global_prepped_data
 
+    if isinstance(change, int):
+        neuron_id = change
+    else:
+        neuron_id = change.new
+
     # Plotting data:
+    n_ax.clear()
     for i in range(0,prepped_data.shape[1]):
         y = prepped_data[neuron_id][i]
         x = np.arange(-100, 520, step=20)
-        plt.plot(x,y, color='dimgray')
+        n_ax.plot(x,y, color='dimgray')
 
     # Labels:
-    plt.xlabel('Time from stimulus onset')
-    plt.ylabel('Number of Spikes Per Second')
-    plt.title(f'Neuron {neuron_id} Spiking Activity with Respect to Each Stimulus')
+    n_ax.set_xlabel('Time from stimulus onset')
+    n_ax.set_ylabel('Number of Spikes Per Second')
+    n_ax.set_title(f'Neuron {neuron_id} Spiking Activity with Respect to Each Stimulus')
 
     #Accessories:
-    plt.axvspan(0, 300, color='gray', alpha=0.3)
-    plt.axvline(t, color='red', linestyle='--',)
+    n_ax.axvspan(0, 300, color='gray', alpha=0.3)
+    n_vline = n_ax.axvline(t, color='red', linestyle='--',)
     # Set y-axis limits
      # Calculate y-axis limits
     max_y = max([max(prepped_data[neuron_id][i]) for i in range(10)])  # Maximum y-value across all lines
     if max_y < 10:
         max_y = 10  # Set ymax to 10 if the default max is lower than 10
-    plt.ylim(0, max_y)
+    n_ax.set_ylim(0, max_y)
    
     # plt.legend()
-    plt.show()
+    # plt.show()
     
 def update_neuron_sizing(stim_id, t, prepped_data = None):
         global neurons
@@ -224,7 +240,7 @@ def update_neuron_sizing(stim_id, t, prepped_data = None):
         
         particles._set_sizes(particle_size_list)
 
-def slope_viz_neurons_per_stimuli(prepped_data = None, n_color = None, t=-100, stim_id = 0):
+def slope_viz_neurons_per_stimuli(change, prepped_data = None, n_color = None, t=-100):
     """Visualizes and creates interactive plot for the average of every neuron per stimulus
     
     Parameters
@@ -257,23 +273,45 @@ def slope_viz_neurons_per_stimuli(prepped_data = None, n_color = None, t=-100, s
     if n_color is None:
         n_color = neuron_colors
 
+    global s_fig, s_ax, s_vline, stim_id
+
+    if isinstance(change, int):
+        stim_id = change
+    else:
+        stim_id = change.new
+
      # Plotting data:
+    s_ax.clear()
     for i in range(0,prepped_data.shape[0]):
         y = prepped_data[i][stim_id]
         x = np.arange(-100, 520, step=20)
-        plt.plot(x,y, color = n_color[i])
+        s_ax.plot(x,y, color = n_color[i])
     
     # Labels:
-    plt.xlabel(f'Time from Stimulus {stim_id} display (20 ms bins)')
-    plt.ylabel('Number of Spikes Per Second')
-    plt.title(f'Neuron Spiking Activity with Respect to Stimulus ID {stim_id}')
+    s_ax.set_xlabel(f'Time from Stimulus {stim_id} display (20 ms bins)')
+    s_ax.set_ylabel('Number of Spikes Per Second')
+    s_ax.set_title(f'Neuron Spiking Activity with Respect to Stimulus ID {stim_id}')
 
     # Accessories:
-    plt.axvspan(0, 300, color='gray', alpha=0.3)
-    plt.axvline(t, color='red', linestyle='--',)
+    s_ax.axvspan(0, 300, color='gray', alpha=0.3)
+    s_vline = s_ax.axvline(t, color='red', linestyle='--',)
 
-    plt.show()
+    # plt.show()
 
+    # update_neuron_sizing(stim_id, t)
+
+def update_nline(position):
+    global n_vline, n_fig
+    position = position.new
+    n_vline.set_xdata([position, position])  # Update x value of the vertical line
+    n_fig.canvas.draw_idle()
+
+def update_sline(t):
+    global s_vline, s_fig, stim_id
+    t = t.new
+    s_vline.set_xdata([t, t])  # Update x value of the vertical line
+    s_fig.canvas.draw_idle()
+    global stim_id
     update_neuron_sizing(stim_id, t)
 
 def plot_appropriate_interactive_graph(prepped_data = None, view = "stim", window_start_sec = 0.1, window_end_sec = 0.5):
@@ -298,28 +336,53 @@ def plot_appropriate_interactive_graph(prepped_data = None, view = "stim", windo
         import ipywidgets as widgets
     except ImportError:
         raise ImportError("Widgets package is not installed. Please pip install ipywidgets to use this function.")
+    
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        raise ImportError("Matplotlib package is not installed. Please pip install matplotlib to use this function.")
+    
+    from IPython.display import display
         
     global global_prepped_data
     if prepped_data is None:
         prepped_data = global_prepped_data
     
-    time_slider = widgets.IntSlider(value=-1e3 * window_start_sec, min=-1e3 * window_start_sec, max=5e3 * window_start_sec, step=5, description='Time')
-    time_slider.layout.width = '6.53in'
-    time_slider.layout.margin = '0 -4px'
+    
     
     if view == "stim":
+        global s_fig, s_ax
+        s_fig, s_ax = plt.subplots()
+
+        time_slider = widgets.IntSlider(value=-1e3 * window_start_sec, min=-1e3 * window_start_sec, max=5e3 * window_start_sec, step=5, description='Time')
+        time_slider.layout.width = '6.53in'
+        time_slider.layout.margin = '0 -4px'
+
         stimuli_dropdown = widgets.Dropdown(
             options= range(0,prepped_data.shape[1]),
             value=0,
             description='Stimulus ID:',
         )
         stimuli_dropdown.layout.margin = "20px 20px"
-        output = widgets.interactive_output(slope_viz_neurons_per_stimuli, {'t': time_slider, 'stim_id': stimuli_dropdown})
-        # Display the widgets and the output
-        display(widgets.VBox([stimuli_dropdown,time_slider]))
-        display(output)
+        # output = widgets.interactive_output(slope_viz_neurons_per_stimuli, {'t': time_slider, 'stim_id': stimuli_dropdown})
+        # # Display the widgets and the output
+        # display(widgets.VBox([stimuli_dropdown,time_slider]))
+        # display(output)
+
+        ui = widgets.VBox([stimuli_dropdown,time_slider])
+        slope_viz_neurons_per_stimuli(stimuli_dropdown.value)
+        time_slider.observe(update_sline, names = "value")
+        stimuli_dropdown.observe(slope_viz_neurons_per_stimuli, names = "value")
+        display(ui)
     
     elif view == "neuron":
+        global n_fig, n_ax
+        n_fig, n_ax = plt.subplots()
+
+        time_slider = widgets.IntSlider(value=-1e3 * window_start_sec, min=-1e3 * window_start_sec, max=5e3 * window_start_sec, step=5, description='Time')
+        time_slider.layout.width = '6.53in'
+        time_slider.layout.margin = '0 -4px'
+
         neuron_dropdown = widgets.Dropdown(
             options= range(0,prepped_data.shape[0]),
             value=354,
@@ -327,13 +390,18 @@ def plot_appropriate_interactive_graph(prepped_data = None, view = "stim", windo
         )
         neuron_dropdown.layout.margin = "20px 20px"
 
-        # Link the function with the interact function
-        output = widgets.interactive_output(slope_viz_stimuli_per_neuron, {'t': time_slider, 'neuron_id': neuron_dropdown})
+        # # Link the function with the interact function
+        # output = widgets.interactive_output(slope_viz_stimuli_per_neuron, {'t': time_slider, 'neuron_id': neuron_dropdown})
 
-        # Display the widgets and the output
-        display(widgets.VBox([neuron_dropdown,time_slider]))
-        display(output)
+        # # Display the widgets and the output
+        # display(widgets.VBox([neuron_dropdown,time_slider]))
+        # display(output)
 
+        ui = widgets.VBox([neuron_dropdown, time_slider])
+        slope_viz_stimuli_per_neuron(neuron_dropdown.value)
+        time_slider.observe(update_nline, names='value')
+        neuron_dropdown.observe(slope_viz_stimuli_per_neuron,names='value')
+        display(ui)
     
 
 def plot_event_average_interaction(spiking_times, spiking_clusters, event_start, event_ids, view = "stim"):
