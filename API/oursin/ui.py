@@ -5,7 +5,7 @@ from vbl_aquarium.models.generic import IDListFloatList
 global_binned_spikes = None
 global_prepped_data = None
 neurons = None
-
+neuron_colors = None
 # def slider_widget(function_call, slider_parameters):
 #     """Creates a slider in the notebook, displays results of the input function
     
@@ -134,6 +134,8 @@ def spikes_binned_event_average(event_start, event_ids, binned_spikes = None, bi
             bin_average = np.mean(neuron_stim_data, axis=0)/bin_size_sec
             final_avg[neuron_id, int(stim_id) - 1, :] = bin_average
 
+    final_avg = np.delete(final_avg, 88, axis=0) #DROPPING THE NEURON WITH THE HIGH BASELINE
+
     global global_prepped_data
     global_prepped_data = final_avg
     return final_avg
@@ -171,7 +173,7 @@ def slope_viz_stimuli_per_neuron(prepped_data = None, t=-100, neuron_id = 0):
     for i in range(0,prepped_data.shape[1]):
         y = prepped_data[neuron_id][i]
         x = np.arange(-100, 520, step=20)
-        plt.plot(x,y)
+        plt.plot(x,y, color='dimgray')
 
     # Labels:
     plt.xlabel('Time from stimulus onset')
@@ -218,11 +220,11 @@ def update_neuron_sizing(stim_id, t, prepped_data = None):
         for i in range(prepped_data.shape[0]):
             neuron = f'n{str(i+1)}'
             particle_size_list.ids.append(neuron)
-            particle_size_list.values.append(round(prepped_data[i][stim_id][t_id]/100,1))
+            particle_size_list.values.append(round(prepped_data[i][stim_id][t_id]/200,4))
         
         particles._set_sizes(particle_size_list)
 
-def slope_viz_neurons_per_stimuli(prepped_data = None, t=-100, stim_id = 0):
+def slope_viz_neurons_per_stimuli(prepped_data = None, n_color = None, t=-100, stim_id = 0):
     """Visualizes and creates interactive plot for the average of every neuron per stimulus
     
     Parameters
@@ -251,11 +253,15 @@ def slope_viz_neurons_per_stimuli(prepped_data = None, t=-100, stim_id = 0):
     if prepped_data is None:
         prepped_data = global_prepped_data
 
+    global neuron_colors
+    if n_color is None:
+        n_color = neuron_colors
+
      # Plotting data:
     for i in range(0,prepped_data.shape[0]):
         y = prepped_data[i][stim_id]
         x = np.arange(-100, 520, step=20)
-        plt.plot(x,y)
+        plt.plot(x,y, color = n_color[i])
     
     # Labels:
     plt.xlabel(f'Time from Stimulus {stim_id} display (20 ms bins)')
@@ -316,7 +322,7 @@ def plot_appropriate_interactive_graph(prepped_data = None, view = "stim", windo
     elif view == "neuron":
         neuron_dropdown = widgets.Dropdown(
             options= range(0,prepped_data.shape[0]),
-            value=355,
+            value=354,
             description='Neuron ID:',
         )
         neuron_dropdown.layout.margin = "20px 20px"
