@@ -9,7 +9,7 @@ public class ParticleBehavior : MonoBehaviour
     private ParticleSystem _particleSystem;
     private ParticleSystem.Particle[] _particles;
 
-    public ParticleSystemModel Data;
+    public ParticleSystemModel Data { get; private set; }
 
     private void Awake()
     {

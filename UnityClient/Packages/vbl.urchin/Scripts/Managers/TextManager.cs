@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using Urchin.API;
 
 namespace Urchin.Managers
 {
-    public class TextManager : MonoBehaviour
+    public class TextManager : Manager
     {
         #region Serialized
         [SerializeField] private GameObject _textParent;
@@ -15,7 +16,10 @@ namespace Urchin.Managers
         #endregion
 
         #region Private variables
+        private Dictionary<string, TextModel> _textDatas;
         private Dictionary<string, GameObject> _textGOs;
+
+        public override ManagerType Type => ManagerType.TextManager;
         #endregion
 
         #region Unity
@@ -37,10 +41,41 @@ namespace Urchin.Managers
         }
         #endregion
 
+        #region Manager
+        public override string ToSerializedData()
+        {
+            return JsonUtility.ToJson(new TextManagerModel
+            {
+                Data = _textDatas.Values.ToArray(),
+            });
+        }
+
+        public override void FromSerializedData(string serializedData)
+        {
+            TextManagerModel textManagerModel = JsonUtility.FromJson<TextManagerModel>(serializedData);
+
+            foreach (TextModel data in textManagerModel.Data)
+            {
+                UpdateData(data);
+            }
+        }
+
+        private struct TextManagerModel
+        {
+            public TextModel[] Data;
+        }
+        #endregion
+
         #region Public functions
 
         public void UpdateData(TextModel data)
         {
+            // save data
+            if (_textDatas.ContainsKey(data.ID))
+                _textDatas[data.ID] = data;
+            else
+                _textDatas.Add(data.ID, data);
+
             if (_textGOs.ContainsKey(data.ID))
             {
                 // Update
@@ -78,6 +113,9 @@ namespace Urchin.Managers
             {
                 if (_textGOs.ContainsKey(data.IDs[i]))
                 {
+                    TextModel dataModel = _textDatas[data.IDs[i]];
+                    dataModel.Text = data.Values[i];
+                    _textDatas[data.IDs[i]] = dataModel;
                     _textGOs[data.IDs[i]].GetComponent<TMP_Text>().text =  data.Values[i];
                 }
                 else
@@ -91,6 +129,9 @@ namespace Urchin.Managers
             {
                 if (_textGOs.ContainsKey(data.IDs[i]))
                 {
+                    TextModel dataModel = _textDatas[data.IDs[i]];
+                    dataModel.Color = data.Values[i];
+                    _textDatas[data.IDs[i]] = dataModel;
                     _textGOs[data.IDs[i]].GetComponent<TMP_Text>().color = data.Values[i];
                 }
                 else
@@ -104,6 +145,9 @@ namespace Urchin.Managers
             {
                 if (_textGOs.ContainsKey(data.IDs[i]))
                 {
+                    TextModel dataModel = _textDatas[data.IDs[i]];
+                    dataModel.FontSize = Mathf.RoundToInt(data.Values[i]);
+                    _textDatas[data.IDs[i]] = dataModel;
                     _textGOs[data.IDs[i]].GetComponent<TMP_Text>().fontSize = data.Values[i];
                 }
                 else
@@ -117,6 +161,9 @@ namespace Urchin.Managers
             {
                 if (_textGOs.ContainsKey(data.IDs[i]))
                 {
+                    TextModel dataModel = _textDatas[data.IDs[i]];
+                    dataModel.Position = data.Values[i];
+                    _textDatas[data.IDs[i]] = dataModel;
                     SetPosition(_textGOs[data.IDs[i]], data.Values[i]);
                 }
                 else

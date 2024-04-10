@@ -1,10 +1,12 @@
 using BrainAtlas;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Urchin.API;
+using Urchin.Managers;
 
-public class ParticleManager : MonoBehaviour
+public class ParticleManager : Manager
 {
     #region Serialized
     [SerializeField] List<string> _materialNames;
@@ -19,6 +21,8 @@ public class ParticleManager : MonoBehaviour
 
     #region Properties
     public static Dictionary<string, Material> ParticleMaterials;
+
+    public override ManagerType Type => ManagerType.ParticleManager;
     #endregion
 
     #region Unity
@@ -46,6 +50,30 @@ public class ParticleManager : MonoBehaviour
         //// Note to self: you can delete particles by setting lifetime to -1
 
         Client_SocketIO.ClearParticles += Clear;
+    }
+    #endregion
+
+    #region Manager
+
+    public override string ToSerializedData()
+    {
+        return JsonUtility.ToJson(new ParticleManagerModel
+        {
+            Data = _psystemMapping.Values.Select(x => x.Data).ToArray(),
+        });
+    }
+
+    public override void FromSerializedData(string serializedData)
+    {
+        ParticleManagerModel particleManagerModel = JsonUtility.FromJson<ParticleManagerModel>(serializedData);
+
+        foreach (ParticleSystemModel model in particleManagerModel.Data)
+            UpdateData(model);
+    }
+
+    private struct ParticleManagerModel
+    {
+        public ParticleSystemModel[] Data;
     }
     #endregion
 
@@ -105,4 +133,5 @@ public class ParticleManager : MonoBehaviour
         Destroy(_psystemMapping[data.ID].gameObject);
         _psystemMapping.Remove(data.ID);
     }
+
 }

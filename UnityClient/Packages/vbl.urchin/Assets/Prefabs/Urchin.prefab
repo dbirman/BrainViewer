@@ -472,8 +472,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _atlasManager: {fileID: 7683298792840207488}
-  _primitiveMeshManager: {fileID: 1366211727439126397}
   _cameraManager: {fileID: 756099984625368948}
+  _lineRendererManager: {fileID: 4390413428189988364}
+  _primitiveMeshManager: {fileID: 1366211727439126397}
+  _textManager: {fileID: 5167816034593033511}
+  _particleManager: {fileID: 6074828215876335387}
   apiURL: 
 --- !u!1 &5012633055188078402
 GameObject:
