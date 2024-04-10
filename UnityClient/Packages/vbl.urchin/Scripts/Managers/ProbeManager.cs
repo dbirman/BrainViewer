@@ -1,11 +1,12 @@
 using BrainAtlas;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Urchin.API;
 
 namespace Urchin.Managers
 {
-    public class ProbeManager : MonoBehaviour
+    public class ProbeManager : Manager
     {
         #region Variables
         [SerializeField] private List<GameObject> _probePrefabOptions;
@@ -19,6 +20,8 @@ namespace Urchin.Managers
 
         // Actual objects
         private Dictionary<string, ProbeBehavior> _probes;
+
+        public override ManagerType Type => throw new System.NotImplementedException();
         #endregion
 
         #region Unity
@@ -52,6 +55,30 @@ namespace Urchin.Managers
             Client_SocketIO.SetProbeSize += SetSizes;
 
             Client_SocketIO.ClearProbes += ClearProbes;
+        }
+
+        #endregion
+
+        #region Manager
+
+
+        public override string ToSerializedData()
+        {
+            return "";
+            //return JsonUtility.ToJson(new ProbeManagerModel()
+            //{
+            //    Data = _probes.Values.Select(x => x.Data).ToArray(),
+            //});
+        }
+
+        public override void FromSerializedData(string serializedData)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public struct ProbeManagerModel
+        {
+            ProbeModel[] Data;
         }
 
         #endregion
