@@ -246,6 +246,7 @@ public class UrchinCore : MonoBehaviour
     public void SetMainCameraMode(bool orthographic)
     {
         _mainCameraBehavior.Data.Mode = orthographic ? CameraMode.orthographic : CameraMode.perspective;
+        _mainCameraBehavior.Data.Controllable = true;
         _mainCameraBehavior.UpdateSettings();
         _uiCanvas.worldCamera = _mainCameraBehavior.ActiveCamera;
         _uiCameraCanvas.worldCamera = _mainCameraBehavior.ActiveCamera;
