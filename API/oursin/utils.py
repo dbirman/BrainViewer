@@ -44,20 +44,35 @@ def sanitize_vector3(vector):
 
 
 def sanitize_color(color):
-    """Does nothing right now
+    """
+    Convert input color to a list of r/g/b/a values in the range 0->1.
 
     Parameters
     ----------
-    color : _type_
-        _description_
+    color : str or list
+        Hex code or list of floats representing color values.
 
     Returns
     -------
-    _type_
-        _description_
+    list
+        List of r/g/b/a values in the range 0->1.
     """
-    return color
-    
+    if isinstance(color, list):
+        if len(color) == 3 or len(color) == 4:
+            try:
+                if max(color) > 1:
+                    return [x / 255 for x in color]
+                else:
+                    return color
+            except (TypeError, ValueError):
+                raise ValueError("Input list must contain three or four floats.")
+
+    elif isinstance(color, str):
+        if color.startswith('#'):
+            return hex_to_rgb(color)
+
+    else:
+        raise TypeError("Input type not recognized.")
 
 def sanitize_float(value):
     if isinstance(value, float):
@@ -117,6 +132,15 @@ def rgb_to_hex(rgb):
 def rgba_to_hex(rgba):
     return '#%02x%02x%02x%02x' % rgba
 
+def hex_to_rgb(hex_code):
+    # Remove '#' if present
+    hex_code = hex_code.lstrip('#')
+    # Convert hexadecimal to RGB
+    r = int(hex_code[0:2], 16)
+    g = int(hex_code[2:4], 16)
+    b = int(hex_code[4:6], 16)
+    return (r/255, g/255, b/255)
+
 def list_of_list2vector3(list_of_list):
     """Convert a list of lists to a list of Vector3 objects
 
@@ -134,33 +158,50 @@ def formatted_vector3(list_of_float):
     ----------
     list_of_float : list
     """
+
+    list_of_float = sanitize_vector3(list_of_float)
+
     return Vector3(
         x = list_of_float[0],
         y = list_of_float[1],
         z = list_of_float[2]
     )
 
-def formatted_color(list_of_float):
-    """Converts a list of floats to a Color. Values should be 0->1
+def formatted_vector2(list_of_float):
+  """Convert a list of floats to a Vector2
+
+  Parameters
+  ----------
+  list_of_float : list
+  """
+  return Vector2(
+      x = list_of_float[0],
+      y = list_of_float[1]
+  )
+
+def formatted_color(color):
+    """Converts a color, either a hex or list of floats, to a Color object
 
     Parameters
     ----------
-    list_of_float : list
-        Length 3 for RGB, 4 for RGBA
+    color : list/str
+        Length 3 for RGB, 4 for RGBA, or a hex color string
     """
 
-    if len(list_of_float) == 3:
+    color = sanitize_color(color)
+
+    if len(color) == 3:
         return Color(
-            r = list_of_float[0],
-            g = list_of_float[1],
-            b = list_of_float[2]
+            r = color[0],
+            g = color[1],
+            b = color[2]
         )
-    elif len(list_of_float) == 4:
+    elif len(color) == 4:
         return Color(
-            r = list_of_float[0],
-            g = list_of_float[1],
-            b = list_of_float[2],
-            a = list_of_float[3]
+            r = color[0],
+            g = color[1],
+            b = color[2],
+            a = color[3]
         )
     else:
         raise Exception('Colors should be length 3 or 4')

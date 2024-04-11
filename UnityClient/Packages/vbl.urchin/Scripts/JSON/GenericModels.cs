@@ -236,6 +236,34 @@ public struct IDListStringList
 
 
 [Serializable]
+public struct IDListVector2Data
+{
+    public string[] IDs;
+    public Vector2 Value;
+
+    public IDListVector2Data(string[] iDs, Vector2 value)
+    {
+        IDs = iDs;
+        Value = value;
+    }
+}
+
+
+[Serializable]
+public struct IDListVector2List
+{
+    public string[] IDs;
+    public Vector2[] Values;
+
+    public IDListVector2List(string[] iDs, Vector2[] values)
+    {
+        IDs = iDs;
+        Values = values;
+    }
+}
+
+
+[Serializable]
 public struct IDListVector3Data
 {
     public string[] IDs;
@@ -311,6 +339,20 @@ public struct StringList
     {
         ID = id;
         Values = values;
+    }
+}
+
+
+[Serializable]
+public struct Vector2Data
+{
+    public string ID;
+    public Vector2 Value;
+
+    public Vector2Data(string id, Vector2 value)
+    {
+        ID = id;
+        Value = value;
     }
 }
 

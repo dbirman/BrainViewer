@@ -4,18 +4,85 @@ from . import client
 import warnings
 from . import utils
 
-from vbl_aquarium.models.generic import IDListFloatList
+from vbl_aquarium.models.unity import Vector3, Color
+from vbl_aquarium.models.generic import IDData
+from vbl_aquarium.models.urchin import ParticleSystemModel
 
 ## Particle system
 counter = 0
-class Particle:
-	"""Particles should not be directly instantiated, use urchin.particles.create(n) and urchin.clear_particles()
+class ParticleSystem:
+	"""Particle system
+	
+	Minimize the number of particle systems you create
+	
+	You cannot edit the number of particles in a system after creation
+	
+	Create separate particle systems when you need to use different materials
 	"""
-	def __init__(self):
-		pass
+	
+	def __init__(self, n, material = 'circle', positions = None, sizes = None, colors = None):
+		"""Initialize particle system
 
-	def set_position(self, position):
-		"""Set the position of a particle in ap/ml/dv coordinates relative to the origin (0,0,0)
+		Parameters
+		----------
+		n : int
+				Number of particles
+		"""
+		global counter
+		counter += 1
+
+		self.data = ParticleSystemModel(
+			id= f'psystem{counter}',
+			n = n,
+			material= material,
+			positions = [Vector3()] * n if positions == None else [utils.formatted_vector3(pos) for pos in utils.sanitize_list(positions, n)],
+			sizes = [0.1] * n if sizes == None else utils.sanitize_list(sizes, n),
+			colors = [Color()] * n if sizes == None else utils.sanitize_list(colors, n)
+		)
+
+		self._update()
+		self.in_unity = True
+
+	def _update(self):
+		"""Push data to Urchin renderer
+		"""
+		client.sio.emit('urchin-particles-update', self.data.to_string())
+
+	def delete(self):
+		"""Delete this particle system and all its particles
+		"""
+		client.sio.emit('urchin-particles-delete', IDData(id= self.data.id).to_string())
+		self.in_unity = False
+
+	def set_material(self, material):
+		"""Set the material of a particle system
+
+		Options are
+	 	- 'gaussian'
+		- 'circle' (default)
+		- 'circle-lit'
+		- 'square'
+		- 'square-lit'
+		- 'diamond'
+		- 'diamond-lit'
+
+		Parameters
+		---------- 
+		material : string
+			new material for all particles
+
+		Examples
+		--------
+		>>>psystem1.set_material('circle')
+		"""
+		if self.in_unity == False:
+			raise Exception("Particle system was deleted")
+		
+		self.data.material = utils.sanitize_string(material)
+		self._update()
+
+	def set_positions(self, positions):
+		"""Set the positions of particles relative to the reference coordinate
 		
 		Parameters
 		---------- 
@@ -24,16 +91,35 @@ class Particle:
 
 		Examples
 		--------
-		>>>p1.set_position([5200,5700,330]) # set a particle to Bregma, in CCF space
+		>>>psystem1.set_positions([5200,5700,330]) # move all particles to Bregma in CCF
 		"""
 		if self.in_unity == False:
-			raise Exception("Particle does not exist in Unity, call create method first.")
+			raise Exception("Particle system was deleted")
 		
-		self.position = utils.sanitize_vector3(position)
-		client.sio.emit('SetParticlePos', {self.id: [self.position[0]/1000, self.position[1]/1000, self.position[2]/1000]})
+		positions = utils.sanitize_list(positions, self.data.n)
+		self.data.positions = [utils.formatted_vector3([pos[0]/1000, pos[1]/1000, pos[2]/1000]) for pos in positions]
+		
+		self._update()
 
-	def set_size(self, size):
-		"""Set the size of a particle
+	def _set_positions(self, positions):
+		"""Efficient position setting, for real-time applications
+
+		Make sure your positions are in mm, not um
+
+		ID should match psystem.data.id
+		
+		Parameters
+		----------
+		positions : Vector3List
+				AP/ML/DV positions in *mm*
+		"""
+		if self.in_unity == False:
+			raise Exception("Particle system was deleted")
+		
+		client.sio.emit('urchin-particles-positions', positions.to_string())
+
+	def set_sizes(self, sizes):
+		"""Set the sizes of particles
 		
 		Parameters
 		---------- 
@@ -41,225 +127,67 @@ class Particle:
 
 		Examples
 		--------
-		>>>p1.set_size(0.02) # 20 um 
+		>>>psystem1.set_sizes([0.02]) # 20 um 
 		"""
 		if self.in_unity == False:
-			raise Exception("Particle does not exist in Unity, call create method first.")
+			raise Exception("Particle system was deleted")
 		
-		size = utils.sanitize_float(size)
-		self.size = size
-		client.sio.emit('SetParticleSize', {self.id: size})
+		sizes = utils.sanitize_list(sizes, self.data.n)
+		self.data.sizes = [utils.sanitize_float(size)/1000 for size in sizes]
+
+		self._update()
+
+	def _set_sizes(self, sizes):
+		"""Efficent size setting, for real-time applications
+
+		ID should match psystem.data.id
+
+		Parameters
+		----------
+		sizes : FloatList
+				Sizes of particles in *mm*
+		"""
+		if self.in_unity == False:
+			raise Exception("Particle system was deleted")
+		
+		client.sio.emit('urchin-particles-sizes', sizes.to_string())
 	
-	def set_color(self, color):
-		"""Set the color of a particle
+	def set_colors(self, colors):
+		"""Set the colors of particles
 		
 		Parameters
 		---------- 
-		color : string hex color
+		colors : list
+			hex or [r,g,b] colors
 
 		Examples
 		--------
-		>>>p1.set_color('#FFFFFF')
+		>>>psystem1.set_color(['#FFFFFF'])
 		"""
 		if self.in_unity == False:
-			raise Exception("Particle does not exist in Unity, call create method first.")
+			raise Exception("Particle system was deleted")
 		
-		color = utils.sanitize_color(color)
-		self.color = color
-		client.sio.emit('SetParticleColor', {self.id: color})
+		colors = utils.sanitize_list(colors, self.data.n)
 
-	# todo: re-implement shape and material when we move to ParticleGroup instead of single Particle objects
+		self.data.colors = [utils.formatted_color(color) for color in colors]
+		self._update()
+	
+	def _set_colors(self, colors):
+		"""Efficient color setting, for real-time applications
 
-	# def set_shape(self, shape):
-	# 	"""Set the shape of a particle
-	# 	Options are
-	#  	 - 'sphere' (default)
-	#  	 - 'cube' better performance when rendering tens of thousands of neurons
+		ID should match psystem.data.id
 
-	# 	Parameters
-	# 	---------- 
-	# 	shape : string
-	# 		new shape of the neuron
-
-	# 	Examples
-	# 	--------
-	# 	>>>p1.set_shape('sphere')
-	# 	"""
-	# 	if self.in_unity == False:
-	# 		raise Exception("Particle does not exist in Unity, call create method first.")
+		Parameters
+		----------
+		colors : ColorList
+				Colors of particles
+		"""
+		if self.in_unity == False:
+			raise Exception("Particle system was deleted")
 		
-	# 	self.shape = shape
-	# 	client.sio.emit('SetNeuronShape', {self.id: shape})
-
-	# def set_material(self, material):
-	# 	"""Set the material of neuron renderer
-	# 	Options are
-	#  	- 'lit-transparent' (default)
-	#  	- 'lit'
-	#  	- 'unlit'
-
-	# 	Parameters
-	# 	---------- 
-	# 	material : string
-	# 		new material of the neuron
-
-	# 	Examples
-	# 	--------
-	# 	>>>p1.set_material('lit-transparent')
-	# 	"""
-	# 	if self.in_unity == False:
-	# 		raise Exception("Particle does not exist in Unity, call create method first.")
-		
-	# 	self.material = material
-	# 	client.sio.emit('SetNeuronMaterial', {self.id: material})
-
-def create(num_particles):
-	"""Create particles
-
-	Note: particles must be created before setting other values
-
-	Parameters
-	----------
-	num_particles : int
-
-	Examples
-	--------  
-	>>> neurons = urchin.particles.create(3)
-	"""
-	global counter
-	neurons = []
-	for i in range(num_particles):
-		counter += 1
-		particle = Particle()
-		particle.id = f'n{str(counter)}'
-		particle.in_unity = True
-		neurons.append(particle)
-
-	client.sio.emit('CreateParticles', [x.id for x in neurons])
-	return neurons
+		client.sio.emit('urchin-particles-colors', colors.to_string())
 
 def clear():
-	"""Clear all particles
-
-	Note that there is no delete method for individual particles, they must all be cleared at once.
+	"""Clear all particle systems
 	"""
-	client.sio.emit('Clear', 'particle')
-
-def set_positions(particles_list, positions_list):
-	"""Set the position of particles in ap/ml/dv coordinates relative to the origin
-
-	Parameters
-	----------
-	particles_list : list of Particle
-	positions_list : list of list of three floats
-		list of positions of neurons (ap, ml, dv) in um
-
-	Examples
-	--------
-	>>> urchin.particles.set_positions([p1,p2,p3], [[1000,1000,1000],...,...])
-	"""
-	particles_list = utils.sanitize_list(particles_list)
-	positions_list = utils.sanitize_list(positions_list)
-
-	neuron_positions = {}
-	for i in range(len(particles_list)):
-		neuron = particles_list[i]
-		if neuron.in_unity:
-			pos = utils.sanitize_vector3(positions_list[i])
-			neuron_positions[neuron.id] = [pos[0]/1000, pos[1]/1000, pos[2]/1000]
-		else:
-			warnings.warn(f"Particle with id {neuron.id} does not exist in Unity, call create method first.")
-	client.sio.emit('SetParticlePos', neuron_positions)
-
-def set_sizes(particles_list, sizes_list):
-	"""Set particles sizes
-
-	Parameters
-	----------
-	particles_list : list of Particle
-	sizes_list : list of float
-
-	Examples
-	--------
-	>>> urchin.particles.set_sizes([p1,n2,n3], [0.01,0.02,0.03])
-	"""
-	particles_list = utils.sanitize_list(particles_list)
-	sizes_list = utils.sanitize_list(sizes_list)
-
-	data = IDListFloatList(
-		ids = [],
-		values= []
-	)
-
-	for i in range(len(particles_list)):
-		neuron = particles_list[i]
-		if neuron.in_unity:
-			data.ids.append(neuron.id)
-			data.values.append(utils.sanitize_float(sizes_list[i]))
-		else:
-			warnings.warn(f"Particle with id {neuron.id} does not exist in Unity, call create method first.")
-	
-	_set_sizes(data)
-
-def _set_sizes(data):
-	"""Set particles sizes when already wrapped
-	
-	Parameters
-	----------
-	neurons_sizes: IDListFloatList
-	
-	Examples
-	--------
-	>>> urchin.particles._set_sizes(IDListFloatList(ids=[0,1,2], value=[1, 1, 1]))
-	"""   
-	client.sio.emit('SetParticleSize', data.to_string())
-
-def set_colors(particles_list, colors_list):
-	"""Set neuron colors
-
-	Parameters
-	----------
-	particles_list : list of Particle
-	colors_list : list of string hex colors
-		list of colors of neurons
-
-	Examples
-	--------
-	>>> urchin.particles.set_colors([p1,n2,n3], ['#FFFFFF','#000000','#FF0000'])
-	"""
-	particles_list = utils.sanitize_list(particles_list)
-	colors_list = utils.sanitize_list(colors_list)
-
-	neurons_colors = {}
-	for i in range(len(particles_list)):
-		neuron = particles_list[i]
-		if neuron.in_unity:
-			neurons_colors[neuron.id] = utils.sanitize_color(colors_list[i])
-		else:
-			warnings.warn(f"Particle with id {neuron.id} does not exist in Unity, call create method first.")
-	client.sio.emit('SetParticleColor', neurons_colors)
-
-def set_material(material_name):
-	"""Change the material used to render neurons
-
- 	Options are
- 	- 'gaussian' (default)
- 	- 'circle'
- 	- 'circle-lit'
- 	- 'square'
- 	- 'square-lit'
- 	- 'diamond'
- 	- 'diamond-lit'
-
-	Parameters
-	----------
-	material_name: string
-
-	Examples
-	--------
-	>>> urchin.neurons.set_material('circle')
-	"""
-	material_name = utils.sanitize_string(material_name)
-
-	client.sio.emit('SetParticleMaterial', material_name)
-
+	client.sio.emit('Clear', 'particles')

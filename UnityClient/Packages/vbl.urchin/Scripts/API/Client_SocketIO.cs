@@ -74,30 +74,28 @@ namespace Urchin.API
             Start_CustomMesh();
             Start_Dock();
 
+            _clearAll = new List<Action> { ClearProbes, ClearAreas, ClearVolumes,
+            ClearText, ClearParticles, ClearMeshes, ClearFOV, ClearCustomMeshes, ClearLines};
+
             // Misc
             manager.Socket.On<string>("Clear", Clear);
         }
 
         #region Socket setup by action group
         public static Action<AtlasModel> AtlasUpdate;
-        public static Action<string> AtlasLoad;
+        public static Action<AtlasModel> AtlasLoad;
         public static Action AtlasLoadDefaults;
 
         //public static Action<CustomAtlasData> AtlasCreateCustom;
         //public static Action<Vector3Data> AtlasSetReferenceCoord;
         //public static Action<AreaGroupData> AtlasSetAreaVisibility;
-        public static Action<Dictionary<string, string>> AtlasSetAreaColors;
-        public static Action<Dictionary<string, float>> AtlasSetAreaIntensities;
-        public static Action<string> AtlasSetColormap;
-        public static Action<Dictionary<string, string>> AtlasSetAreaMaterials;
-        public static Action<Dictionary<string, float>> AtlasSetAreaAlphas;
         public static Action<Dictionary<string, List<float>>> AtlasSetAreaData;
         public static Action<int> AtlasSetAreaDataIndex;
 
         private void Start_Atlas()
         {
             manager.Socket.On<string>("urchin-atlas-update", x => AtlasUpdate.Invoke(JsonUtility.FromJson<AtlasModel>(x)));
-            manager.Socket.On<string>("urchin-atlas-load", x => AtlasLoad.Invoke(x));
+            manager.Socket.On<string>("urchin-atlas-load", x => AtlasLoad.Invoke(JsonUtility.FromJson<AtlasModel>(x)));
             manager.Socket.On<string>("urchin-atlas-defaults", x => AtlasLoadDefaults.Invoke());
 
 
@@ -127,86 +125,65 @@ namespace Urchin.API
             //manager.Socket.On<string>("SetVolumeData", x => SetVolumeData.Invoke(JsonUtility.FromJson<VolumeDataChunk>(x)));
             manager.Socket.On<string>("DeleteVolume", x => DeleteVolume.Invoke(x));
         }
-        
-        // new
-        public static Action<IDListFloatList> SetParticleSize;
 
-        // old
-        public static Action<List<string>> CreateParticles;
-        public static Action<Dictionary<string, float[]>> SetParticlePosition;
-        //public static Action<Dictionary<string, string>> SetParticleShape;
-        public static Action<Dictionary<string, string>> SetParticleColor;
-        public static Action<string> SetParticleMaterial;
+
+        public static Action<ParticleSystemModel> ParticlesUpdate;
+        public static Action<IDData> ParticlesDelete;
+        public static Action<Vector3List> ParticlesSetPositions;
+        public static Action<FloatList> ParticlesSetSizes;
+        public static Action<ColorList> ParticlesSetColors;
 
         private void Start_Particles()
         {
-            manager.Socket.On<List<string>>("CreateParticles", x => CreateParticles.Invoke(x));
-            manager.Socket.On<Dictionary<string, float[]>>("SetParticlePos", x => SetParticlePosition.Invoke(x));
-            manager.Socket.On<string>("SetParticleSize", x => SetParticleSize.Invoke(JsonUtility.FromJson<IDListFloatList>(x)));
-            //manager.Socket.On<Dictionary<string, string>>("SetParticleShape", x => SetParticleShape.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetParticleColor", x => SetParticleColor.Invoke(x));
-            manager.Socket.On<string>("SetParticleMaterial", x => SetParticleMaterial.Invoke(x));
+            manager.Socket.On<string>("urchin-particles-update", x => ParticlesUpdate.Invoke(JsonUtility.FromJson<ParticleSystemModel>(x)));
+            manager.Socket.On<string>("urchin-particles-delete", x => ParticlesDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
+            manager.Socket.On<string>("urchin-particles-positions", x => ParticlesSetPositions.Invoke(JsonUtility.FromJson<Vector3List>(x)));
+            manager.Socket.On<string>("urchin-particles-sizes", x => ParticlesSetSizes.Invoke(JsonUtility.FromJson<FloatList>(x)));
+            manager.Socket.On<string>("urchin-particles-colors", x => ParticlesSetColors.Invoke(JsonUtility.FromJson<ColorList>(x)));
         }
 
-        public static Action<List<string>> CreateProbes;
-        public static Action<List<string>> DeleteProbes;
-        public static Action<Dictionary<string, string>> SetProbeColors;
-        public static Action<Dictionary<string, List<float>>> SetProbePos;
-        public static Action<Dictionary<string, List<float>>> SetProbeAngles;
-        public static Action<Dictionary<string, string>> SetProbeStyle;
-        public static Action<Dictionary<string, List<float>>> SetProbeSize;
+
+        public static Action<ProbeModel> ProbeUpdate;
+        public static Action<IDData> ProbeDelete;
+
+        public static Action<IDListColorList> ProbeSetColors;
+        public static Action<IDListVector3List> ProbeSetPositions;
+        public static Action<IDListVector3List> ProbeSetAngles;
+        public static Action<IDListVector3List> ProbeSetScales;
 
         private void Start_Probes()
         {
-            manager.Socket.On<List<string>>("CreateProbes", x => CreateProbes.Invoke(x));
-            manager.Socket.On<List<string>>("DeleteProbes", x => DeleteProbes.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetProbeColors", x => SetProbeColors.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetProbePos", x => SetProbePos.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetProbeAngles", x => SetProbeAngles.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetProbeStyle", x => SetProbeStyle.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetProbeSize", x => SetProbeSize.Invoke(x));
+            manager.Socket.On<string>("urchin-probe-update", x => ProbeUpdate.Invoke(JsonUtility.FromJson<ProbeModel>(x)));
+            manager.Socket.On<string>("urchin-probe-delete", x => ProbeDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
+
+            manager.Socket.On<string>("urchin-probe-colors", x => ProbeSetColors.Invoke(JsonUtility.FromJson<IDListColorList>(x)));
+            manager.Socket.On<string>("urchin-probe-positions", x => ProbeSetPositions.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
+            manager.Socket.On<string>("urchin-probe-angles", x => ProbeSetAngles.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
+            manager.Socket.On<string>("urchin-probe-scales", x => ProbeSetScales.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
         }
 
         // New Camera
         public static Action<CameraRotationModel> SetCameraLerpRotation;
         public static Action<FloatData> SetCameraLerp;
         public static Action<FloatData> CameraBrainYaw;
+        public static Action<Vector2Data> RequestScreenshot;
 
-        // Old Camera
-        public static Action<Dictionary<string, List<float>>> SetCameraTarget;
-        public static Action<Dictionary<string, List<float>>> SetCameraRotation;
-        public static Action<Dictionary<string, string>> SetCameraTargetArea;
-        public static Action<Dictionary<string, float>> SetCameraZoom;
-        public static Action<Dictionary<string, List<float>>> SetCameraPan;
-        public static Action<Dictionary<string, string>> SetCameraMode;
-        public static Action<Dictionary<string, string>> SetCameraColor;
-        public static Action<string> SetCameraControl;
-        public static Action<string> RequestScreenshot;
-        public static Action<Dictionary<string, float>> SetCameraYAngle;
-        public static Action<List<string>> CreateCamera;
-        public static Action<List<string>> DeleteCamera;
+        public static Action<CameraModel> UpdateCamera;
+        public static Action<IDData> DeleteCamera;
 
         private void Start_Camera()
         {
             //New
-            manager.Socket.On<string>("SetCameraLerpRotation", x => SetCameraLerpRotation.Invoke(JsonUtility.FromJson<CameraRotationModel>(x)));
-            manager.Socket.On<string>("SetCameraLerp", x => SetCameraLerp.Invoke(JsonUtility.FromJson<FloatData>(x)));
+            manager.Socket.On<string>("urchin-camera-update", x => UpdateCamera.Invoke(JsonUtility.FromJson<CameraModel>(x)));
+            manager.Socket.On<string>("urchin-camera-delete", x => DeleteCamera.Invoke(JsonUtility.FromJson<IDData>(x)));
+
+            manager.Socket.On<string>("urchin-camera-lerp-set", x => SetCameraLerpRotation.Invoke(JsonUtility.FromJson<CameraRotationModel>(x)));
+            manager.Socket.On<string>("urchin-camera-lerp", x => SetCameraLerp.Invoke(JsonUtility.FromJson<FloatData>(x)));
+            manager.Socket.On<string>("urchin-camera-screenshot-request", x => RequestScreenshot.Invoke(JsonUtility.FromJson<Vector2Data>(x)));
+
 
             manager.Socket.On<string>("urchin-brain-yaw", x => CameraBrainYaw.Invoke(JsonUtility.FromJson<FloatData>(x)));
 
-            //Old
-            manager.Socket.On<Dictionary<string, List<float>>>("SetCameraTarget", x => SetCameraTarget.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetCameraRotation", x => SetCameraRotation.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetCameraTargetArea", x => SetCameraTargetArea.Invoke(x));
-            manager.Socket.On<Dictionary<string, float>>("SetCameraZoom", x => SetCameraZoom.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetCameraPan", x => SetCameraPan.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetCameraMode", x => SetCameraMode.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetCameraColor", x => SetCameraColor.Invoke(x));
-            manager.Socket.On<string>("SetCameraControl", x => SetCameraControl.Invoke(x));
-            manager.Socket.On<string>("RequestCameraImg", x => RequestScreenshot.Invoke(x));
-            manager.Socket.On<Dictionary<string, float>>("SetCameraYAngle", x => SetCameraYAngle.Invoke(x));
-            manager.Socket.On<List<string>>("CreateCamera", x => CreateCamera.Invoke(x));
-            manager.Socket.On<List<string>>("DeleteCamera", x => DeleteCamera.Invoke(x));
         }
 
         public static Action ResetLightLink;
@@ -220,34 +197,32 @@ namespace Urchin.API
             manager.Socket.On<List<float>>("SetLightRotation", x => SetLightRotation.Invoke(x));
         }
 
-        public static Action<List<string>> CreateText;
-        public static Action<List<string>> DeleteText;
-        public static Action<Dictionary<string, string>> SetTextText;
-        public static Action<Dictionary<string, string>> SetTextColors;
-        public static Action<Dictionary<string, int>> SetTextSizes;
-        public static Action<Dictionary<string, List<float>>> SetTextPositions;
+
+
+        public static Action<TextModel> TextUpdate;
+        public static Action<IDData> TextDelete;
+        public static Action<IDListStringList> TextSetTexts;
+        public static Action<IDListColorList> TextSetColors;
+        public static Action<IDListFloatList> TextSetSizes;
+        public static Action<IDListVector2List> TextSetPositions;
 
         private void Start_Text()
         {
-            manager.Socket.On<List<string>>("CreateText", x => CreateText.Invoke(x));
-            manager.Socket.On<List<string>>("DeleteText", x => DeleteText.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetTextText", x => SetTextText.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetTextColors", x => SetTextColors.Invoke(x));
-            manager.Socket.On<Dictionary<string, int>>("SetTextSizes", x => SetTextSizes.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetTextPositions", x => SetTextPositions.Invoke(x));
+            manager.Socket.On<string>("urchin-text-update", x => TextUpdate.Invoke(JsonUtility.FromJson<TextModel>(x)));
+            manager.Socket.On<string>("urchin-text-delete", x => TextDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
+            manager.Socket.On<string>("urchin-text-texts", x => TextSetTexts.Invoke(JsonUtility.FromJson<IDListStringList>(x)));
+            manager.Socket.On<string>("urchin-text-colors", x => TextSetColors.Invoke(JsonUtility.FromJson<IDListColorList>(x)));
+            manager.Socket.On<string>("urchin-text-sizes", x => TextSetSizes.Invoke(JsonUtility.FromJson<IDListFloatList>(x)));
+            manager.Socket.On<string>("urchin-text-positions", x => TextSetPositions.Invoke(JsonUtility.FromJson<IDListVector2List>(x)));
         }
 
-        public static Action<List<string>> CreateLine;
-        public static Action<Dictionary<string, List<List<float>>>> SetLinePosition;
-        public static Action<List<string>> DeleteLine;
-        public static Action<Dictionary<string, string>> SetLineColor;
+        public static Action<LineModel> UpdateLine;
+        public static Action<IDData> DeleteLine;
 
         private void Start_LineRenderer()
         {
-            manager.Socket.On<List<string>>("CreateLine", x => CreateLine.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<List<float>>>>("SetLinePosition", x => SetLinePosition.Invoke(x));
-            manager.Socket.On<List<string>>("DeleteLine", x => DeleteLine.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetLineColor", x => SetLineColor.Invoke(x));
+            manager.Socket.On<string>("urchin-line-update", x => UpdateLine.Invoke(JsonUtility.FromJson<LineModel>(x)));
+            manager.Socket.On<string>("urchin-line-delete", x => DeleteLine.Invoke(JsonUtility.FromJson<IDData>(x)));
         }
 
         #region Mesh
@@ -265,15 +240,15 @@ namespace Urchin.API
         private void Start_Mesh()
         {
             // Singular
-            manager.Socket.On<string>("MeshUpdate", x => MeshUpdate.Invoke(JsonUtility.FromJson<MeshModel>(x)));
-            manager.Socket.On<string>("MeshDelete", x => MeshDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
+            manager.Socket.On<string>("urchin-meshes-update", x => MeshUpdate.Invoke(JsonUtility.FromJson<MeshModel>(x)));
+            manager.Socket.On<string>("urchin-meshes-delete", x => MeshDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
 
             // Plural
-            manager.Socket.On<string>("MeshDeletes", x => MeshDeletes.Invoke(JsonUtility.FromJson<IDList>(x)));
-            manager.Socket.On<string>("MeshPositions", x => MeshSetPositions.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
-            manager.Socket.On<string>("MeshScales", x => MeshSetScales.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
-            manager.Socket.On<string>("MeshColors", x => MeshSetColors.Invoke(JsonUtility.FromJson<IDListColorList>(x)));
-            manager.Socket.On<string>("MeshMaterials", x => MeshSetMaterials.Invoke(JsonUtility.FromJson<IDListStringList>(x)));
+            manager.Socket.On<string>("urchin-meshes-deletes", x => MeshDeletes.Invoke(JsonUtility.FromJson<IDList>(x)));
+            manager.Socket.On<string>("urchin-meshes-positions", x => MeshSetPositions.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
+            manager.Socket.On<string>("urchin-meshes-scales", x => MeshSetScales.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
+            manager.Socket.On<string>("urchin-meshes-colors", x => MeshSetColors.Invoke(JsonUtility.FromJson<IDListColorList>(x)));
+            manager.Socket.On<string>("urchin-meshes-materials", x => MeshSetMaterials.Invoke(JsonUtility.FromJson<IDListStringList>(x)));
         }
 
         #endregion
@@ -299,26 +274,22 @@ namespace Urchin.API
             manager.Socket.On<Dictionary<string, bool>>("SetFOVVisibility", x => SetFOVVisibility.Invoke(x));
         }
 
-        //public static Action<CustomMeshData> CustomMeshCreate;
-        //public static Action<CustomMeshDestroy> CustomMeshDestroy;
-        //public static Action<CustomMeshPosition> CustomMeshPosition;
-        //public static Action<Vector3Data> CustomMeshScale;
+        public static Action<CustomMeshModel> CustomMeshUpdate;
+        public static Action<IDData> CustomMeshDelete;
 
         private void Start_CustomMesh()
         {
-            //manager.Socket.On<string>("CustomMeshCreate", x => CustomMeshCreate.Invoke(JsonUtility.FromJson<CustomMeshData>(x)));
-            //manager.Socket.On<string>("CustomMeshDestroy", x => CustomMeshDestroy.Invoke(JsonUtility.FromJson<CustomMeshDestroy>(x)));
-            //manager.Socket.On<string>("CustomMeshPosition", x => CustomMeshPosition.Invoke(JsonUtility.FromJson<CustomMeshPosition>(x)));
-            //manager.Socket.On<string>("CustomMeshScale", x => CustomMeshScale.Invoke(JsonUtility.FromJson<Vector3Data>(x)));
+            manager.Socket.On<string>("urchin-custommesh-update", x => CustomMeshUpdate.Invoke(JsonUtility.FromJson<CustomMeshModel>(x)));
+            manager.Socket.On<string>("urchin-custommesh-delete", x => CustomMeshDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
         }
 
-        public static Action<SaveModel> Save;
-        public static Action<LoadModel> Load;
+        public static Action<SaveRequest> Save;
+        public static Action<LoadRequest> Load;
 
         private void Start_Dock()
         {
-            manager.Socket.On<string>("urchin-save", x => Save.Invoke(JsonUtility.FromJson<SaveModel>(x)));
-            manager.Socket.On<string>("urchin-load", x => Load.Invoke(JsonUtility.FromJson<LoadModel>(x)));
+            manager.Socket.On<string>("urchin-save", x => Save.Invoke(JsonUtility.FromJson<SaveRequest>(x)));
+            manager.Socket.On<string>("urchin-load", x => Load.Invoke(JsonUtility.FromJson<LoadRequest>(x)));
         }
 
         #endregion
@@ -333,17 +304,28 @@ namespace Urchin.API
         public static Action ClearMeshes;
         public static Action ClearFOV;
         public static Action ClearCustomMeshes;
-        public static List<Action> ClearAll = new List<Action> { ClearProbes, ClearAreas, ClearVolumes,
-            ClearText, ClearParticles, ClearMeshes, ClearFOV, ClearCustomMeshes};
+        public static Action ClearLines;
+        public static List<Action> _clearAll;
         private void Clear(string val)
         {
             switch (val)
             {
                 case "all":
-                    foreach (var action in ClearAll)
-                        action?.Invoke();
+                    for (int i = 0; i < _clearAll.Count; i++)
+                    {
+                        try
+                        {
+                            _clearAll[i].Invoke();
+                        }
+                        catch
+                        {
+                            Debug.Log(i);
+                        }
+                    }
+                    //foreach (var action in _clearAll)
+                    //    action.Invoke();
                     break;
-                case "probe":
+                case "probes":
                     ClearProbes.Invoke();
                     break;
                 case "area":
@@ -355,7 +337,7 @@ namespace Urchin.API
                 case "text":
                     ClearText.Invoke();
                     break;
-                case "particle":
+                case "particles":
                     ClearParticles.Invoke();
                     break;
                 case "mesh":
@@ -364,9 +346,13 @@ namespace Urchin.API
                 case "texture":
                     ClearFOV.Invoke();
                     break;
-                case "custommesh":
+                case "custom":
                     ClearCustomMeshes.Invoke();
                     break;
+                case "lines":
+                    ClearLines.Invoke();
+                    break;
+                    
             }
         }
         #endregion
@@ -412,17 +398,17 @@ namespace Urchin.API
 
         public static void Log(string msg)
         {
-            manager.Socket.Emit("log", msg);
+            manager.Socket.Emit("log", JsonUtility.ToJson(new Log(msg)));
         }
 
         public static void LogWarning(string msg)
         {
-            manager.Socket.Emit("log-warning", msg);
+            manager.Socket.Emit("log-warning", JsonUtility.ToJson(new LogWarning(msg)));
         }
 
         public static void LogError(string msg)
         {
-            manager.Socket.Emit("log-error", $"{msg} -- errors can be reported at https://github.com/VirtualBrainLab/Urchin/issues");
+            manager.Socket.Emit("log-error", JsonUtility.ToJson(new LogError($"{msg} -- errors can be reported at https://github.com/VirtualBrainLab/Urchin/issues")));
         }
     }
 

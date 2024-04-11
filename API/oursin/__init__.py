@@ -3,7 +3,6 @@ urchin.
 
 Python library for connecting to and sending data to a Universal Renderer for Neuroscience renderer.
 """
-__author__ = 'Daniel Birman'
 
 # load the client
 from . import client
@@ -31,4 +30,3 @@ from . import colors
 
 # load the atlases
 from .atlas import *
-

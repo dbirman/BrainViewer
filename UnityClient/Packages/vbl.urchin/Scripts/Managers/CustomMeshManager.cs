@@ -6,15 +6,18 @@ using Urchin.API;
 
 namespace Urchin.Managers
 {
-    public class CustomMeshManager : MonoBehaviour
+    public class CustomMeshManager : Manager
     {
         #region Serialized
         [SerializeField] private Transform _customMeshParentT;
         #endregion
 
         #region Private
+        private Dictionary<string, CustomMeshModel> _customMeshModels;
         private Dictionary<string, GameObject> _customMeshGOs;
         private BlenderSpace _blenderSpace;
+
+        public override ManagerType Type => ManagerType.CustomMeshManager;
         #endregion
 
         private void Start()
@@ -23,79 +26,112 @@ namespace Urchin.Managers
 
             _blenderSpace = new();
 
-            //Client_SocketIO.CustomMeshCreate += Create;
-            //Client_SocketIO.CustomMeshDestroy += Destroy;
-            //Client_SocketIO.CustomMeshPosition += SetPosition;
-            //Client_SocketIO.CustomMeshScale += SetScale;
+            Client_SocketIO.CustomMeshUpdate += UpdateData;
+            Client_SocketIO.CustomMeshDelete += Delete;
 
             Client_SocketIO.ClearCustomMeshes += Clear;
         }
 
-        //public void Create(CustomMeshData data)
-        //{
-        //    GameObject go = new GameObject(data.ID);
-        //    go.transform.SetParent(_customMeshParentT);
-
-        //    Mesh mesh = new Mesh();
-
-        //    // the vertices are assumed to have been passed in ap/ml/dv directions
-        //    mesh.vertices = data.vertices.Select(x => _blenderSpace.Space2World_Vector(x)).ToArray();
-
-        //    mesh.triangles = data.triangles;
-
-        //    if (data.normals != null)
-        //        mesh.normals = data.normals;
-
-        //    go.AddComponent<MeshFilter>().mesh = mesh;
-        //    go.AddComponent<MeshRenderer>().material = MaterialManager.MeshMaterials["opaque-lit"];
-        //    go.GetComponent<MeshRenderer>().material.color = Color.gray;
-
-        //    _SetPosition(go, Vector3.zero);
-
-        //    _customMeshGOs.Add(data.ID, go);
-        //}
-
-        //public void Destroy(CustomMeshDestroy data)
-        //{
-        //    if (_customMeshGOs.ContainsKey(data.ID))
-        //    {
-        //        Destroy(_customMeshGOs[data.ID]);
-        //        _customMeshGOs.Remove(data.ID);
-        //    }
-        //    else
-        //        Client_SocketIO.LogWarning($"Custom mesh {data.ID} does not exist in the scene, cannot destroy");
-
-        //}
-
-        //public void SetPosition(CustomMeshPosition data)
-        //{
-        //    if (_customMeshGOs.ContainsKey(data.ID))
-        //    {
-        //        _SetPosition(_customMeshGOs[data.ID], data.Position, data.UseReference ? data.UseReference : true);
-        //    }
-        //    else
-        //        Client_SocketIO.LogWarning($"Custom mesh {data.ID} does not exist in the scene, cannot set position");
-        //}
-
-        private void _SetPosition(GameObject customMeshGO, Vector3 posCoordT, bool useReference = true)
+        #region Manager
+        public override string ToSerializedData()
         {
-            Transform transform = customMeshGO.transform;
+            CMeshManagerModel model = new CMeshManagerModel()
+            {
+                Data = _customMeshModels.Values.ToArray()
+            };
 
-            transform.position = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(posCoordT, useReference);
+            return JsonUtility.ToJson(model);
         }
 
-        //public void SetScale(Vector3Data data)
-        //{
-        //    if (_customMeshGOs.ContainsKey(data.ID))
-        //    {
-        //        Transform transform = _customMeshGOs[data.ID].transform;
+        public override void FromSerializedData(string serializedData)
+        {
+            CMeshManagerModel model = JsonUtility.FromJson<CMeshManagerModel>(serializedData);
 
-        //        // Set scale, rotating to match the atlas format
-        //        transform.localScale = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World_Vector(data.Value);
-        //    }
-        //    else
-        //        Client_SocketIO.LogWarning($"Custom mesh {data.ID} does not exist in the scene, cannot set scale");
-        //}
+            foreach (CustomMeshModel data in model.Data)
+                UpdateData(data);
+        }
+
+        private struct CMeshManagerModel
+        {
+            public CustomMeshModel[] Data;
+        }
+        #endregion
+
+        public void UpdateData(CustomMeshModel data)
+        {
+            if (_customMeshGOs.ContainsKey(data.ID))
+            {
+                // Update
+                _customMeshModels[data.ID] = data;
+                SetPosition(data);
+                SetScale(data);
+            }
+            else
+                Create(data);
+        }
+
+        private void Create(CustomMeshModel data)
+        {
+            GameObject go = new GameObject(data.ID);
+            go.transform.SetParent(_customMeshParentT);
+
+            Mesh mesh = new Mesh();
+
+            // the vertices are assumed to have been passed in ap/ml/dv directions
+            mesh.vertices = data.Vertices.Select(x => _blenderSpace.Space2World_Vector(x)).ToArray();
+
+            mesh.triangles = data.Triangles;
+
+            if (data.Normals != null)
+                mesh.normals = data.Normals;
+
+            go.AddComponent<MeshFilter>().mesh = mesh;
+            go.AddComponent<MeshRenderer>().material = MaterialManager.GetMaterial("opaque-lit");
+            go.GetComponent<MeshRenderer>().material.color = Color.gray;
+
+            SetPosition(data); 
+            SetScale(data);
+
+            _customMeshModels.Add(data.ID, data);
+            _customMeshGOs.Add(data.ID, go);
+        }
+
+        private void Delete(IDData data)
+        {
+            if (_customMeshGOs.ContainsKey(data.ID))
+            {
+                Destroy(_customMeshGOs[data.ID]);
+                _customMeshGOs.Remove(data.ID);
+            }
+            else
+                Client_SocketIO.LogWarning($"Custom mesh {data.ID} does not exist in the scene, cannot destroy");
+
+        }
+
+        private void SetPosition(CustomMeshModel data)
+        {
+            if (_customMeshGOs.ContainsKey(data.ID))
+            {
+                Transform transform = _customMeshGOs[data.ID].transform;
+
+                transform.position = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(data.Position, data.UseReference);
+            }
+            else
+                Client_SocketIO.LogWarning($"Custom mesh {data.ID} does not exist in the scene, cannot set position");
+        }
+
+        private void SetScale(CustomMeshModel data)
+        {
+            if (_customMeshGOs.ContainsKey(data.ID))
+            {
+                Transform transform = _customMeshGOs[data.ID].transform;
+
+                // Set scale, rotating to match the atlas format
+                transform.localScale = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World_Vector(data.Scale);
+            }
+            else
+                Client_SocketIO.LogWarning($"Custom mesh {data.ID} does not exist in the scene, cannot set scale");
+        }
 
         public void Clear()
         {

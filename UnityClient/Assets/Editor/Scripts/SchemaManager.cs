@@ -10,7 +10,7 @@ public class SchemaManager
         string aqFolder = "C:\\proj\\VBL\\vbl-aquarium\\models\\csharp\\";
         string unityFolder = "Packages/vbl.urchin/Scripts/JSON/";
 
-        string[] files = { "UrchinModels.cs", "GenericModels.cs", "DockModels.cs" };
+        string[] files = { "UrchinModels.cs", "GenericModels.cs", "DockModels.cs", "LoggingModels.cs" };
 
         foreach (string file in files)
         {

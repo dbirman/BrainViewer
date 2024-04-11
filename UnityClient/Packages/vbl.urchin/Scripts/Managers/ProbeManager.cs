@@ -1,11 +1,12 @@
 using BrainAtlas;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Urchin.API;
 
 namespace Urchin.Managers
 {
-    public class ProbeManager : MonoBehaviour
+    public class ProbeManager : Manager
     {
         #region Variables
         [SerializeField] private List<GameObject> _probePrefabOptions;
@@ -19,6 +20,8 @@ namespace Urchin.Managers
 
         // Actual objects
         private Dictionary<string, ProbeBehavior> _probes;
+
+        public override ManagerType Type => throw new System.NotImplementedException();
         #endregion
 
         #region Unity
@@ -43,96 +46,115 @@ namespace Urchin.Managers
 
         private void Start()
         {
-            Client_SocketIO.CreateProbes += CreateProbes;
-            Client_SocketIO.DeleteProbes += DeleteProbes;
-            Client_SocketIO.SetProbeColors += SetColors;
-            Client_SocketIO.SetProbePos += SetPositions;
-            Client_SocketIO.SetProbeAngles += SetAngles;
-            //Client_SocketIO.SetProbeStyle += SetStyles;
-            Client_SocketIO.SetProbeSize += SetSizes;
+            Client_SocketIO.ProbeUpdate += UpdateData;
+            Client_SocketIO.ProbeDelete += Delete;
+
+            Client_SocketIO.ProbeSetAngles += SetAngles;
+            Client_SocketIO.ProbeSetColors += SetColors;
+            Client_SocketIO.ProbeSetPositions += SetPositions;
+            Client_SocketIO.ProbeSetScales += SetScales;
 
             Client_SocketIO.ClearProbes += ClearProbes;
         }
 
         #endregion
 
+        #region Manager
+
+
+        public override string ToSerializedData()
+        {
+            return JsonUtility.ToJson(new ProbeManagerModel()
+            {
+                Data = _probes.Values.Select(x => x.Data).ToArray(),
+            });
+        }
+
+        public override void FromSerializedData(string serializedData)
+        {
+            ProbeManagerModel model = JsonUtility.FromJson<ProbeManagerModel>(serializedData);
+
+            foreach (ProbeModel data in model.Data)
+            {
+                UpdateData(data);
+            }
+        }
+
+        public struct ProbeManagerModel
+        {
+            public ProbeModel[] Data;
+        }
+
+        #endregion
+
         #region Public object functions
 
-        public void CreateProbes(List<string> probeNames)
+        public void UpdateData(ProbeModel data)
         {
-            foreach (string probeName in probeNames)
+            if (_probes.ContainsKey(data.ID))
             {
-                if (!_probes.ContainsKey(probeName))
-                {
-                    GameObject newProbe = Instantiate(_defaultPrefab, _probeParentT);
-                    newProbe.name = $"probe_{probeName}";
-                    ProbeBehavior probeBehavior = newProbe.GetComponent<ProbeBehavior>();
+                // update
+            }
+            else
+                CreateProbes(data);
+        }
 
-                    probeBehavior.SetPosition(BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(Vector3.zero));
-                    probeBehavior.SetAngles(Vector3.zero);
+        public void CreateProbes(ProbeModel data)
+        {
+            GameObject newProbe = Instantiate(_defaultPrefab, _probeParentT);
+            newProbe.name = $"probe_{data.ID}";
+            ProbeBehavior probeBehavior = newProbe.GetComponent<ProbeBehavior>();
 
-                    _probes.Add(probeName, probeBehavior);
-                }
-                else
-                {
-                    Client_SocketIO.LogError(string.Format("Probe {0} already exists in the scene", probeName));
-                }
+            probeBehavior.UpdateData(data);
+
+            _probes.Add(data.ID, probeBehavior);
+        }
+
+        public void Delete(IDData data)
+        {
+            if (_probes.ContainsKey(data.ID))
+            {
+                Destroy(_probes[data.ID]);
+                _probes.Remove(data.ID);
             }
         }
 
-        public void DeleteProbes(List<string> probeNames)
+        public void SetColors(IDListColorList data)
         {
-            foreach (string probeName in probeNames)
+            for (int i = 0; i < data.IDs.Length; i++)
             {
-                Destroy(_probes[probeName]);
-                _probes.Remove(probeName);
+                if (_probes.ContainsKey(data.IDs[i]))
+                {
+                    _probes[data.IDs[i]].SetColor(data.Values[i]);
+                }
+                else
+                    Client_SocketIO.LogError($"Cannot set color. Probe {data.IDs[i]} not found");
             }
         }
 
-        public void SetColors(Dictionary<string, string> probeColors)
+        public void SetPositions(IDListVector3List data)
         {
-            foreach (KeyValuePair<string, string> kvp in probeColors)
+            for (int i = 0; i < data.IDs.Length; i++)
             {
-                if (_probes.ContainsKey(kvp.Key))
+                if (_probes.ContainsKey(data.IDs[i]))
                 {
-                    Color newColor;
-                    if (ColorUtility.TryParseHtmlString(kvp.Value, out newColor))
-                        _probes[kvp.Key].SetColor(newColor);
+                    _probes[data.IDs[i]].SetPosition(data.Values[i]);
                 }
                 else
-                    Client_SocketIO.LogError($"Probe {kvp.Key} not found");
+                    Client_SocketIO.LogError($"Cannot set color. Probe {data.IDs[i]} not found");
             }
         }
 
-        /// <summary>
-        /// Set position, positions should be in mm
-        /// </summary>
-        /// <param name="probePositions"></param>
-        public void SetPositions(Dictionary<string, List<float>> probePositions)
+        public void SetAngles(IDListVector3List data)
         {
-            foreach (KeyValuePair<string, List<float>> kvp in probePositions)
+            for (int i = 0; i < data.IDs.Length; i++)
             {
-                if (_probes.ContainsKey(kvp.Key))
+                if (_probes.ContainsKey(data.IDs[i]))
                 {
-                    Vector3 coordU = new Vector3(kvp.Value[0], kvp.Value[1], kvp.Value[2]);
-                    Vector3 worldU = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(coordU);
-                    _probes[kvp.Key].SetPosition(worldU);
+                    _probes[data.IDs[i]].SetAngles(data.Values[i]);
                 }
                 else
-                    Client_SocketIO.LogError($"Probe {kvp.Key} not found");
-            }
-        }
-
-        public void SetAngles(Dictionary<string, List<float>> probeAngles)
-        {
-            foreach (KeyValuePair<string, List<float>> kvp in probeAngles)
-            {
-                if (_probes.ContainsKey(kvp.Key))
-                {
-                    _probes[kvp.Key].SetAngles(new Vector3(kvp.Value[0], kvp.Value[1], kvp.Value[2]));
-                }
-                else
-                    Client_SocketIO.LogError($"Probe {kvp.Key} not found");
+                    Client_SocketIO.LogError($"Cannot set color. Probe {data.IDs[i]} not found");
             }
         }
 
@@ -151,16 +173,16 @@ namespace Urchin.Managers
         //    }
         //}
 
-        public void SetSizes(Dictionary<string, List<float>> probeScales)
+        public void SetScales(IDListVector3List data)
         {
-            foreach (KeyValuePair<string, List<float>> kvp in probeScales)
+            for (int i = 0; i < data.IDs.Length; i++)
             {
-                if (_probes.ContainsKey(kvp.Key))
+                if (_probes.ContainsKey(data.IDs[i]))
                 {
-                    _probes[kvp.Key].SetSize(new Vector3(kvp.Value[0], kvp.Value[1], kvp.Value[2]));
+                    _probes[data.IDs[i]].SetScale(data.Values[i]);
                 }
-                //else
-                //    Debug.Log("Probe " + kvp.Key + " not found");
+                else
+                    Client_SocketIO.LogError($"Cannot set color. Probe {data.IDs[i]} not found");
             }
         }
 

@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using Urchin.API;
 
 namespace Urchin.Managers
 {
-    public class TextManager : MonoBehaviour
+    public class TextManager : Manager
     {
         #region Serialized
         [SerializeField] private GameObject _textParent;
@@ -15,7 +16,10 @@ namespace Urchin.Managers
         #endregion
 
         #region Private variables
+        private Dictionary<string, TextModel> _textDatas;
         private Dictionary<string, GameObject> _textGOs;
+
+        public override ManagerType Type => ManagerType.TextManager;
         #endregion
 
         #region Unity
@@ -26,97 +30,152 @@ namespace Urchin.Managers
 
         private void Start()
         {
-            Client_SocketIO.CreateText += Create;
-            Client_SocketIO.DeleteText += Delete;
-            Client_SocketIO.SetTextText += SetText;
-            Client_SocketIO.SetTextColors += SetColor;
-            Client_SocketIO.SetTextSizes += SetSize;
-            Client_SocketIO.SetTextPositions += SetPosition;
+            Client_SocketIO.TextUpdate += UpdateData;
+            Client_SocketIO.TextDelete += Delete;
+            Client_SocketIO.TextSetTexts += SetTexts;
+            Client_SocketIO.TextSetColors += SetColors;
+            Client_SocketIO.TextSetSizes += SetSizes;
+            Client_SocketIO.TextSetPositions += SetPositions;
 
             Client_SocketIO.ClearText += Clear;
         }
         #endregion
 
+        #region Manager
+        public override string ToSerializedData()
+        {
+            return JsonUtility.ToJson(new TextManagerModel
+            {
+                Data = _textDatas.Values.ToArray(),
+            });
+        }
+
+        public override void FromSerializedData(string serializedData)
+        {
+            TextManagerModel textManagerModel = JsonUtility.FromJson<TextManagerModel>(serializedData);
+
+            foreach (TextModel data in textManagerModel.Data)
+            {
+                UpdateData(data);
+            }
+        }
+
+        private struct TextManagerModel
+        {
+            public TextModel[] Data;
+        }
+        #endregion
+
         #region Public functions
 
-        public void Create(List<string> data)
+        public void UpdateData(TextModel data)
         {
-            Debug.Log("Creating text");
-            foreach (string textName in data)
+            // save data
+            if (_textDatas.ContainsKey(data.ID))
+                _textDatas[data.ID] = data;
+            else
+                _textDatas.Add(data.ID, data);
+
+            if (_textGOs.ContainsKey(data.ID))
             {
-                if (!_textGOs.ContainsKey(textName))
+                // Update
+                TMP_Text text = _textGOs[data.ID].GetComponent<TMP_Text>();
+                text.text = data.Text;
+                text.color = data.Color;
+                text.fontSize = data.FontSize;
+                SetPosition(_textGOs[data.ID], data.Position);
+            }
+            else
+            {
+                // Create
+                Create(data);
+            }
+        }
+
+        public void Create(TextModel data)
+        {
+            GameObject textGO = Instantiate(_textPrefab, _textParent.transform);
+            _textGOs.Add(data.ID, textGO);
+        }
+
+        public void Delete(IDData data)
+        {
+            if (_textGOs.ContainsKey(data.ID))
+            {
+                Destroy(_textGOs[data.ID]);
+                _textGOs.Remove(data.ID);
+            }
+        }
+
+        public void SetTexts(IDListStringList data)
+        {
+            for (int i = 0; i < data.IDs.Length; i++)
+            {
+                if (_textGOs.ContainsKey(data.IDs[i]))
                 {
-                    GameObject textGO = Instantiate(_textPrefab, _textParent.transform);
-                    _textGOs.Add(textName, textGO);
-                }
-            }
-        }
-
-        public void Delete(List<string> data)
-        {
-            Debug.Log("Deleting text");
-            foreach (string textName in data)
-            {
-                if (_textGOs.ContainsKey(textName))
-                {
-                    Destroy(_textGOs[textName]);
-                    _textGOs.Remove(textName);
-                }
-            }
-        }
-
-        public void SetText(Dictionary<string, string> data)
-        {
-            foreach (KeyValuePair<string, string> kvp in data)
-            {
-                if (_textGOs.ContainsKey(kvp.Key))
-                    _textGOs[kvp.Key].GetComponent<TMP_Text>().text = kvp.Value;
-            }
-        }
-
-        public void SetColor(Dictionary<string, string> data)
-        {
-            Debug.Log("Setting text colors");
-            foreach (KeyValuePair<string, string> kvp in data)
-            {
-                Color newColor;
-                if (_textGOs.ContainsKey(kvp.Key) && ColorUtility.TryParseHtmlString(kvp.Value, out newColor))
-                {
-                    _textGOs[kvp.Key].GetComponent<TMP_Text>().color = newColor;
-                }
-                //else
-                    //Client.LogError("Failed to set text color to: " + kvp.Value);
-            }
-        }
-
-        public void SetSize(Dictionary<string, int> data)
-        {
-            Debug.Log("Setting text sizes");
-            foreach (KeyValuePair<string, int> kvp in data)
-            {
-                if (_textGOs.ContainsKey(kvp.Key))
-                    _textGOs[kvp.Key].GetComponent<TMP_Text>().fontSize = kvp.Value;
-            }
-        }
-
-        public void SetPosition(Dictionary<string, List<float>> data)
-        {
-#if UNITY_EDITOR
-            Debug.Log("Setting text positions");
-#endif
-            Vector2 canvasWH = new Vector2(uiCanvas.GetComponent<RectTransform>().rect.width, uiCanvas.GetComponent<RectTransform>().rect.height);
-            foreach (KeyValuePair<string, List<float>> kvp in data)
-            {
-                if (_textGOs.ContainsKey(kvp.Key))
-                {
-                    _textGOs[kvp.Key].transform.localPosition = new Vector2(canvasWH.x * kvp.Value[0] / 2, canvasWH.y * kvp.Value[1] / 2);
+                    TextModel dataModel = _textDatas[data.IDs[i]];
+                    dataModel.Text = data.Values[i];
+                    _textDatas[data.IDs[i]] = dataModel;
+                    _textGOs[data.IDs[i]].GetComponent<TMP_Text>().text =  data.Values[i];
                 }
                 else
-                {
-                    Debug.Log("Couldn't set position for " + kvp.Key);
-                    //Client.LogError(string.Format("Couldn't set position of {0}", kvp.Key));
-                }
+                    Client_SocketIO.LogError($"Cannot set position. Text object with ID {data.IDs[i]} does not exist in Urchin");
             }
+        }
+
+        public void SetColors(IDListColorList data)
+        {
+            for (int i = 0; i < data.IDs.Length; i++)
+            {
+                if (_textGOs.ContainsKey(data.IDs[i]))
+                {
+                    TextModel dataModel = _textDatas[data.IDs[i]];
+                    dataModel.Color = data.Values[i];
+                    _textDatas[data.IDs[i]] = dataModel;
+                    _textGOs[data.IDs[i]].GetComponent<TMP_Text>().color = data.Values[i];
+                }
+                else
+                    Client_SocketIO.LogError($"Cannot set position. Text object with ID {data.IDs[i]} does not exist in Urchin");
+            }
+        }
+
+        public void SetSizes(IDListFloatList data)
+        {
+            for (int i = 0; i < data.IDs.Length; i++)
+            {
+                if (_textGOs.ContainsKey(data.IDs[i]))
+                {
+                    TextModel dataModel = _textDatas[data.IDs[i]];
+                    dataModel.FontSize = Mathf.RoundToInt(data.Values[i]);
+                    _textDatas[data.IDs[i]] = dataModel;
+                    _textGOs[data.IDs[i]].GetComponent<TMP_Text>().fontSize = data.Values[i];
+                }
+                else
+                    Client_SocketIO.LogError($"Cannot set position. Text object with ID {data.IDs[i]} does not exist in Urchin");
+            }
+        }
+
+        public void SetPositions(IDListVector2List data)
+        {
+            for (int i = 0; i < data.IDs.Length; i++)
+            {
+                if (_textGOs.ContainsKey(data.IDs[i]))
+                {
+                    TextModel dataModel = _textDatas[data.IDs[i]];
+                    dataModel.Position = data.Values[i];
+                    _textDatas[data.IDs[i]] = dataModel;
+                    SetPosition(_textGOs[data.IDs[i]], data.Values[i]);
+                }
+                else
+                    Client_SocketIO.LogError($"Cannot set position. Text object with ID {data.IDs[i]} does not exist in Urchin");
+            }
+        }
+
+        private void SetPosition(GameObject textGO, Vector2 position)
+        {
+            Vector2 canvasWH = new Vector2(uiCanvas.GetComponent<RectTransform>().rect.width, uiCanvas.GetComponent<RectTransform>().rect.height);
+
+            textGO.transform.localPosition = new Vector2(canvasWH.x * position.x / 2, canvasWH.y * position.y / 2);
         }
 
         public void Clear()
@@ -124,7 +183,8 @@ namespace Urchin.Managers
             Debug.Log("(Client) Clearing text");
             foreach (GameObject text in _textGOs.Values)
                 Destroy(text);
-            _textGOs = new Dictionary<string, GameObject>();
+
+            _textGOs.Clear();
         }
         #endregion
     }

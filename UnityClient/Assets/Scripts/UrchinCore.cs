@@ -18,6 +18,7 @@ public class UrchinCore : MonoBehaviour
     [SerializeField] private BrainCameraController cameraController;
     [SerializeField] private CameraBehavior _mainCameraBehavior;
     [SerializeField] private Canvas _uiCanvas;
+    [SerializeField] private Canvas _uiCameraCanvas;
     [SerializeField] private ColormapPanel _colormapPanel;
 
     [SerializeField] private AtlasManager _atlasManager;
@@ -225,7 +226,7 @@ public class UrchinCore : MonoBehaviour
     }
 
     public void KeyExplodeImplode(float explodeTime)
-    {
+    { 
         exploded = !exploded;
         if (exploded)
             StartCoroutine(AnimateExplodeHelper(explodeTime));
@@ -244,8 +245,10 @@ public class UrchinCore : MonoBehaviour
 
     public void SetMainCameraMode(bool orthographic)
     {
-        _mainCameraBehavior.SetCameraMode(orthographic);
+        _mainCameraBehavior.Data.Mode = orthographic ? CameraMode.orthographic : CameraMode.perspective;
+        _mainCameraBehavior.UpdateSettings();
         _uiCanvas.worldCamera = _mainCameraBehavior.ActiveCamera;
+        _uiCameraCanvas.worldCamera = _mainCameraBehavior.ActiveCamera;
     }
 
     private IEnumerator AnimateExplodeHelper(float explodeTime)

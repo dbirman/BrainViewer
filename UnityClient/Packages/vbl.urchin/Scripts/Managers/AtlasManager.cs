@@ -20,7 +20,7 @@ namespace Urchin.Managers
         #region static
         public static HashSet<OntologyNode> VisibleNodes { get; private set; }
 
-        public override ManagerType Type => throw new NotImplementedException();
+        public override ManagerType Type => ManagerType.AtlasManager;
 
         public static AtlasManager Instance;
         #endregion
@@ -29,11 +29,6 @@ namespace Urchin.Managers
         private AtlasModel Data;
 
         private Dictionary<string, (string name, bool webgl)> _apiNameMapping;
-
-        /// <summary>
-        /// Intensity values map to full, left, right
-        /// </summary>
-        private Dictionary<OntologyNode, (float full, float left, float right)> _areaIntensity;
 
         private Dictionary<int, List<float>> _areaData;
         private int _areaDataIndex;
@@ -48,12 +43,16 @@ namespace Urchin.Managers
         public UnityEvent<Converter<float, Color>, bool, float, float> ColormapChangedEvent;
         #endregion
 
+        #region Async
+        private TaskCompletionSource<bool> _loadSource;
+        public Task LoadTask;
+        #endregion
+
         #region Unity
         private void Awake()
         {
             _areaSides = new();
             _areaData = new();
-            _areaIntensity = new();
             VisibleNodes = new();
 
             if (Instance != null)
@@ -67,6 +66,9 @@ namespace Urchin.Managers
                 _apiNameMapping.Add(_apiNames[i],
                     (_atlasNames[i], _availableOnWebGL[i]));
             }
+
+            _loadSource = new TaskCompletionSource<bool>();
+            LoadTask = _loadSource.Task;
         }
 
         private void Start()
@@ -82,16 +84,6 @@ namespace Urchin.Managers
             Client_SocketIO.AtlasLoadDefaults += LoadDefaultAreasVoid;
 
             //Client_SocketIO.AtlasCreateCustom += CustomAtlas;
-
-            //Client_SocketIO.AtlasSetAreaVisibility += SetAreaVisibility;
-            //Client_SocketIO.AtlasSetAreaColors += SetAreaColors;
-            //Client_SocketIO.AtlasSetAreaIntensities += SetAreaIntensity;
-            //Client_SocketIO.AtlasSetColormap += SetAreaColormap;
-            //Client_SocketIO.AtlasSetAreaMaterials += SetAreaMaterial;
-            //Client_SocketIO.AtlasSetAreaAlphas += SetAreaAlpha;
-            //Client_SocketIO.AtlasSetAreaData += SetAreaData;
-            //Client_SocketIO.AtlasSetAreaDataIndex += SetAreaIndex;
-            //Client_SocketIO.AtlasLoadAreaDefaults += LoadDefaultAreasVoid;
         }
         #endregion
 
@@ -112,17 +104,24 @@ namespace Urchin.Managers
 
         #region Public
 
-        public void UpdateData(AtlasModel data)
+        public async void UpdateData(AtlasModel data)
         {
 #if UNITY_EDITOR
             Debug.Log("(AtlasManager) Area update called");
 #endif
             Data = data;
 
-            if (BrainAtlasManager.ActiveReferenceAtlas.Name != _apiNameMapping[data.Name].name)
+            if (BrainAtlasManager.ActiveReferenceAtlas != null &&
+                BrainAtlasManager.ActiveReferenceAtlas.Name != _apiNameMapping[data.Name].name)
             {
                 Client_SocketIO.LogError($"Update failed. Atlas {BrainAtlasManager.ActiveReferenceAtlas.Name} is already loaded, re-start Urchin to change atlases.");
                 return;
+            }
+
+            if (BrainAtlasManager.ActiveReferenceAtlas == null)
+            {
+                LoadAtlas(data);
+                await LoadTask;
             }
 
             // Check for colormap
@@ -137,17 +136,17 @@ namespace Urchin.Managers
             }
         }
 
-        public async void LoadAtlas(string apiName)
+        public async void LoadAtlas(AtlasModel data)
         {
-            Task atlasTask;
-            
-            if (!_apiNameMapping.ContainsKey(apiName))
+            if (!_apiNameMapping.ContainsKey(data.Name))
             {
-                Client_SocketIO.LogError($"Atlas {apiName} does not exist.");
+                Client_SocketIO.LogError($"Atlas {data.Name} does not exist.");
                 return;
             }
 
-            (string atlasName, bool availableOnWebGL) = _apiNameMapping[apiName];
+            Data = data;
+
+            (string atlasName, bool availableOnWebGL) = _apiNameMapping[data.Name];
 
 #if UNITY_WEBGL
             if (!availableOnWebGL)
@@ -157,14 +156,20 @@ namespace Urchin.Managers
             }
 #endif
 
-            atlasTask = BrainAtlasManager.LoadAtlas(atlasName);
+            if (BrainAtlasManager.ActiveReferenceAtlas != null)
+            {
+                Client_SocketIO.LogWarning($"Atlas cannot be loaded twice, restart the renderer.");
+                return;
+            }
 
-            await atlasTask;
+            await BrainAtlasManager.LoadAtlas(atlasName);
 
             BrainAtlasManager.SetReferenceCoord(Utils.Utils.BregmaDefaults[BrainAtlasManager.ActiveReferenceAtlas.Name]);
 #if UNITY_EDITOR
             Debug.Log($"Reference coordinate set to {Utils.Utils.BregmaDefaults[BrainAtlasManager.ActiveReferenceAtlas.Name]}");
+
 #endif
+            _loadSource.SetResult(true);
         }
 
         public async void UpdateArea(StructureModel structureData)

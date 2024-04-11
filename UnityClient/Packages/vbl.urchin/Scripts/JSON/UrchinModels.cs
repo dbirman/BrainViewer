@@ -22,27 +22,27 @@ public struct AtlasModel
 [Serializable]
 public struct CameraModel
 {
-    public float Id;
-    public string Type;
+    public string ID;
     public Vector3 Position;
     public Vector3 Rotation;
     public Vector3 Target;
     public float Zoom;
     public Vector2 Pan;
     public CameraMode Mode;
+    public Color BackgroundColor;
     public bool Controllable;
     public bool Main;
 
-    public CameraModel(float id, string type, Vector3 position, Vector3 rotation, Vector3 target, float zoom, Vector2 pan, CameraMode mode, bool controllable, bool main)
+    public CameraModel(string id, Vector3 position, Vector3 rotation, Vector3 target, float zoom, Vector2 pan, CameraMode mode, Color backgroundColor, bool controllable, bool main)
     {
-        Id = id;
-        Type = type;
+        ID = id;
         Position = position;
         Rotation = rotation;
         Target = target;
         Zoom = zoom;
         Pan = pan;
         Mode = mode;
+        BackgroundColor = backgroundColor;
         Controllable = controllable;
         Main = main;
     }
@@ -102,40 +102,40 @@ public struct CustomAtlasModel
 
 
 [Serializable]
-public struct CustomMeshData
+public struct CustomMeshModel
 {
     public string ID;
     public Vector3[] Vertices;
     public int[] Triangles;
     public Vector3[] Normals;
+    public Vector3 Position;
+    public bool UseReference;
+    public Vector3 Scale;
 
-    public CustomMeshData(string id, Vector3[] vertices, int[] triangles, Vector3[] normals)
+    public CustomMeshModel(string id, Vector3[] vertices, int[] triangles, Vector3[] normals, Vector3 position, bool useReference, Vector3 scale)
     {
         ID = id;
         Vertices = vertices;
         Triangles = triangles;
         Normals = normals;
+        Position = position;
+        UseReference = useReference;
+        Scale = scale;
     }
 }
 
 
 [Serializable]
-public struct CustomMeshModel
+public struct LineModel
 {
     public string ID;
-    public Vector3 Position;
-    public bool UseReference;
-    public string Material;
-    public Vector3 Scale;
+    public Vector3[] Positions;
     public Color Color;
 
-    public CustomMeshModel(string id, Vector3 position, bool useReference, string material, Vector3 scale, Color color)
+    public LineModel(string id, Vector3[] positions, Color color)
     {
         ID = id;
-        Position = position;
-        UseReference = useReference;
-        Material = material;
-        Scale = scale;
+        Positions = positions;
         Color = color;
     }
 }
@@ -166,26 +166,22 @@ public struct MeshModel
 
 
 [Serializable]
-public struct ParticleGroupModel
+public struct ParticleSystemModel
 {
     public string ID;
-    public Vector3 Scale;
-    public string Shape;
+    public int N;
     public string Material;
-    public float[] Xs;
-    public float[] Ys;
-    public float[] Zs;
+    public Vector3[] Positions;
+    public float[] Sizes;
     public Color[] Colors;
 
-    public ParticleGroupModel(string id, Vector3 scale, string shape, string material, float[] xs, float[] ys, float[] zs, Color[] colors)
+    public ParticleSystemModel(string id, int n, string material, Vector3[] positions, float[] sizes, Color[] colors)
     {
         ID = id;
-        Scale = scale;
-        Shape = shape;
+        N = n;
         Material = material;
-        Xs = xs;
-        Ys = ys;
-        Zs = zs;
+        Positions = positions;
+        Sizes = sizes;
         Colors = colors;
     }
 }
@@ -198,6 +194,28 @@ public struct PrimitiveMeshModel
     public PrimitiveMeshModel(MeshModel[] data)
     {
         Data = data;
+    }
+}
+
+
+[Serializable]
+public struct ProbeModel
+{
+    public string ID;
+    public Vector3 Position;
+    public Color Color;
+    public Vector3 Angles;
+    public string Style;
+    public Vector3 Scale;
+
+    public ProbeModel(string id, Vector3 position, Color color, Vector3 angles, string style, Vector3 scale)
+    {
+        ID = id;
+        Position = position;
+        Color = color;
+        Angles = angles;
+        Style = style;
+        Scale = scale;
     }
 }
 
@@ -224,6 +242,26 @@ public struct StructureModel
         ColorIntensity = colorIntensity;
         Side = side;
         Material = material;
+    }
+}
+
+
+[Serializable]
+public struct TextModel
+{
+    public string ID;
+    public string Text;
+    public Color Color;
+    public int FontSize;
+    public Vector2 Position;
+
+    public TextModel(string id, string text, Color color, int fontSize, Vector2 position)
+    {
+        ID = id;
+        Text = text;
+        Color = color;
+        FontSize = fontSize;
+        Position = position;
     }
 }
 

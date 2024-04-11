@@ -13,6 +13,12 @@ receive_data = []
 CHUNK_SIZE = 100000000
 
 counter = 0
+
+def clear():
+    """Clear all custom meshes
+    """
+    client.sio.emit('Clear','texture')
+
 class Texture:
     def __init__(self, position=None, offset=None, texture_file=None):
         self.create()

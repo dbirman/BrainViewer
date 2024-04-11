@@ -53,6 +53,11 @@ def save_clicks(fpath):
 		# Write data
 		writer.writerows(data)
 
+def clear():
+    """Clear all custom meshes
+    """
+    client.sio.emit('Clear','volume')
+
 class Volume:
 	"""Volumetric dataset represented in a compressed format by using a colormap to translate
 	uint8 x/y/z data into full RGB color.

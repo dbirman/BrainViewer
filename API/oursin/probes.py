@@ -4,48 +4,37 @@ from . import client
 import warnings
 from . import utils
 
+from vbl_aquarium.models.urchin import ProbeModel
+from vbl_aquarium.models.generic import IDData, IDListVector3List, IDListColorList, IDListStringList
+
 ##Probes Renderer
 counter = 0
+
+def clear():
+    """Clear all custom meshes
+    """
+    client.sio.emit('Clear','probes')
+
 class Probe:
 	def __init__(self, color = 'FFFFFF', position = [0,0,0], angle = [0,0,0], style = 'line', scale = [0.070, 3.840, 0.020]):
-		self.create()
-
-		color = utils.sanitize_color(color)
-		self.color = color
-		client.sio.emit('SetProbeColors', {self.id:color})
-
-		position = utils.sanitize_vector3(position)
-		self.position = position
-		client.sio.emit('SetProbePos', {self.id:position})
-
-		angle = utils.sanitize_vector3(angle)
-		self.angle = angle
-		client.sio.emit('SetProbeAngles', {self.id:angle})
 		
-		style = utils.sanitize_string(style)
-		self.style = style
-		#client.sio.emit('SetProbeStyle', {self.id:style})
-
-		scale = utils.sanitize_vector3(scale)
-		self.scale = scale
-		client.sio.emit('SetProbeSize', {self.id:scale})
-
-	def create(self):
-		"""Create probe objects
-
-		Parameters
-		----------
-		none
-
-		Examples
-		--------
-		>>> p1 = urchin.probes.Probe()
-		"""
 		global counter
 		counter +=1
-		self.id = 'p' + str(counter)
-		client.sio.emit('CreateProbes', [self.id])
+		
+		self.data = ProbeModel(
+			id = f'p{counter}',
+			position= utils.formatted_vector3(position),
+			color= utils.formatted_color(color),
+			angles = utils.formatted_vector3(angle),
+			style = style,
+			scale = utils.formatted_vector3(scale)
+		)
+
+		self._update()
 		self.in_unity = True
+
+	def _update(self):
+		client.sio.emit('urchin-probe-update', self.data.to_string())
 
 	def delete(self):
 		"""Delete probe objects
@@ -58,7 +47,7 @@ class Probe:
 		--------
 		>>> p1.delete()
 		"""
-		client.sio.emit('DeleteProbes', [self.id])
+		client.sio.emit('urchin-probe-delete', IDData(id=self.data.id).to_string())
 		self.in_unity = False
 
 	def set_color(self,color):
@@ -76,11 +65,10 @@ class Probe:
 		if self.in_unity == False:
 			raise Exception("Object does not exist in Unity, call create method first.")
 		
-		color = utils.sanitize_color(color)
-		self.color
-		client.sio.emit('SetProbeColors', {self.id:color})
+		self.data.color = utils.formatted_color(color)
+		self._update()
 
-	def set_position(self, probe_positions):
+	def set_position(self, position):
 		"""Set probe tip position in AP/ML/DV coordinates in um relative to the zero coordinate (front, top, left)
 
 		Parameters
@@ -95,8 +83,8 @@ class Probe:
 		if self.in_unity == False:
 			raise Exception("Object does not exist in Unity, call create method first.")
 		
-		self.position = utils.sanitize_vector3(probe_positions)
-		client.sio.emit('SetProbePos', {self.id:[self.position[0]/1000, self.position[1]/1000, self.position[2]/1000]})
+		self.data.position = utils.formatted_vector3(position)
+		self._update()
 
 	def set_angle(self, probe_angles):
 		"""Set probe azimuth/elevation/spin angles in degrees
@@ -115,9 +103,10 @@ class Probe:
 		"""
 		if self.in_unity == False:
 			raise Exception("Object does not exist in Unity, call create method first.")
-		probe_angles = utils.sanitize_vector3(probe_angles)
-		self.angle = probe_angles
-		client.sio.emit('SetProbeAngles', {self.id:probe_angles})
+		
+		self.data.angles = utils.formatted_vector3(probe_angles)
+
+		self._update()
 
 	# def set_probe_style(self,probe_data):
 	# 	"""Set probe rendering style
@@ -152,9 +141,10 @@ class Probe:
 		"""
 		if self.in_unity == False:
 			raise Exception("Object does not exist in Unity, call create method first.")
-		probe_scale = utils.sanitize_vector3(probe_scale)
-		self.scale = probe_scale
-		client.sio.emit('SetProbeSize', {self.id:probe_scale})
+		
+		self.data.scale = utils.formatted_vector3(probe_scale)
+
+		self._update()
 
 	
 def create(num_objects):
@@ -204,17 +194,14 @@ def set_colors(probes_list, colors_list):
 	--------
 	>>> urchin.probes.set_colors(probes,['#FFFFFF','#000000'])
 	"""
-	probes_list = utils.sanitize_list(probes_list)
-	colors_list = utils.sanitize_list(colors_list)
+	colors_list = utils.sanitize_list(colors_list, len(probes_list))
 
-	probe_colors = {}
-	for i in range(len(probes_list)):
-		probe = probes_list[i]
-		if probe.in_unity:
-			probe_colors[probe.id] = utils.sanitize_color(colors_list[i])
-		else:
-			warnings.warn(f"Object with id {probe.id} does not exist in Unity, Please create object {probe.id}.")
-	client.sio.emit('SetProbeColors', probe_colors)
+	data = IDListColorList(
+		ids = [x.data.id for x in probes_list],
+		values= [utils.formatted_color(x) for x in colors_list]
+	)
+
+	client.sio.emit('urchin-probe-colors', data.to_string())
 
 def set_positions(probes_list, positions_list):
 	"""Set probe tip positions in AP/ML/DV coordinates in um relative to the zero point (front, left, top)
@@ -224,24 +211,19 @@ def set_positions(probes_list, positions_list):
 	probes_list : list of Probe
 	positions_list : list of vector3
 		tip coordinate in AP/ML/DV in um
-      
+			
 	Examples
 	--------
 	>>> urchin.probes.set_positions(probes,[[1000,2000,1000],[2000,2000,2000]])
 	"""
-	probes_list = utils.sanitize_list(probes_list)
-	positions_list = utils.sanitize_list(positions_list)
+	positions_list = utils.sanitize_list(positions_list, len(probes_list))
 
-	probe_pos = {}
-	for i in range(len(probes_list)):
-		probe = probes_list[i]
-		if probe.in_unity:
-			pos = utils.sanitize_vector3(positions_list[i])
-			probe_pos[probe.id] = [pos[0]/1000, pos[1]/1000, pos[2]/1000]
-		else:
-			warnings.warn(f"Object with id {probe.id} does not exist. Please create object {probe.id}.")
+	data = IDListVector3List(
+		ids = [x.data.id for x in probes_list],
+		values= [utils.formatted_vector3([pos[0]/1000, pos[1]/1000, pos[2]/1000]) for pos in positions_list]
+	)
 
-	client.sio.emit('SetProbePos', probe_pos)
+	client.sio.emit('urchin-probe-positions', data.to_string())
 
 def set_angles(probes_list, angles_list):
 	"""Set probe azimuth/elevation/spin angles in degrees
@@ -260,18 +242,14 @@ def set_angles(probes_list, angles_list):
 	--------
 	>>> urchin.probes.set_angles(probes,[[-90,0,0],[0,30,0]])
 	"""
-	probes_list = utils.sanitize_list(probes_list)
-	angles_list = utils.sanitize_list(angles_list)
+	angles_list = utils.sanitize_list(angles_list, len(probes_list))
 
-	probe_angle = {}
-	for i in range(len(probes_list)):
-		probe = probes_list[i]
-		if probe.in_unity:
-			probe_angle[probe.id] = utils.sanitize_vector3(angles_list[i])
-		else:
-			warnings.warn(f"Object with id {probe.id} does not exist. Please create object {probe.id}.")
+	data = IDListVector3List(
+		ids = [x.data.id for x in probes_list],
+		values= [utils.formatted_vector3(angle) for angle in angles_list]
+	)
 
-	client.sio.emit('SetProbeAngles', probe_angle)
+	client.sio.emit('urchin-probe-angles', data.to_string())
 
 # def set_probe_styles(probes_list,styles_list):
 # 	"""Set probe rendering style
@@ -319,15 +297,11 @@ def set_scales(probes_list, scales_list):
 	--------
 	>>> urchin.probes.set_scales(probes,[[0.070, 3.840, 0.020],[0.070, 3.840, 0.020]])
 	"""
-	probes_list = utils.sanitize_list(probes_list)
-	scales_list = utils.sanitize_list(scales_list)
+	scales_list = utils.sanitize_list(scales_list, len(probes_list))
 
-	probe_scale = {}
-	for i in range(len(probes_list)):
-		probe = probes_list[i]
-		if probe.in_unity:
-			probe_scale[probe.id] = utils.sanitize_vector3(scales_list[i])
-		else:
-			warnings.warn(f"Object with id {probe.id} does not exist. Please create object {probe.id}.")
+	data = IDListVector3List(
+		ids = [x.data.id for x in probes_list],
+		values= [utils.formatted_vector3(scale) for scale in scales_list]
+	)
 
-	client.sio.emit('SetProbeSize', probe_scale)
+	client.sio.emit('urchin-probe-scales', data.to_string())

@@ -1,5 +1,7 @@
+using BrainAtlas;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -8,7 +10,14 @@ using Urchin.Managers;
 
 public class DataManager : MonoBehaviour
 {
+    [SerializeField] AtlasManager _atlasManager;
+    [SerializeField] CameraManager _cameraManager;
+    [SerializeField] LineRendererManager _lineRendererManager;
     [SerializeField] PrimitiveMeshManager _primitiveMeshManager;
+    [SerializeField] TextManager _textManager;
+    [SerializeField] ParticleManager _particleManager;
+    [SerializeField] CustomMeshManager _customMeshManager;
+    [SerializeField] ProbeManager _probeManager;
 
     [SerializeField] private string apiURL;
 
@@ -17,59 +26,132 @@ public class DataManager : MonoBehaviour
     #region Unity
     private void Awake()
     {
-        _managers = new();
-        _managers.Add(_primitiveMeshManager);
+        _managers = new()
+        {
+            _atlasManager,
+            _primitiveMeshManager,
+            _cameraManager,
+            _lineRendererManager,
+            _textManager,
+            _particleManager,
+            _customMeshManager,
+            _probeManager
+        };
 
         Client_SocketIO.Save += x => StartCoroutine(Save(x));
-
+        Client_SocketIO.Load += x => StartCoroutine(Load(x));
     }
     #endregion
 
-    public IEnumerator Save(SaveModel data)
+    public IEnumerator Save(SaveRequest data)
     {
+        // Generate a LoadModel holding the data
+        LoadModel allData = new LoadModel(new int[_managers.Count], new string[_managers.Count]);
+
         for (int i = 0; i < _managers.Count; i++)
         {
-            string type = Manager.Type2String(_managers[i].Type);
+            allData.Types[i] = (int)_managers[i].Type;
+            allData.Data[i] = _managers[i].ToSerializedData();
+        }
 
-            //// Push data up to the REST API
-            var uploadModel = new UploadModel
+
+        if (data.Filename != "")
+        {
+            // Save data to a local file
+            string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
+            string jsonData = JsonUtility.ToJson(allData);
+
+//#if !UNITY_WEBGL
+            File.WriteAllText(filePath, jsonData);
+            Client_SocketIO.Log($"File saved to {filePath}, re-load this file by passing just the filename, not the full path.");
+//#endif
+        }
+        else
+        {
+            // Load data to the cloud
+            for (int i = 0; i < _managers.Count; i++)
             {
-                Data = _managers[i].ToSerializedData(),
-                Password = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
-            };
+                //// Push data up to the REST API
+                var uploadRequest = new UploadRequest
+                {
+                    Type = allData.Types[i],
+                    Data = allData.Data[i],
+                    Password = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+                };
 
-            Debug.Log(_managers[i].ToSerializedData());
+                yield return null;
 
-            yield return null;
+                string json = JsonUtility.ToJson(uploadRequest);
+                byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
 
-            //string json = JsonUtility.ToJson(uploadModel);
-            //byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+                UnityWebRequest request = new UnityWebRequest($"{apiURL}/upload/{data.Bucket}", "POST");
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.SetRequestHeader("Content-Type", "application/json");
 
-            //UnityWebRequest request = new UnityWebRequest($"{apiURL}/{data.Bucket}/{type}/data", "POST");
-            //request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            //request.SetRequestHeader("Content-Type", "application/json");
+                yield return request.SendWebRequest();
 
-            //yield return request.SendWebRequest();
-
-            //Debug.Log($"Response code{request.responseCode}");
+                if (request.responseCode != 201)
+                {
+                    Client_SocketIO.LogError(request.error);
+                }
+            }
         }
     }
 
-    public void Load(string targetURL)
+    public IEnumerator Load(LoadRequest data)
     {
-        throw new System.NotImplementedException();
+        if (data.Filename != "")
+        {
+            string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
 
-        //// Get the manager data back from the API
-        //FlattenedData data = new();
+            ParseLoadData(JsonUtility.FromJson<LoadModel>(File.ReadAllText(filePath)));
+        }
+        else
+        {
+            string json = JsonUtility.ToJson(data);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
 
-        //foreach (ManagerData managerData in data.Data)
-        //{
-        //    switch (managerData.Type)
-        //    {
-        //        case ManagerType.PrimitiveMeshManager:
-        //            _primitiveMeshManager.FromSerializedData(managerData.Data);
-        //            break;
-        //    }
-        //}
+            UnityWebRequest request = new UnityWebRequest($"{apiURL}/{data.Bucket}/all", "GET");
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                ParseLoadData(JsonUtility.FromJson<LoadModel>(request.downloadHandler.text));
+            }
+            else
+            {
+                Client_SocketIO.LogError(request.error);
+            }
+        }
+    }
+
+    private async void ParseLoadData(LoadModel data)
+    {
+        // If any of the models are the atlas model, load that first
+        for (int i = 0; i < data.Types.Length; i++)
+        {
+            if ((ManagerType)data.Types[i] == ManagerType.AtlasManager)
+            {
+                _atlasManager.FromSerializedData(data.Data[i]);
+                await _atlasManager.LoadTask;
+            }
+        }
+
+        // Then load everything else (these are all independent)
+        for (int i = 0; i < data.Types.Length; i++)
+        {
+            string managerData = data.Data[i];
+
+            switch ((ManagerType)data.Types[i])
+            {
+                case ManagerType.PrimitiveMeshManager:
+                    _primitiveMeshManager.FromSerializedData(managerData);
+                    break;
+            }
+        }
     }
 }
