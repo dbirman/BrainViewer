@@ -123,7 +123,7 @@ public class ParticleManager : Manager
         GameObject psystemGO = Instantiate(_psystemPrefabGO, _psystemParentT);
         ParticleBehavior pbehavior = psystemGO.GetComponent<ParticleBehavior>();
 
-        pbehavior.UpdateData(data);
+        pbehavior.UpdateData(data, true);
 
         _psystemMapping.Add(data.ID, pbehavior);
     }

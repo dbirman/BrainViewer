@@ -17,38 +17,43 @@ public class ParticleBehavior : MonoBehaviour
     }
 
     #region Public
-    public void UpdateData(ParticleSystemModel data)
+    public void UpdateData(ParticleSystemModel data, bool created = false)
     {
-        if (_particleSystem.particleCount == 0)
+        Debug.Log(created);
+        if (created)
         {
             ParticleSystem.EmitParams emitParams = new ParticleSystem.EmitParams();
 
-            //for (int i = 0; i < data.Sizes)
             emitParams.position = Vector3.zero;
-            emitParams.startColor = Color.red;
+            emitParams.startColor = Color.white;
             emitParams.startSize = 0.1f;
-            _particleSystem.Emit(emitParams, 1);
+            _particleSystem.Emit(emitParams, data.N);
 
             _particles = new ParticleSystem.Particle[_particleSystem.particleCount];
             _particleSystem.GetParticles(_particles);
         }
 
-        // Convert positions to World
+        Debug.Log(data.Positions.Length);
+        Debug.Log(data.Sizes.Length);
+        Debug.Log(data.Colors.Length);
         SetPositions(data.Positions);
-
-        SetSizes();
-        SetColors();
-        SetPositions();
+        SetSizes(data.Sizes);
+        SetColors(data.Colors);
     }
 
     public void SetSizes(float[] sizes)
     {
+        ParticleSystemModel data = Data;
+        data.Sizes = new float[sizes.Length];
+
         for (int i = 0; i < _particles.Length; i++)
-            Data.Sizes[i] = sizes[i];
-        SetSizes();
+            data.Sizes[i] = sizes[i];
+
+        Data = data;
+        _SetSizes();
     }
 
-    private void SetSizes()
+    private void _SetSizes()
     {
         for (int i = 0; i < _particles.Length; i++)
             _particles[i].startSize = Data.Sizes[i];
@@ -57,11 +62,17 @@ public class ParticleBehavior : MonoBehaviour
 
     public void SetColors(Color[] colors)
     {
+        ParticleSystemModel data = Data;
+        data.Colors = new Color[colors.Length];
+
         for (int i = 0; i < _particles.Length; i++)
-            Data.Colors[i] = colors[i];
+            data.Colors[i] = colors[i];
+
+        Data = data;
+        _SetColors();
     }
 
-    private void SetColors()
+    private void _SetColors()
     {
         for (int i = 0; i < _particles.Length; i++)
             _particles[i].startColor = Data.Colors[i];
@@ -70,17 +81,22 @@ public class ParticleBehavior : MonoBehaviour
 
     public void SetPositions(Vector3[] positions)
     {
+        ParticleSystemModel data = Data;
+        data.Positions = new Vector3[positions.Length];
+
         for (int i = 0; i < _particles.Length; i++)
         {
-            Vector3 posWorld = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(positions[i]);
-            Data.Positions[i] = posWorld;
+            data.Positions[i] = positions[i];
         }
+
+        Data = data;
+        _SetPositions();
     }
 
-    private void SetPositions()
+    private void _SetPositions()
     {
         for (int i = 0; i < _particles.Length; i++)
-            _particles[i].position = Data.Positions[i];
+            _particles[i].position = BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(Data.Positions[i]);
         _particleSystem.SetParticles(_particles);
     }
     #endregion
