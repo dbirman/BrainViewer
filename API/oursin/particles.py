@@ -35,9 +35,9 @@ class ParticleSystem:
 			id= f'psystem{counter}',
 			n = n,
 			material= material,
-			positions = [Vector3()] * n if positions == None else [utils.formatted_vector3(pos) for pos in utils.sanitize_list(positions, n)],
-			sizes = [0.1] * n if sizes == None else utils.sanitize_list(sizes, n),
-			colors = [Color()] * n if sizes == None else utils.sanitize_list(colors, n)
+			positions = [Vector3()] * n if positions is None else [utils.formatted_vector3(pos) for pos in utils.sanitize_list(positions, n)],
+			sizes = [0.1] * n if sizes is None else utils.sanitize_list(sizes, n),
+			colors = [Color()] * n if sizes is None else utils.sanitize_list(colors, n)
 		)
 
 		self._update()
