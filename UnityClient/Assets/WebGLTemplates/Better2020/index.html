@@ -97,6 +97,21 @@
           alert(message);
         });
       };
+
+      function downloadFile(filename, data) {
+            var blob = new Blob([data], {type: 'application/json'});
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+
+        
       document.body.appendChild(script);
     </script>
   </body>

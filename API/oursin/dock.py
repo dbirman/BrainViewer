@@ -3,7 +3,7 @@ from . import client
 import requests
 import hashlib
 
-from vbl_aquarium.models.dock import BucketRequest, SaveRequest, LoadRequest
+from vbl_aquarium.models.dock import BucketRequest, SaveRequest, LoadRequest, LoadModel
 
 # Define the API endpoint URL
 api_url = "http://localhost:5000"
@@ -72,17 +72,21 @@ def save(filename = None, bucket_name = None, password = None):
     global password_hash
 
     if filename is not None:
-        raise Exception("Not implemented yet")
+      with open(filename, 'rb') as file:
+        json_data = file.read()
+      
+      data = LoadModel(**)
 
-    check_and_store(bucket_name, password)
+    else:
+      check_and_store(bucket_name, password)
 
-    data = SaveRequest(
-        filename= "" if filename is None else filename,
-        bucket= active_bucket,
-        password= password_hash
-    )
+      data = SaveRequest(
+          filename= "" if filename is None else filename,
+          bucket= active_bucket,
+          password= password_hash
+      )
 
-    client.sio.emit('urchin-save', data.to_string())
+      client.sio.emit('urchin-save', data.to_string())
 
 def load(filename = None, bucket_name = None, password= None):
     """Load all data from a bucket

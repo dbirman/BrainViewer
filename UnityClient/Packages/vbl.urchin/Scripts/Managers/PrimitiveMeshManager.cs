@@ -13,8 +13,12 @@ namespace Urchin.Managers
         [SerializeField] private Transform _primitiveMeshParentT;
         [SerializeField] private GameObject _primitivePrefabGO;
 
+        [SerializeField] List<string> meshNames;
+        [SerializeField] List<Mesh> meshOpts;
+
         //Keeping a dictionary mapping names of objects to the game object in schene
         private Dictionary<string, MeshBehavior> _meshBehaviors;
+        private Dictionary<string, Mesh> _meshOptions;
 
         #region Properties
         public override ManagerType Type { get { return ManagerType.PrimitiveMeshManager; } }
@@ -24,6 +28,10 @@ namespace Urchin.Managers
         private void Awake()
         {
             _meshBehaviors = new();
+
+            _meshOptions = new();
+            for (int i = 0; i < meshNames.Count; i++)
+                _meshOptions.Add(meshNames[i], meshOpts[i]);
         }
 
         private void Start()
@@ -131,6 +139,7 @@ namespace Urchin.Managers
             for (int i = 0; i < data.IDs.Length; i++)
                 _meshBehaviors[data.IDs[i]].SetMaterial(data.Values[i]);
         }
+
         #endregion
 
         #region Manager

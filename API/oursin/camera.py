@@ -72,7 +72,8 @@ class Camera:
 		counter += 1	
 
 		self.data = CameraModel(
-			id = 'CameraMain' if main else f'Camera{counter}'
+			id = 'CameraMain' if main else f'Camera{counter}',
+			controllable= True if main else False
 		)
 		
 		self._update()

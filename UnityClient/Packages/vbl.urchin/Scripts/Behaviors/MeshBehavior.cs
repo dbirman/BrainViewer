@@ -97,5 +97,10 @@ public class MeshBehavior : MonoBehaviour
     {
         Renderer.material = MaterialManager.GetMaterial(Data.Material);
     }
+
+    public void SetMesh(Mesh mesh)
+    {
+        GetComponent<MeshFilter>().mesh = mesh;
+    }
     #endregion
 }

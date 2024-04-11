@@ -7,9 +7,17 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Urchin.API;
 using Urchin.Managers;
+#if UNITY_WEBGL && !UNITY_EDITOR
+using System.Runtime.InteropServices;
+#endif
 
 public class DataManager : MonoBehaviour
 {
+#if UNITY_WEBGL && !UNITY_EDITOR
+    [DllImport("__Internal")]
+    private static extern void DownloadFile(string filename, string filedata);
+#endif
+
     [SerializeField] AtlasManager _atlasManager;
     [SerializeField] CameraManager _cameraManager;
     [SerializeField] LineRendererManager _lineRendererManager;
@@ -61,10 +69,12 @@ public class DataManager : MonoBehaviour
             string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
             string jsonData = JsonUtility.ToJson(allData);
 
-//#if !UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
+            DownloadFile(data.Filename, jsonData);
+#else
             File.WriteAllText(filePath, jsonData);
             Client_SocketIO.Log($"File saved to {filePath}, re-load this file by passing just the filename, not the full path.");
-//#endif
+#endif
         }
         else
         {

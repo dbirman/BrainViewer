@@ -4,4 +4,8 @@ mergeInto(LibraryManager.library, {
     window.alert(UTF8ToString(pid));
   },
 
+  DownloadFile: function(filename, filedata) {
+    downloadFile(filename, filedata);
+  }
+
 });
