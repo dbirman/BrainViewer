@@ -16,6 +16,7 @@ public class DataManager : MonoBehaviour
     [SerializeField] PrimitiveMeshManager _primitiveMeshManager;
     [SerializeField] TextManager _textManager;
     [SerializeField] ParticleManager _particleManager;
+    [SerializeField] CustomMeshManager _customMeshManager;
 
     [SerializeField] private string apiURL;
 
@@ -31,8 +32,8 @@ public class DataManager : MonoBehaviour
             _cameraManager,
             _lineRendererManager,
             _textManager,
-            _particleManager
-
+            _particleManager,
+            _customMeshManager
         };
 
         Client_SocketIO.Save += x => StartCoroutine(Save(x));

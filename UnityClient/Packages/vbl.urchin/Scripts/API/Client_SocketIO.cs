@@ -143,25 +143,23 @@ namespace Urchin.API
         }
 
 
-        //pubic statc Action<ProbeModel
+        public static Action<ProbeModel> ProbeUpdate;
+        public static Action<IDData> ProbeDelete;
 
-        public static Action<List<string>> CreateProbes;
-        public static Action<List<string>> DeleteProbes;
-        public static Action<Dictionary<string, string>> SetProbeColors;
-        public static Action<Dictionary<string, List<float>>> SetProbePos;
-        public static Action<Dictionary<string, List<float>>> SetProbeAngles;
-        public static Action<Dictionary<string, string>> SetProbeStyle;
-        public static Action<Dictionary<string, List<float>>> SetProbeSize;
+        public static Action<IDListColorList> ProbeSetColors;
+        public static Action<IDListVector3List> ProbeSetPositions;
+        public static Action<IDListVector3List> ProbeSetAngles;
+        public static Action<IDListVector3List> ProbeSetScales;
 
         private void Start_Probes()
         {
-            manager.Socket.On<List<string>>("CreateProbes", x => CreateProbes.Invoke(x));
-            manager.Socket.On<List<string>>("DeleteProbes", x => DeleteProbes.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetProbeColors", x => SetProbeColors.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetProbePos", x => SetProbePos.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetProbeAngles", x => SetProbeAngles.Invoke(x));
-            manager.Socket.On<Dictionary<string, string>>("SetProbeStyle", x => SetProbeStyle.Invoke(x));
-            manager.Socket.On<Dictionary<string, List<float>>>("SetProbeSize", x => SetProbeSize.Invoke(x));
+            manager.Socket.On<string>("urchin-probe-update", x => ProbeUpdate.Invoke(JsonUtility.FromJson<ProbeModel>(x)));
+            manager.Socket.On<string>("urchin-probe-delete", x => ProbeDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
+
+            manager.Socket.On<string>("urchin-probe-colors", x => ProbeSetColors.Invoke(JsonUtility.FromJson<IDListColorList>(x)));
+            manager.Socket.On<string>("urchin-probe-positions", x => ProbeSetPositions.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
+            manager.Socket.On<string>("urchin-probe-angles", x => ProbeSetAngles.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
+            manager.Socket.On<string>("urchin-probe-scales", x => ProbeSetScales.Invoke(JsonUtility.FromJson<IDListVector3List>(x)));
         }
 
         // New Camera
@@ -276,17 +274,13 @@ namespace Urchin.API
             manager.Socket.On<Dictionary<string, bool>>("SetFOVVisibility", x => SetFOVVisibility.Invoke(x));
         }
 
-        //public static Action<CustomMeshData> CustomMeshCreate;
-        //public static Action<CustomMeshDestroy> CustomMeshDestroy;
-        //public static Action<CustomMeshPosition> CustomMeshPosition;
-        //public static Action<Vector3Data> CustomMeshScale;
+        public static Action<CustomMeshModel> CustomMeshUpdate;
+        public static Action<IDData> CustomMeshDelete;
 
         private void Start_CustomMesh()
         {
-            //manager.Socket.On<string>("CustomMeshCreate", x => CustomMeshCreate.Invoke(JsonUtility.FromJson<CustomMeshData>(x)));
-            //manager.Socket.On<string>("CustomMeshDestroy", x => CustomMeshDestroy.Invoke(JsonUtility.FromJson<CustomMeshDestroy>(x)));
-            //manager.Socket.On<string>("CustomMeshPosition", x => CustomMeshPosition.Invoke(JsonUtility.FromJson<CustomMeshPosition>(x)));
-            //manager.Socket.On<string>("CustomMeshScale", x => CustomMeshScale.Invoke(JsonUtility.FromJson<Vector3Data>(x)));
+            manager.Socket.On<string>("urchin-custommesh-update", x => CustomMeshUpdate.Invoke(JsonUtility.FromJson<CustomMeshModel>(x)));
+            manager.Socket.On<string>("urchin-custommesh-delete", x => CustomMeshDelete.Invoke(JsonUtility.FromJson<IDData>(x)));
         }
 
         public static Action<SaveRequest> Save;

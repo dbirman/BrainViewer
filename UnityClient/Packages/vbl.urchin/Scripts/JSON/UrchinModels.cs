@@ -102,41 +102,25 @@ public struct CustomAtlasModel
 
 
 [Serializable]
-public struct CustomMeshData
+public struct CustomMeshModel
 {
     public string ID;
     public Vector3[] Vertices;
     public int[] Triangles;
     public Vector3[] Normals;
+    public Vector3 Position;
+    public bool UseReference;
+    public Vector3 Scale;
 
-    public CustomMeshData(string id, Vector3[] vertices, int[] triangles, Vector3[] normals)
+    public CustomMeshModel(string id, Vector3[] vertices, int[] triangles, Vector3[] normals, Vector3 position, bool useReference, Vector3 scale)
     {
         ID = id;
         Vertices = vertices;
         Triangles = triangles;
         Normals = normals;
-    }
-}
-
-
-[Serializable]
-public struct CustomMeshModel
-{
-    public string ID;
-    public Vector3 Position;
-    public bool UseReference;
-    public string Material;
-    public Vector3 Scale;
-    public Color Color;
-
-    public CustomMeshModel(string id, Vector3 position, bool useReference, string material, Vector3 scale, Color color)
-    {
-        ID = id;
         Position = position;
         UseReference = useReference;
-        Material = material;
         Scale = scale;
-        Color = color;
     }
 }
 

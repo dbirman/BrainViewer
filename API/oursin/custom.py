@@ -4,7 +4,10 @@ from . import client
 from . import utils
 import json
 
-count = 0
+from vbl_aquarium.models.urchin import CustomMeshModel
+from vbl_aquarium.models.generic import IDData
+
+counter = 0
 
 class CustomMesh:
     """Custom 3D object
@@ -19,32 +22,36 @@ class CustomMesh:
         ----------
         vertices : list of vector3
             Vertex coordinates, the x/y/z directions will correspond to AP/DV/ML if your object was exported from Blender
-        triangles : list of vector3
-            Triangle vertex indexes
+        triangles : list of int
+            Triangle vertex 
         normals : list of vector3, optional
             Normal directions, by default None
         """
-        global count
+        global counter
+        counter += 1
 
-        self.id = str(count)
-        count += 1
+        self.data = CustomMeshModel(
+            id = str(counter),
+            vertices = [utils.formatted_vector3(x) for x in vertices],
+            triangles = [utils.formatted_vector3(x) for x in triangles],
+            normals = normals
+        )
 
-        data = {}
-        data['ID'] = self.id
-        data['vertices'] = vertices
-        data['triangles'] = triangles
-
-        if not normals is None:
-            data['normals'] = normals
-
-        client.sio.emit('CustomMeshCreate', json.dumps(data))
-        
+        self._update()
         self.in_unity = True
+
+    def _update(self):
+        client.sio.emit('urchin-custommesh-update', self.data.to_string())
 
     def delete(self):
         """Destroy this object in the renderer scene
         """
-        client.sio.emit('CustomMeshDelete', self.id)
+
+        data = IDData(
+            id = self.data.id
+        )
+
+        client.sio.emit('urchin-custommesh-delete', data.to_string())
         self.in_unity = False
 
     def set_position(self, position = [0,0,0], use_reference = True):
@@ -64,14 +71,11 @@ class CustomMesh:
         use_reference : bool, optional
             whether to use the reference coordinate, by default True
         """
-        position = utils.sanitize_vector3(position)
 
-        data = {}
-        data['ID'] = self.id
-        data['Position'] = utils.formatted_vector3(position)
-        data['UseReference'] = use_reference
+        self.data.position = utils.formatted_vector3(position)
+        self.data.use_reference = use_reference
 
-        client.sio.emit('CustomMeshPosition', json.dumps(data))
+        self._update()
 
     def set_scale(self, scale = [1, 1, 1]):
         """_summary_
@@ -82,13 +86,9 @@ class CustomMesh:
             _description_, by default [1, 1, 1]
         """
 
-        scale = utils.sanitize_vector3(scale)
+        self.data.scale = utils.formatted_vector3(scale)
 
-        data = {}
-        data['ID'] = self.id
-        data['Value'] = utils.formatted_vector3(scale)
-
-        client.sio.emit('CustomMeshScale', json.dumps(data))
+        self._update()
 
 def clear():
     """Clear all custom meshes
