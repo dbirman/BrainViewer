@@ -700,8 +700,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 592623199083560915}
+  m_Children: []
   m_Father: {fileID: 2757818260648243688}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6074828215876335387
@@ -732,8 +731,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 1b5463b1e2e640845ab8f1005a84aafe, type: 2}
   - {fileID: 2100000, guid: 7864e8cafb9a00a4d9f06e4295d0df69, type: 2}
   - {fileID: 2100000, guid: a3621f25cab63014eb488d47d569cf72, type: 2}
-  _psystemPrefabGO: {fileID: 0}
-  _psystemParentT: {fileID: 0}
+  _psystemPrefabGO: {fileID: 8965023397781002357, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
+  _psystemParentT: {fileID: 5107351892853129139}
 --- !u!1001 &648514006979445990
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1020,65 +1019,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8eb74672a89844458a35e5b533041e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &7959072852079228110
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 5107351892853129139}
-    m_Modifications:
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -90
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8965023397781002357, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-      propertyPath: m_Name
-      value: ParticleSystem
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
---- !u!4 &592623199083560915 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7371589121525205789, guid: b7a2da7e173d526428a14202ebacc6a2, type: 3}
-  m_PrefabInstance: {fileID: 7959072852079228110}
-  m_PrefabAsset: {fileID: 0}
