@@ -29,11 +29,17 @@ public class DataManager : MonoBehaviour
 
     [SerializeField] private string apiURL;
 
+    #region Variables
     private List<Manager> _managers;
+    private DockModel Data;
+    #endregion
+
 
     #region Unity
     private void Awake()
     {
+        Data.DockUrl = apiURL;
+
         _managers = new()
         {
             _atlasManager,
@@ -48,8 +54,14 @@ public class DataManager : MonoBehaviour
 
         Client_SocketIO.Save += x => StartCoroutine(Save(x));
         Client_SocketIO.Load += x => StartCoroutine(Load(x));
+        Client_SocketIO.DockData += UpdateData;
     }
     #endregion
+
+    public void UpdateData(DockModel data)
+    {
+        Data = data;
+    }
 
     public IEnumerator Save(SaveRequest data)
     {
@@ -94,7 +106,7 @@ public class DataManager : MonoBehaviour
                 string json = JsonUtility.ToJson(uploadRequest);
                 byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
 
-                UnityWebRequest request = new UnityWebRequest($"{apiURL}/upload/{data.Bucket}", "POST");
+                UnityWebRequest request = new UnityWebRequest($"{Data.DockUrl}/upload/{data.Bucket}", "POST");
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                 request.SetRequestHeader("Content-Type", "application/json");
 
@@ -121,7 +133,7 @@ public class DataManager : MonoBehaviour
             string json = JsonUtility.ToJson(data);
             byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest request = new UnityWebRequest($"{apiURL}/{data.Bucket}/all", "GET");
+            UnityWebRequest request = new UnityWebRequest($"{Data.DockUrl}/{data.Bucket}/all", "GET");
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");

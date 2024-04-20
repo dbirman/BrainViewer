@@ -35,11 +35,7 @@ public class MaterialManager : MonoBehaviour
         else
         {
             string msg = $"Material {materialName} does not exist";
-#if UNITY_EDITOR
-            throw new Exception(msg);
-#else
-            Debug.Log(msg);
-#endif
+            return null;
         }
     }
 }

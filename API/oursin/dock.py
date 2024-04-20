@@ -75,7 +75,7 @@ def save(filename = None, bucket_name = None, password = None):
       with open(filename, 'rb') as file:
         json_data = file.read()
       
-      data = LoadModel(**)
+    #   data = LoadModel(**)
 
     else:
       check_and_store(bucket_name, password)

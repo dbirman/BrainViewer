@@ -13,6 +13,17 @@ public struct BucketRequest
 }
 
 [Serializable]
+public struct DockModel
+{
+    public string DockUrl;
+
+    public DockModel(string dockUrl)
+    {
+        DockUrl = dockUrl;
+    }
+}
+
+[Serializable]
 public struct DownloadRequest
 {
     public string Password;

@@ -25,6 +25,7 @@ namespace Urchin.Managers
         #region Unity
         private void Awake()
         {
+            _textDatas = new Dictionary<string, TextModel>();
             _textGOs = new Dictionary<string, GameObject>();
         }
 
