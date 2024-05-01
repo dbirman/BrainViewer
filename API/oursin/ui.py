@@ -3,6 +3,11 @@ from . import particles
 from . import meshes
 from vbl_aquarium.models.generic import IDListFloatList
 
+class interactive_plot :
+    def __init__():
+        pass
+    #pass in all the data, do data calcs
+    #attach plotting functions
 global_binned_spikes = None
 global_prepped_data = None
 neurons = None
@@ -207,8 +212,7 @@ def slope_viz_stimuli_per_neuron(change, prepped_data = None, t=-100):
         max_y = 10  # Set ymax to 10 if the default max is lower than 10
     n_ax.set_ylim(0, max_y)
    
-    # plt.legend()
-    # plt.show()
+
     
 def update_neuron_sizing(stim_id, t, prepped_data = None):
         global neurons
