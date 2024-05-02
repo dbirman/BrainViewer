@@ -1861,11 +1861,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _apiNames.Array.size
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _atlasNames.Array.size
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _apiNames.Array.data[0]
@@ -1880,6 +1880,18 @@ PrefabInstance:
       value: waxholm78
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.data[3]
+      value: ccf50
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.data[4]
+      value: ccf100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.data[5]
+      value: princeton20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _atlasNames.Array.data[0]
       value: allen_mouse_25um
       objectReference: {fileID: 0}
@@ -1890,6 +1902,18 @@ PrefabInstance:
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _atlasNames.Array.data[2]
       value: whs_sd_rat_78um
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.data[3]
+      value: allen_mouse_50um
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.data[4]
+      value: allen_mouse_100um
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.data[5]
+      value: princeton_mouse_20um
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _availableOnWebGL.Array.size
