@@ -22,6 +22,7 @@ namespace Urchin.Managers
 
         private void Start()
         {
+            _customMeshModels = new();
             _customMeshGOs = new();
 
             _blenderSpace = new();

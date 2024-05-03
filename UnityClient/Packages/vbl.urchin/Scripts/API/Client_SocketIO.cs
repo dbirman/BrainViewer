@@ -285,12 +285,14 @@ namespace Urchin.API
 
         public static Action<SaveRequest> Save;
         public static Action<LoadRequest> Load;
+        public static Action<LoadModel> LoadData;
         public static Action<DockModel> DockData;
 
         private void Start_Dock()
         {
             manager.Socket.On<string>("urchin-save", x => Save.Invoke(JsonUtility.FromJson<SaveRequest>(x)));
             manager.Socket.On<string>("urchin-load", x => Load.Invoke(JsonUtility.FromJson<LoadRequest>(x)));
+            manager.Socket.On<string>("urchin-load-data", x => LoadData.Invoke(JsonUtility.FromJson<LoadModel>(x)));
             manager.Socket.On<string>("urchin-dock-data", x => DockData.Invoke(JsonUtility.FromJson<DockModel>(x)));
         }
 

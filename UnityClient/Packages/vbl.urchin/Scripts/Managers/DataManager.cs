@@ -54,6 +54,7 @@ public class DataManager : MonoBehaviour
 
         Client_SocketIO.Save += x => StartCoroutine(Save(x));
         Client_SocketIO.Load += x => StartCoroutine(Load(x));
+        Client_SocketIO.LoadData += ParseLoadData;
         Client_SocketIO.DockData += UpdateData;
     }
     #endregion
@@ -78,15 +79,17 @@ public class DataManager : MonoBehaviour
         if (data.Filename != "")
         {
             // Save data to a local file
-            string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
-            string jsonData = JsonUtility.ToJson(allData);
+            //string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
+            string serializedJson = JsonUtility.ToJson(allData);
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-            DownloadFile(data.Filename, jsonData);
-#else
-            File.WriteAllText(filePath, jsonData);
-            Client_SocketIO.Log($"File saved to {filePath}, re-load this file by passing just the filename, not the full path.");
-#endif
+            Debug.Log($"Sending save data: {serializedJson}");
+            Client_SocketIO.Emit("urchin-dock-callback", serializedJson);
+//#if UNITY_WEBGL && !UNITY_EDITOR
+//            DownloadFile(data.Filename, serializedJson);
+//#else
+//            File.WriteAllText(filePath, serializedJson);
+//            Client_SocketIO.Log($"File saved to {filePath}, re-load this file by passing just the filename, not the full path.");
+//#endif
         }
         else
         {
