@@ -1917,7 +1917,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _availableOnWebGL.Array.size
-      value: 3
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _availableOnWebGL.Array.data[0]
@@ -1925,6 +1925,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _availableOnWebGL.Array.data[2]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _availableOnWebGL.Array.data[3]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _availableOnWebGL.Array.data[4]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _availableOnWebGL.Array.data[5]
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
