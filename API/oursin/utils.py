@@ -57,7 +57,7 @@ def sanitize_color(color):
     list
         List of r/g/b/a values in the range 0->1.
     """
-    if isinstance(color, list):
+    if isinstance(color, list) or isinstance(color, tuple):
         if len(color) == 3 or len(color) == 4:
             try:
                 if max(color) > 1:
