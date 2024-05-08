@@ -5,7 +5,7 @@ import warnings
 from . import utils
 
 from vbl_aquarium.models.unity import Vector3, Color
-from vbl_aquarium.models.generic import IDData, FloatList
+from vbl_aquarium.models.generic import IDData, FloatList, ColorList
 from vbl_aquarium.models.urchin import ParticleSystemModel
 
 ## Particle system
@@ -178,9 +178,20 @@ class ParticleSystem:
 			raise Exception("Particle system was deleted")
 		
 		colors = utils.sanitize_list(colors, self.data.n)
+		colors = [utils.formatted_color(color) for color in colors]
+		self.data.colors = colors
 
-		self.data.colors = [utils.formatted_color(color) for color in colors]
-		self._update()
+		
+		if self.data.n < 100000:
+				self._update()
+		else:
+				# use the efficient code
+				data = ColorList(
+					id= self.data.id,
+					values= colors
+				)
+
+				self._set_colors(data)
 	
 	def _set_colors(self, colors):
 		"""Efficient color setting, for real-time applications
