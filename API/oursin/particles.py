@@ -130,22 +130,22 @@ class ParticleSystem:
 		>>>psystem1.set_sizes([20])  
 		"""
 		if self.in_unity == False:
-			raise Exception("Particle system was deleted")
+				raise Exception("Particle system was deleted")
 		
 		sizes = utils.sanitize_list(sizes, self.data.n)
 		sizes = [utils.sanitize_float(size)/1000 for size in sizes]
 		self.data.sizes = sizes
 		
-    if self.data.n < 100000:
-      self._update()
+		if self.data.n < 100000:
+				self._update()
 		else:
-      # use the efficient code
-      data = FloatList(
-        id= self.data.id,
-        values= sizes
-      )
+				# use the efficient code
+				data = FloatList(
+					id= self.data.id,
+					values= sizes
+				)
 
-      self._set_sizes(data)
+				self._set_sizes(data)
 
 	def _set_sizes(self, sizes):
 		"""Efficent size setting, for real-time applications
