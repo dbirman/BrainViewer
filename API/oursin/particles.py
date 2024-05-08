@@ -5,7 +5,7 @@ import warnings
 from . import utils
 
 from vbl_aquarium.models.unity import Vector3, Color
-from vbl_aquarium.models.generic import IDData
+from vbl_aquarium.models.generic import IDData, FloatList
 from vbl_aquarium.models.urchin import ParticleSystemModel
 
 ## Particle system
@@ -119,7 +119,7 @@ class ParticleSystem:
 		client.sio.emit('urchin-particles-positions', positions.to_string())
 
 	def set_sizes(self, sizes):
-		"""Set the sizes of particles
+		"""Set the sizes of particles in um
 		
 		Parameters
 		---------- 
@@ -127,15 +127,25 @@ class ParticleSystem:
 
 		Examples
 		--------
-		>>>psystem1.set_sizes([0.02]) # 20 um 
+		>>>psystem1.set_sizes([20])  
 		"""
 		if self.in_unity == False:
 			raise Exception("Particle system was deleted")
 		
 		sizes = utils.sanitize_list(sizes, self.data.n)
-		self.data.sizes = [utils.sanitize_float(size)/1000 for size in sizes]
+		sizes = [utils.sanitize_float(size)/1000 for size in sizes]
+		self.data.sizes = sizes
+		
+    if self.data.n < 100000:
+      self._update()
+		else:
+      # use the efficient code
+      data = FloatList(
+        id= self.data.id,
+        values= sizes
+      )
 
-		self._update()
+      self._set_sizes(data)
 
 	def _set_sizes(self, sizes):
 		"""Efficent size setting, for real-time applications
