@@ -6,6 +6,9 @@ import numpy as np
 import zlib
 import json
 import csv
+import base64
+
+from vbl_aquarium.models.urchin import VolumeMetaModel, VolumeDataChunk
 
 counter = 0
 
@@ -54,9 +57,9 @@ def save_clicks(fpath):
 		writer.writerows(data)
 
 def clear():
-    """Clear all custom meshes
-    """
-    client.sio.emit('Clear','volume')
+		"""Clear all custom meshes
+		"""
+		client.sio.emit('Clear','volume')
 
 class Volume:
 	"""Volumetric dataset represented in a compressed format by using a colormap to translate
@@ -82,41 +85,41 @@ class Volume:
 
 		flattened_data = volume_data.flatten().astype(np.uint8).tobytes()
 		compressed_data = zlib.compress(flattened_data)
+		compressed_data = base64.b64encode(compressed_data).decode('utf-8')
 
-		self.n_compressed_bytes = len(compressed_data)
-		self.visible = True
-		if colormap is not None:
-			self.colormap = colormap
-		else:
-			self.colormap = ['#000000'] * 255
+		if colormap is None:
+			colormap = ['#000000'] * 255
+		
+		self.data = VolumeMetaModel(
+			name = f'volume{counter}',
+			n_bytes = len(compressed_data),
+			colormap = [utils.formatted_color(color) for color in colormap],
+			visible = True
+		)
 
 		self.update()
 
 		# send data packets
 		# split data into chunks
-		n_chunks = int(np.ceil(self.n_compressed_bytes / CHUNK_LIMIT))
+		n_chunks = int(np.ceil(self.data.n_bytes / CHUNK_LIMIT))
 		print(f'Data fits in {n_chunks} chunks of 1MB or less')
 		offset = 0
 		for chunk in range(n_chunks):
 			# get the data
-			chunk_size = np.min((self.n_compressed_bytes - offset, CHUNK_LIMIT))
+			chunk_size = np.min((self.data.n_bytes - offset, CHUNK_LIMIT))
 
-			chunk_data = {}
-			chunk_data['name'] = self.id
-			chunk_data['offset'] = int(offset)
-			chunk_data['compressedByteChunk'] = list(compressed_data[offset : offset + chunk_size])
-			client.sio.emit('SetVolumeData', json.dumps(chunk_data))
+			chunk_data = VolumeDataChunk(
+				name = self.data.name,
+				# bytes = base64.b64encode(compressed_data[offset : offset + chunk_size]).decode('utf-8')
+				bytes = compressed_data[offset : offset + chunk_size]
+
+			)
+			client.sio.emit('SetVolumeData', chunk_data.to_string())
 
 			offset += chunk_size
 
 	def update(self):
-		data = {}
-		data['name'] = self.id
-		data['nCompressedBytes'] = self.n_compressed_bytes
-		data['visible'] = self.visible
-		data['colormap'] = self.colormap
-
-		client.sio.emit('UpdateVolume', json.dumps(data))
+		client.sio.emit('UpdateVolume', self.data.to_string())
 
 	def delete(self):
 		client.sio.emit('DeleteVolume', self.id)

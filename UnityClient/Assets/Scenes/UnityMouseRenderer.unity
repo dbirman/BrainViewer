@@ -1664,6 +1664,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2555904598708727173, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _volumeUIGO
+      value: 
+      objectReference: {fileID: 2094717183}
+    - target: {fileID: 2555904598708727173, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: AlphaChangedEvent.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -9293,6 +9297,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2072997662}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &2094717183 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8384581763761108035, guid: 797f30df999d646458e9984856b9b1f7, type: 3}
+  m_PrefabInstance: {fileID: 231208879068536369}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2102590513
 PrefabInstance:
   m_ObjectHideFlags: 0

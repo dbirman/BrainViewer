@@ -265,3 +265,34 @@ public struct TextModel
     }
 }
 
+[Serializable]
+public struct VolumeDataChunk
+{
+    public string Name;
+    public string Bytes;
+
+    public VolumeDataChunk(string name, string bytes)
+    {
+        Name = name;
+        Bytes = bytes;
+    }
+}
+
+
+[Serializable]
+public struct VolumeMetaModel
+{
+    public string Name;
+    public int NBytes;
+    public Color[] Colormap;
+    public bool Visible;
+
+    public VolumeMetaModel(string name, int nBytes, Color[] colormap, bool visible)
+    {
+        Name = name;
+        NBytes = nBytes;
+        Colormap = colormap;
+        Visible = visible;
+    }
+}
+

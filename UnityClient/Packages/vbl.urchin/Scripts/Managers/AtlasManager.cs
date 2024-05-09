@@ -83,7 +83,7 @@ namespace Urchin.Managers
             Client_SocketIO.AtlasLoad += LoadAtlas;
             Client_SocketIO.AtlasLoadDefaults += LoadDefaultAreasVoid;
 
-            //Client_SocketIO.AtlasCreateCustom += CustomAtlas;
+            Client_SocketIO.AtlasCreateCustom += CustomAtlas;
         }
         #endregion
 
@@ -103,6 +103,11 @@ namespace Urchin.Managers
         #endregion
 
         #region Public
+
+        public void CustomAtlas(CustomAtlasModel data)
+        {
+            BrainAtlasManager.CustomAtlas(data.Name, data.Dimensions, data.Resolution);
+        }
 
         public async void UpdateData(AtlasModel data)
         {
