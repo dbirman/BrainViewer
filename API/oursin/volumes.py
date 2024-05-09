@@ -142,7 +142,8 @@ def compress_volume(volume_data, n_colors=254):
 	-------
 	(uint8 volume, float[] map)
 	"""
-	quantiles = np.quantile(volume_data.flatten(), np.linspace(0,1,n_colors))
+	valid_values = volume_data[~np.isnan(volume_data)]
+	quantiles = np.quantile(valid_values.flatten(), np.linspace(0,1,n_colors))
 
 	out = np.digitize(volume_data, quantiles, right=True).astype(np.uint8)
 	out[np.isnan(volume_data)] = 255
