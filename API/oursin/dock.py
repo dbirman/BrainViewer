@@ -2,8 +2,9 @@
 from . import client
 import requests
 import hashlib
+import os
 
-from vbl_aquarium.models.dock import BucketRequest, SaveRequest, LoadRequest, DockModel
+from vbl_aquarium.models.dock import BucketRequest, SaveRequest, LoadRequest, DockModel, LoadModel
 
 # Define the API endpoint URL
 api_url = "http://localhost:5000"
@@ -16,9 +17,15 @@ callback_filename = None
 
 def _save_callback(data):
     global callback_filename
-    print(f"(dock) Save callback received, saving data to {callback_filename}")
+
+    current_path = os.getcwd()
+    full_path = os.path.join(current_path, callback_filename)
+
+    print(f"(dock) Save callback received, saving data to {full_path}")
     # data will be a serialized LoadModel, but we can just ignore that and save it
-    with open(callback_filename, 'rb') as file:
+
+
+    with open(full_path, 'w') as file:
         file.write(data)
 
 def create_bucket(bucket_name, password, api_url = api_url, token = test_token):
@@ -117,17 +124,21 @@ def load(filename = None, bucket_name = None, password= None):
     global password_hash
 
     if filename is not None:
-        raise Exception("Not implemented yet")
+        with open(filename, 'r') as file:
+            data_raw = file.read()
+            
+        client.sio.emit('urchin-load-data', data_raw)
+    else:
     
-    check_and_store(bucket_name, password)
+        check_and_store(bucket_name, password)
 
-    data = LoadRequest(
-        filename= "" if filename is None else filename,
-        bucket= "" if active_bucket is None else active_bucket,
-        password= "" if password_hash is None else password_hash
-    )
+        data = LoadRequest(
+            filename= "" if filename is None else filename,
+            bucket= "" if active_bucket is None else active_bucket,
+            password= "" if password_hash is None else password_hash
+        )
 
-    client.sio.emit('urchin-load', data.to_string())
+        client.sio.emit('urchin-load', data.to_string())
 
 def check_and_store(bucket_name, password):
     global active_bucket
