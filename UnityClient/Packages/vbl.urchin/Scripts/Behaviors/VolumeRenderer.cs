@@ -30,7 +30,8 @@ public class VolumeRenderer : MonoBehaviour
     private Vector3 _prevSlicePosition;
     public Vector3 _slicePosition;
 
-    private byte[] _compressedData;
+    private string _compressedString;
+    private int _compressedStringLength;
     private Color[] _colormap;
 
     private int width;
@@ -113,7 +114,13 @@ public class VolumeRenderer : MonoBehaviour
 
     public void Apply()
     {
-        using (MemoryStream compressedStream = new MemoryStream(_compressedData))
+#if UNITY_EDITOR
+        Debug.Log("(VolumeRenderer) Applying texture");
+#endif
+
+        byte[] compressedData = Convert.FromBase64String(_compressedString);
+
+        using (MemoryStream compressedStream = new MemoryStream(compressedData))
         using (MemoryStream decompressedStream = new MemoryStream())
         using (DeflateStream decompressor = new DeflateStream(compressedStream, CompressionMode.Decompress))
         {
@@ -133,13 +140,13 @@ public class VolumeRenderer : MonoBehaviour
         _volumeTexture.Apply();
         }
 
-    public void SetColormap(string[] hexColors)
+    public void SetColormap(Color[] colors)
     {
         Debug.Log("(UM_VolRend) Creating new colormap for: " + name);
         for (int i = 0; i < 255; i++)
         {
-            if (i < hexColors.Length)
-                _colormap[i] = Utils.ParseHexColor(hexColors[i]);
+            if (i < colors.Length)
+                _colormap[i] = colors[i];
             else
                 _colormap[i] = Color.black;
         }
@@ -155,19 +162,23 @@ public class VolumeRenderer : MonoBehaviour
 
     public void SetMetadata(int nCompressedBytes)
     {
-        _compressedData = new byte[nCompressedBytes];
+        _compressedString = "";
+        _compressedStringLength = nCompressedBytes;
         _nextOffset = 0;
 
-        Debug.Log($"Waiting to receive {_compressedData.Length} bytes");
+        Debug.Log($"Waiting to receive {_compressedStringLength} bytes");
     }
 
-    public void SetData(byte[] newData)
+    public void SetData(string newData)
     {
         Debug.Log($"Received {newData.Length} bytes putting in offset {_nextOffset}");
-        Buffer.BlockCopy(newData, 0, _compressedData, _nextOffset, newData.Length);
-        _nextOffset += newData.Length;
+        //Buffer.BlockCopy(newData, 0, _compressedData, _nextOffset, newData.Length);
+        //_nextOffset += newData.Length;
 
-        if (_nextOffset == _compressedData.Length)
+        _compressedString += newData;
+
+        Debug.Log((_compressedString.Length, _compressedStringLength));
+        if (_compressedString.Length == _compressedStringLength)
             Apply();
     }
 

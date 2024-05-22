@@ -21,7 +21,7 @@ namespace Urchin.Managers
         // Actual objects
         private Dictionary<string, ProbeBehavior> _probes;
 
-        public override ManagerType Type => throw new System.NotImplementedException();
+        public override ManagerType Type => ManagerType.ProbeManager;
         #endregion
 
         #region Unity

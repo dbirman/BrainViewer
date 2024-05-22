@@ -86,7 +86,8 @@ namespace Urchin.Managers
         {
             foreach (var kvp in _meshBehaviors)
             {
-                Destroy(kvp.Value.gameObject);
+                if (kvp.Value != null && kvp.Value.gameObject != null)
+                    Destroy(kvp.Value.gameObject);
             }
             _meshBehaviors.Clear();
         }

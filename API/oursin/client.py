@@ -6,6 +6,7 @@ import asyncio
 from . import camera
 from . import volumes
 from . import meshes
+from . import dock
 
 from vbl_aquarium.models.logging import *
 
@@ -58,6 +59,10 @@ def receive_volume_click(data):
 @sio.on('NeuronCallback')
 def receive_neuron_callback(data):
 	meshes._neuron_callback(data)
+
+@sio.on('urchin-dock-callback')
+def receive_dock_callback(data):
+	dock._save_callback(data)
 	
 # Helper functions
 def connected():

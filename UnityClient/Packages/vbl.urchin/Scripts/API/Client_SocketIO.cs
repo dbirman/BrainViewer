@@ -86,7 +86,7 @@ namespace Urchin.API
         public static Action<AtlasModel> AtlasLoad;
         public static Action AtlasLoadDefaults;
 
-        //public static Action<CustomAtlasData> AtlasCreateCustom;
+        public static Action<CustomAtlasModel> AtlasCreateCustom;
         //public static Action<Vector3Data> AtlasSetReferenceCoord;
         //public static Action<AreaGroupData> AtlasSetAreaVisibility;
         public static Action<Dictionary<string, List<float>>> AtlasSetAreaData;
@@ -101,7 +101,7 @@ namespace Urchin.API
 
             // CCF Areas
             //manager.Socket.On<string>("LoadAtlas", x => AtlasLoad.Invoke(x));
-            ////manager.Socket.On<string>("CustomAtlas", x => AtlasCreateCustom.Invoke(JsonUtility.FromJson<CustomAtlasData>(x)));
+            manager.Socket.On<string>("CustomAtlas", x => AtlasCreateCustom.Invoke(JsonUtility.FromJson<CustomAtlasModel>(x)));
             ////manager.Socket.On<string>("AtlasSetReferenceCoord", x => AtlasSetReferenceCoord.Invoke(JsonUtility.FromJson<Vector3Data>(x)));
             //manager.Socket.On<string>("SetAreaVisibility", x => AtlasSetAreaVisibility.Invoke(JsonUtility.FromJson<AreaGroupData>(x)));
             //manager.Socket.On<Dictionary<string, string>>("SetAreaColors", x => AtlasSetAreaColors.Invoke(x));
@@ -114,15 +114,15 @@ namespace Urchin.API
             //manager.Socket.On<string>("LoadDefaultAreas", x => AtlasLoadAreaDefaults.Invoke());
         }
 
-        //public static Action<VolumeDataChunk> SetVolumeData;
-        //public static Action<VolumeMeta> UpdateVolume;
+        public static Action<VolumeDataChunk> SetVolumeData;
+        public static Action<VolumeMetaModel> UpdateVolume;
         public static Action<string[]> SetVolumeColormap;
         public static Action<string> DeleteVolume;
 
         private void Start_Volume()
         {
-            //manager.Socket.On<string>("UpdateVolume", x => UpdateVolume.Invoke(JsonUtility.FromJson<VolumeMeta>(x)));
-            //manager.Socket.On<string>("SetVolumeData", x => SetVolumeData.Invoke(JsonUtility.FromJson<VolumeDataChunk>(x)));
+            manager.Socket.On<string>("UpdateVolume", x => UpdateVolume.Invoke(JsonUtility.FromJson<VolumeMetaModel>(x)));
+            manager.Socket.On<string>("SetVolumeData", x => SetVolumeData.Invoke(JsonUtility.FromJson<VolumeDataChunk>(x)));
             manager.Socket.On<string>("DeleteVolume", x => DeleteVolume.Invoke(x));
         }
 
@@ -285,12 +285,14 @@ namespace Urchin.API
 
         public static Action<SaveRequest> Save;
         public static Action<LoadRequest> Load;
+        public static Action<LoadModel> LoadData;
         public static Action<DockModel> DockData;
 
         private void Start_Dock()
         {
             manager.Socket.On<string>("urchin-save", x => Save.Invoke(JsonUtility.FromJson<SaveRequest>(x)));
             manager.Socket.On<string>("urchin-load", x => Load.Invoke(JsonUtility.FromJson<LoadRequest>(x)));
+            manager.Socket.On<string>("urchin-load-data", x => LoadData.Invoke(JsonUtility.FromJson<LoadModel>(x)));
             manager.Socket.On<string>("urchin-dock-data", x => DockData.Invoke(JsonUtility.FromJson<DockModel>(x)));
         }
 

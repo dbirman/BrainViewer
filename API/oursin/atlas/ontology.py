@@ -3,21 +3,20 @@ from .. import utils
 from pathlib import Path
 
 import json
-from vbl_aquarium.models.urchin import AtlasModel, StructureModel, ColormapModel
+from vbl_aquarium.models.urchin import AtlasModel, StructureModel, ColormapModel, CustomAtlasModel
 from vbl_aquarium.models.generic import *
 
 class CustomAtlas:
     def __init__(self, atlas_name, atlas_dimensions, atlas_resolution):
         self.atlas_name = atlas_name
 
-        data = {}
-        data['name'] = atlas_name
-        data['dimensions'] = utils.sanitize_vector3(atlas_dimensions)
-        data['resolution'] = utils.sanitize_vector3(atlas_resolution)
+        data = CustomAtlasModel(
+            name = atlas_name,
+            dimensions= utils.formatted_vector3(atlas_dimensions),
+            resolution= utils.formatted_vector3(atlas_resolution)
+        )
 
-        print(data)
-
-        client.sio.emit('CustomAtlas', json.dumps(data))
+        client.sio.emit('CustomAtlas', data.to_string())
 
 class Atlas:
     def __init__(self, atlas_name):

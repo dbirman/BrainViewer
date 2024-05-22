@@ -114,7 +114,7 @@ namespace Urchin.Behaviors
         private IEnumerator ScreenshotHelper(Vector2 size)
         {
             RenderTexture originalTexture = ActiveCamera.targetTexture;
-            //int originalCullingMask = ActiveCamera.cullingMask;
+            int originalCullingMask = ActiveCamera.cullingMask;
 
             // Set the UI layer to not be rendered
             int uiLayer = LayerMask.NameToLayer("UI");
@@ -136,7 +136,7 @@ namespace Urchin.Behaviors
 
             // return the camera
             ActiveCamera.targetTexture = originalTexture;
-            //ActiveCamera.cullingMask = originalCullingMask;
+            ActiveCamera.cullingMask = originalCullingMask;
             RenderTexture.active = null;
             captureTexture.Release();
 
