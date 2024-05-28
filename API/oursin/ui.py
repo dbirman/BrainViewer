@@ -175,7 +175,7 @@ class interactive_plot :
         # Labels:
         self.ax.set_xlabel('Time from stimulus onset (ms)')
         self.ax.set_ylabel('Number of Spikes Per Second')
-        self.ax.set_title(f'Neuron {neuron_id} Spiking Activity with Respect to Each Stimulus')
+        self.ax.set_title(f'Neuron cluster {neuron_id} Spiking Activity with Respect to Each Stimulus')
 
         #Accessories:
         self.ax.axvspan(0, self.event_duration_sec * 1000, color='gray', alpha=0.3)
@@ -183,7 +183,7 @@ class interactive_plot :
         # Set y-axis limits
         # Calculate y-axis limits
         
-        max_y = max([max(prepped_data[neuron_id][i]) for i in range(10)])  # Maximum y-value across all lines
+        max_y = max([max(prepped_data[neuron_id][i]) for i in range(prepped_data.shape[1])])  # Maximum y-value across all lines
         if max_y < 10:
             max_y = 10  # Set ymax to 10 if the default max is lower than 10
         self.ax.set_ylim(0, max_y)
@@ -253,7 +253,7 @@ class interactive_plot :
         # Labels:
         self.ax.set_xlabel(f'Time from Stimulus {stim_id} display (20 ms bins)')
         self.ax.set_ylabel('Number of Spikes Per Second')
-        self.ax.set_title(f'Neuron Spiking Activity with Respect to Stimulus ID {stim_id}')
+        self.ax.set_title(f'Neuron Cluster Spiking Activity with Respect to Stimulus ID {stim_id}')
 
          #Accessories:
         self.ax.axvspan(0, 300, color='gray', alpha=0.3)
