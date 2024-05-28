@@ -12,19 +12,73 @@ class interactive_plot :
         self.fig = None
         self.ax = None
         self.vline = None
+        self.window_start_sec = None
+        self.window_end_sec = None
+        self.event_duration_sec = None
 
-    def avg_and_bin(self,  spike_times_raw_data, spike_clusters_data, event_start, event_ids, bin_size=0.02, bin_size_sec=0.02, window_start_sec = 0.1, window_end_sec = 0.5):
-        #binning data:
+    def is_1d(self, arr):
+        # return all(dim > 1 for dim in arr.shape)
+        return arr.ndim == 1
+
+    def avg_and_bin(self,  spike_times_raw_data, spike_clusters_data, event_start, event_ids,  window_start_sec, event_duration_sec, window_end_sec, bin_size_sec=0.02, sample = True):
+        """Bins data and calculates averages across stimuli, outputting a 3d array of data in format [neuron_cluster_id, stimulus_id, time]
+        
+        Parameters
+        ----------
+        spike_times_raw_data: 1D array
+            raw data of spiking times in samples
+        spike_clusters_data: 1D array
+            raw data of spiking clusters in a 1d array
+        event_start: 1d array
+            time in which the events analyzed start within the experiment
+        event_ids: 1d array
+            ids of the different event types
+        window_start_sec: float
+            length of time within data you want to include before the event start, in seconds
+        event_duration_sec: float
+            length of time of the event, primarily used for visual graphing parts later, in seconds
+        window_end_sec: float
+            length of time within data you want to include after the event ends, in seconds
+        bin_size_sec: float
+            size of the bin, in seconds. defaults to 20 ms / 0.02 sec
+        sample: boolean
+            whether the data for spike times is saved in seconds (true = samples, false = seconds)
+
+            
+        Examples
+        -------- 
+        >>> neuron_graph.avg_and_bin(st_samp, sc, event_start, event_ids, window_start_sec=0.1, window_end_sec=0.5, sample= True)
+        """
+        # checking inputs:
         try:
             import numpy as np
         except ImportError:
             raise ImportError("Numpy package is not installed. Please pip install numpy to use this function.")
-        # bin the spike times and clusters
-        spike_times_raw_data = np.squeeze(spike_times_raw_data)
-        spike_clusters_data = np.squeeze(spike_clusters_data)
-        spike_times_sec = spike_times_raw_data / 3e4 # convert from 30khz samples to seconds
+        if not self.is_1d(spike_times_raw_data):
+            raise TypeError("Please ensure that inputs are all 1d arrays, be sure to call np.squeeze if needed.")
+        
+        if not self.is_1d(spike_clusters_data):
+            raise TypeError("Please ensure that inputs are all 1d arrays, be sure to call np.squeeze if needed.")
+        
+        if not self.is_1d(event_start):
+            raise TypeError("Please ensure that inputs are all 1d arrays, be sure to call np.squeeze if needed.")
+        
+        if not self.is_1d(event_ids):
+            raise TypeError("Please ensure that inputs are all 1d arrays, be sure to call np.squeeze if needed.")
+        
+        self.window_start_sec = window_start_sec
+        self.event_duration_sec = event_duration_sec
+        self.window_end_sec = event_duration_sec + window_end_sec # since the rest of the code relies on just what the total is, event_duration is j used for graphing purposes
+        window_end_sec = self.window_end_sec
+        
+        if sample:
+            spike_times_sec = spike_times_raw_data / 3e4 # convert from 30khz samples to seconds
+        else:
+            spike_times_sec = spike_times_raw_data
+
+
         # set up bin edges - 20 ms here
-        bins_seconds = np.arange(np.min(spike_times_sec), np.max(spike_times_sec), bin_size)
+        bins_seconds = np.arange(np.min(spike_times_sec), np.max(spike_times_sec), bin_size_sec)
         # make list of lists for spike times specific to each cluster
         spikes = [spike_times_sec[spike_clusters_data == cluster] for cluster in np.unique(spike_clusters_data)]
         # bin
@@ -36,14 +90,15 @@ class interactive_plot :
         self.binned_spikes = binned_spikes
 
         #averaging data:
-        bintime_prev = int(window_start_sec * 50)
-        bintime_post = int(window_end_sec * 50 + 1)
-        windowsize = bintime_prev + bintime_post
         bin_size = bin_size_sec * 1000
+        bintime_prev = int(window_start_sec * (1000/bin_size))
+        bintime_post = int(window_end_sec * (1000/bin_size) + 1)
+        windowsize = bintime_prev + bintime_post
+        
 
         # To bin: divide by 20, floor
         stim_binned = np.floor(event_start * 1000 / bin_size).astype(int)
-        stim_binned = np.transpose(stim_binned)
+        self.stim_binned = stim_binned
 
 
         u_stim_ids = np.unique(event_ids)
@@ -54,28 +109,38 @@ class interactive_plot :
         for neuron_id in range(binned_spikes.shape[0]):
 
             for stim_id in u_stim_ids:
-                stim_indices = np.where(event_ids[0] == stim_id)[0]
+                stim_indices = np.where(event_ids == stim_id)[0]
 
                 neuron_stim_data = np.empty((len(stim_indices), windowsize))
                 
                 for i, stim_idx in enumerate(stim_indices):
-                    bin_id = int(stim_binned[0][stim_idx])
+                    bin_id = int(stim_binned[stim_idx])
                     selected_columns = binned_spikes[neuron_id, bin_id - bintime_prev: bin_id + bintime_post]
+
+                    # # Check if selected_columns is empty
+                    # if selected_columns.size == 0:
+                    #     print(f"Empty selected_columns for neuron {neuron_id}, stim {stim_id}, stim_idx {stim_idx}")
+                    #     selected_columns = np.zeros(windowsize)
+                    
+                    # # Check if selected_columns can be reshaped to match neuron_stim_data's row shape
+                    # if selected_columns.shape[0] != windowsize:
+                    #     print(f"selected_columns shape mismatch for neuron {neuron_id}, stim {stim_id}, stim_idx {stim_idx}")
+                    #     selected_columns = np.zeros(windowsize)
+
+
                     neuron_stim_data[i,:] = selected_columns
 
                 bin_average = np.mean(neuron_stim_data, axis=0)/bin_size_sec
                 final_avg[neuron_id, int(stim_id) - 1, :] = bin_average
         self.avg_data = final_avg
 
-    def slope_viz_stimuli_per_neuron(self,change, t=-100):
+    def slope_viz_stimuli_per_neuron(self,change, step = 20):
         """Visualizes and creates interactive plot for the average of each stimulus per neuron
         
         Parameters
         ----------
         prepped_data: 3D array
             prepped data of averages of binned spikes and events in the format of [neuron_id, stimulus_id, time]
-        t: int
-                time in milliseconds of where to initially place the vertical line
             neuron_id: int
                 id of neuron
             
@@ -92,8 +157,6 @@ class interactive_plot :
         except ImportError:
             raise ImportError("Matplotlib package is not installed. Please pip install matplotlib to use this function.")
         
-        # global global_prepped_data
-        # global n_fig, n_ax, n_vline
         
         prepped_data = self.avg_data
 
@@ -106,19 +169,20 @@ class interactive_plot :
         self.ax.clear()
         for i in range(0,prepped_data.shape[1]):
             y = prepped_data[neuron_id][i]
-            x = np.arange(-100, 520, step=20)
+            x = np.arange(-1e3 * self.window_start_sec, 1e3 * self.window_end_sec + step, step=step)
             self.ax.plot(x,y, color='dimgray')
 
         # Labels:
-        self.ax.set_xlabel('Time from stimulus onset')
+        self.ax.set_xlabel('Time from stimulus onset (ms)')
         self.ax.set_ylabel('Number of Spikes Per Second')
         self.ax.set_title(f'Neuron {neuron_id} Spiking Activity with Respect to Each Stimulus')
 
         #Accessories:
-        self.ax.axvspan(0, 300, color='gray', alpha=0.3)
-        self.vline = self.ax.axvline(t, color='red', linestyle='--',)
+        self.ax.axvspan(0, self.event_duration_sec * 1000, color='gray', alpha=0.3)
+        self.vline = self.ax.axvline(-1e3 * self.window_start_sec, color='red', linestyle='--',)
         # Set y-axis limits
         # Calculate y-axis limits
+        
         max_y = max([max(prepped_data[neuron_id][i]) for i in range(10)])  # Maximum y-value across all lines
         if max_y < 10:
             max_y = 10  # Set ymax to 10 if the default max is lower than 10
@@ -208,7 +272,61 @@ class interactive_plot :
         self.fig.canvas.draw_idle()
         self.update_neuron_sizing(t)
 
-    def plot_appropriate_interactive_graph(self, view = "stim", window_start_sec = 0.1, window_end_sec = 0.5):
+    def plot_neuron_view_interactive_graph(self):
+        """Plots appropriate interactive graph based on view
+        
+        Parameters
+        ----------
+        prepped_data: 3D array
+            prepped data of averages of binned spikes and events in the format of [neuron_id, stimulus_id, time]
+        view: str
+            view type, either "stim" or "neuron"
+        window_start_sec: float
+            start of window in seconds, default value is 0.1
+        window_end_sec: float
+            end of window in seconds, default value is 0.5
+        
+        Examples
+        --------
+        >>> urchin.ui.plot_appropriate_interactie_graph(prepped_data, view = "stim")
+        """
+        try:
+            import ipywidgets as widgets
+        except ImportError:
+            raise ImportError("Widgets package is not installed. Please pip install ipywidgets to use this function.")
+        
+        try:
+            import matplotlib.pyplot as plt
+        except ImportError:
+            raise ImportError("Matplotlib package is not installed. Please pip install matplotlib to use this function.")
+        
+        from IPython.display import display
+            
+        
+        prepped_data = self.avg_data
+    
+        self.fig, self.ax = plt.subplots()
+
+        time_slider = widgets.IntSlider(value=-1e3 * self.window_start_sec, min=-1e3 * self.window_start_sec, max=1e3 * self.window_end_sec, step=5, description='Time')
+        time_slider.layout.width = '6.53in'
+        time_slider.layout.margin = '0 -4px'
+
+        neuron_dropdown = widgets.Dropdown(
+            options= range(0,prepped_data.shape[0]),
+            value=0,
+            description='Neuron ID:',
+        )
+        neuron_dropdown.layout.margin = "20px 20px"
+
+
+        ui = widgets.VBox([neuron_dropdown, time_slider])
+        self.slope_viz_stimuli_per_neuron(neuron_dropdown.value)
+        time_slider.observe(self.update_nline, names='value')
+        neuron_dropdown.observe(self.slope_viz_stimuli_per_neuron,names='value')
+        display(ui)
+
+
+def plot_event_view_interactive_graph(self, view = "stim", window_start_sec = 0.1, window_end_sec = 0.5):
         """Plots appropriate interactive graph based on view
         
         Parameters
