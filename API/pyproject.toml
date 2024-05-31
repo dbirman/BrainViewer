@@ -28,9 +28,9 @@ classifiers = [
 ]
 dependencies = [
   "pydantic>=2.7.0",
-  "python-socketio[client]>=5.8, <5.11",
+  "python-socketio[client]>=5.8, <5.12",
   "numpy>=1.23.3, <1.27.0",
-  "Pillow>=9.5, <10.2",
+  "Pillow>=9.5, <10.4",
   "vbl-aquarium>=0.0.14",
 ]
 
