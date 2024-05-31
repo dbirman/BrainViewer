@@ -134,19 +134,17 @@ class interactive_plot :
                 final_avg[neuron_id, int(stim_id) - 1, :] = bin_average
         self.avg_data = final_avg
 
-    def slope_viz_stimuli_per_neuron(self,change, step = 20):
+    def slope_viz_stimuli_per_neuron(self, change, step = 20):
         """Visualizes and creates interactive plot for the average of each stimulus per neuron
         
         Parameters
         ----------
-        prepped_data: 3D array
-            prepped data of averages of binned spikes and events in the format of [neuron_id, stimulus_id, time]
-            neuron_id: int
-                id of neuron
+        step: int
+            the increment along the x axis, in ms. defaults to 20
             
         Examples
         --------
-        >>> urchin.ui.slope_viz_stimuli_per_neuron(t=-100, neuron_id = 0)
+        >>> urchin.ui.slope_viz_stimuli_per_neuron()
         """
         try:
             import numpy as np
@@ -205,21 +203,17 @@ class interactive_plot :
         meshes.set_scales(self.neurons, size_list)
 
 
-    def slope_viz_neurons_per_stimuli(self, change, t=-100):
+    def slope_viz_neurons_per_stimuli(self, change, step = 20):
         """Visualizes and creates interactive plot for the average of every neuron per stimulus
         
         Parameters
         ----------
-        prepped_data: 3D array
-            prepped data of averages of binned spikes and events in the format of [neuron_id, stimulus_id, time]
-        t: int
-            time in milliseconds of where to initially place the vertical line
-        stim_id: int
-            id of neuron
+        step: int
+            the increment along the x axis, in ms. defaults to 20
         
         Examples
         --------
-        >>> urchin.ui.slope_viz_stimuli_per_neuron(t=-100, stim_id = 0)
+        >>> urchin.ui.slope_viz_stimuli_per_neuron()
         """
         try:
             import numpy as np
@@ -247,7 +241,7 @@ class interactive_plot :
         self.ax.clear()
         for i in range(0,prepped_data.shape[0]):
             y = prepped_data[i][stim_id]
-            x = np.arange(-100, 520, step=20)
+            x = np.arange(-1e3 * self.window_start_sec, 1e3 * self.window_end_sec + step, step=step)
             self.ax.plot(x,y, color = n_color[i])
         
         # Labels:
@@ -256,12 +250,13 @@ class interactive_plot :
         self.ax.set_title(f'Neuron Cluster Spiking Activity with Respect to Stimulus ID {stim_id}')
 
          #Accessories:
-        self.ax.axvspan(0, 300, color='gray', alpha=0.3)
-        self.vline = self.ax.axvline(t, color='red', linestyle='--',)
+        self.ax.axvspan(0, self.event_duration_sec * 1000, color='gray', alpha=0.3)
+        self.vline = self.ax.axvline(-1e3 * self.window_start_sec, color='red', linestyle='--',)
+
+
 
 
     def update_nline(self, position):
-        # global n_vline, n_fig
         position = position.new
         self.vline.set_xdata([position, position])  # Update x value of the vertical line
         self.fig.canvas.draw_idle()
@@ -288,7 +283,7 @@ class interactive_plot :
         
         Examples
         --------
-        >>> urchin.ui.plot_appropriate_interactie_graph(prepped_data, view = "stim")
+        >>> graph_object.plot_neuron_view_interactive_graph()
         """
         try:
             import ipywidgets as widgets
@@ -326,7 +321,7 @@ class interactive_plot :
         display(ui)
 
 
-def plot_event_view_interactive_graph(self, view = "stim", window_start_sec = 0.1, window_end_sec = 0.5):
+    def plot_stim_view_interactive_graph(self, locations = None):
         """Plots appropriate interactive graph based on view
         
         Parameters
@@ -359,46 +354,23 @@ def plot_event_view_interactive_graph(self, view = "stim", window_start_sec = 0.
         
         prepped_data = self.avg_data
         
-        
-        
-        if view == "stim":
-            self.fig, self.ax = plt.subplots()
+        self.fig, self.ax = plt.subplots()
 
-            time_slider = widgets.IntSlider(value=-1e3 * window_start_sec, min=-1e3 * window_start_sec, max=5e3 * window_start_sec, step=5, description='Time')
-            time_slider.layout.width = '6.53in'
-            time_slider.layout.margin = '0 -4px'
+        time_slider = widgets.IntSlider(value=-1e3 * self.window_start_sec, min=-1e3 * self.window_start_sec, max=1e3 * self.window_end_sec, step=5, description='Time')
+        time_slider.layout.width = '6.53in'
+        time_slider.layout.margin = '0 -4px'
 
-            stimuli_dropdown = widgets.Dropdown(
-                options= range(0,prepped_data.shape[1]),
-                value=0,
-                description='Stimulus ID:',
-            )
-            stimuli_dropdown.layout.margin = "20px 20px"
+        stimuli_dropdown = widgets.Dropdown(
+            options= range(0,prepped_data.shape[1]),
+            value=0,
+            description='Stimulus ID:',
+        )
+        stimuli_dropdown.layout.margin = "20px 20px"
 
-            ui = widgets.VBox([stimuli_dropdown,time_slider])
-            self.slope_viz_neurons_per_stimuli(stimuli_dropdown.value)
-            time_slider.observe(self.update_sline, names = "value")
-            stimuli_dropdown.observe(self.slope_viz_neurons_per_stimuli, names = "value")
-            display(ui)
-        
-        elif view == "neuron":
-            self.fig, self.ax = plt.subplots()
+        ui = widgets.VBox([stimuli_dropdown,time_slider])
+        self.slope_viz_neurons_per_stimuli(stimuli_dropdown.value)
+        time_slider.observe(self.update_sline, names = "value")
+        stimuli_dropdown.observe(self.slope_viz_neurons_per_stimuli, names = "value")
+        display(ui)
 
-            time_slider = widgets.IntSlider(value=-1e3 * window_start_sec, min=-1e3 * window_start_sec, max=5e3 * window_start_sec, step=5, description='Time')
-            time_slider.layout.width = '6.53in'
-            time_slider.layout.margin = '0 -4px'
-
-            neuron_dropdown = widgets.Dropdown(
-                options= range(0,prepped_data.shape[0]),
-                value=354,
-                description='Neuron ID:',
-            )
-            neuron_dropdown.layout.margin = "20px 20px"
-
-
-            ui = widgets.VBox([neuron_dropdown, time_slider])
-            self.slope_viz_stimuli_per_neuron(neuron_dropdown.value)
-            time_slider.observe(self.update_nline, names='value')
-            neuron_dropdown.observe(self.slope_viz_stimuli_per_neuron,names='value')
-            display(ui)
         
