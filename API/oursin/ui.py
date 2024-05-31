@@ -1,6 +1,6 @@
 """Interactive components within notebooks"""
-from . import particles
 from . import meshes
+from . import utils
 from vbl_aquarium.models.generic import IDListFloatList
 
 class interactive_plot :
@@ -17,7 +17,6 @@ class interactive_plot :
         self.event_duration_sec = None
 
     def is_1d(self, arr):
-        # return all(dim > 1 for dim in arr.shape)
         return arr.ndim == 1
 
     def avg_and_bin(self,  spike_times_raw_data, spike_clusters_data, event_start, event_ids,  window_start_sec, event_duration_sec, window_end_sec, bin_size_sec=0.02, sample = True):
@@ -210,6 +209,10 @@ class interactive_plot :
         ----------
         step: int
             the increment along the x axis, in ms. defaults to 20
+
+        if you want to set custom colors for the graph without generating neurons in a brainview, 
+        you can set self.neuron_colors=[list of colors of length of # neurons] outside of this function,
+        and self.neuron_colors = None if trying to go back to random.
         
         Examples
         --------
@@ -223,11 +226,18 @@ class interactive_plot :
             import matplotlib.pyplot as plt
         except ImportError:
             raise ImportError("Matplotlib package is not installed. Please pip install matplotlib to use this function.")
+        try:
+            import random
+        except ImportError:
+            raise ImportError("random package is not installed. Please pip install random to use this function.")
+    
         
         prepped_data = self.avg_data
 
-        
-        n_color = self.neuron_colors
+        # if self.neuron_colors is not None:
+        #     n_color = self.neuron_colors
+        # else:
+        #     n_color = [[random.random() for _ in range(3)] for _ in range(prepped_data.shape[0])]
 
 
         if isinstance(change, int):
@@ -242,7 +252,7 @@ class interactive_plot :
         for i in range(0,prepped_data.shape[0]):
             y = prepped_data[i][stim_id]
             x = np.arange(-1e3 * self.window_start_sec, 1e3 * self.window_end_sec + step, step=step)
-            self.ax.plot(x,y, color = n_color[i])
+            self.ax.plot(x,y, color = self.neuron_colors[i])
         
         # Labels:
         self.ax.set_xlabel(f'Time from Stimulus {stim_id} display (20 ms bins)')
@@ -265,7 +275,8 @@ class interactive_plot :
         t = t.new
         self.vline.set_xdata([t, t])  # Update x value of the vertical line
         self.fig.canvas.draw_idle()
-        self.update_neuron_sizing(t)
+        if self.neurons is not None:
+            self.update_neuron_sizing(t)
 
     def plot_neuron_view_interactive_graph(self):
         """Plots appropriate interactive graph based on view
@@ -326,14 +337,13 @@ class interactive_plot :
         
         Parameters
         ----------
-        prepped_data: 3D array
-            prepped data of averages of binned spikes and events in the format of [neuron_id, stimulus_id, time]
-        view: str
-            view type, either "stim" or "neuron"
-        window_start_sec: float
-            start of window in seconds, default value is 0.1
-        window_end_sec: float
-            end of window in seconds, default value is 0.5
+        locations: pandas dataframe of len how many neurons
+            dataframe with the following columns: ['left_right_ccf_coordinate', 'anterior_posterior_ccf_coordinate',
+       'dorsal_ventral_ccf_coordinate', 'color'] for if you are trying to run the function with the corresponding interactive urchin component
+
+        if you want to set custom colors for the graph without generating neurons in a brainview, 
+        you can set self.neuron_colors=[list of colors of length of # neurons] outside of this function,
+        and self.neuron_colors = None if trying to go back to random.
         
         Examples
         --------
@@ -348,11 +358,33 @@ class interactive_plot :
             import matplotlib.pyplot as plt
         except ImportError:
             raise ImportError("Matplotlib package is not installed. Please pip install matplotlib to use this function.")
+        try:
+            import random
+        except ImportError:
+            raise ImportError("random package is not installed. Please pip install random to use this function.")
         
         from IPython.display import display
             
         
         prepped_data = self.avg_data
+        
+        if locations is not None:
+            self.neurons = meshes.create(len(locations))
+            positions_list = []
+
+            for i, row in locations.iterrows():
+                position = [round(row.left_right_ccf_coordinate), round(row.anterior_posterior_ccf_coordinate), round(row.dorsal_ventral_ccf_coordinate)]
+                positions_list.append(position)
+            
+            meshes.set_positions(self.neurons, positions_list)
+            meshes.set_scales(self.neurons, [[0.05,0.05,0.05]]* len(self.neurons))
+
+            if 'color' in locations.columns:
+                self.neuron_colors = list(locations["color"])
+                self.neuron_colors = [utils.hex_to_rgb(x) for x in self.neuron_colors]
+                meshes.set_colors(self.neurons, self.neuron_colors)
+        if self.neuron_colors is None:
+            self.neuron_colors = [[random.random() for _ in range(3)] for _ in range(prepped_data.shape[0])]
         
         self.fig, self.ax = plt.subplots()
 
