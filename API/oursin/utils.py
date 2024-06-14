@@ -68,8 +68,7 @@ def sanitize_color(color):
                 raise ValueError("Input list must contain three or four floats.")
 
     elif isinstance(color, str):
-        if color.startswith('#'):
-            return hex_to_rgb(color)
+        return hex_to_rgb(color)
 
     else:
         raise TypeError("Input type not recognized.")

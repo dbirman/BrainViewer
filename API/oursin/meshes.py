@@ -280,7 +280,7 @@ def set_colors(meshes_list, colors_list):
 
   data = IDListColorList(
     ids = [x.data.id for x in meshes_list],
-    values = [utils.formatted_color(utils.sanitize_vector3(x)) for x in colors_list]
+    values = [utils.formatted_color(x) for x in colors_list]
   )
 
   client.sio.emit('urchin-meshes-colors', data.to_string())
