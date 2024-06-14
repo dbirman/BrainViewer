@@ -367,6 +367,9 @@ namespace Urchin.API
 
         public static void Emit(string header, string data)
         {
+#if UNITY_EDITOR
+            Debug.Log($"Sending event: {header} with data {data}");
+#endif
             manager.Socket.Emit(header, data);
         }
 
