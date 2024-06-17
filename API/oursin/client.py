@@ -63,6 +63,10 @@ def receive_neuron_callback(data):
 @sio.on('urchin-dock-callback')
 def receive_dock_callback(data):
 	dock._save_callback(data)
+
+@sio.on('urchin-loaded-callback')
+def urchin_loaded_callback(data):
+	camera._on_loaded()
 	
 # Helper functions
 def connected():

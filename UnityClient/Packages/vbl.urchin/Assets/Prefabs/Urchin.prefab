@@ -186,6 +186,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _primitiveMeshParentT: {fileID: 1366211727439126398}
   _primitivePrefabGO: {fileID: 3780062229249569090, guid: 70ca9229f59b9d34cae96f29e23a3c1b, type: 3}
+  meshNames: []
+  meshOpts: []
 --- !u!1 &1398703444632528419
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,6 +423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f4e09f8cb4ee4cbd0630b53cb148b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _client: {fileID: 2699667523703933131}
 --- !u!114 &2699667523703933131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -616,7 +619,7 @@ MonoBehaviour:
   _renderTexture2: {fileID: 8400000, guid: 3ec18ee15b3d55943a655547b54df5f0, type: 2}
   _renderTexture3: {fileID: 8400000, guid: 6beab1dc65faa2f429cbf24390bc7062, type: 2}
   _renderTexture4: {fileID: 8400000, guid: 70d722c7394d2f746a700129510c613e, type: 2}
-  mainCamera: {fileID: 3393775226113162772}
+  _mainCamera: {fileID: 3393775226113162772}
   _lightBehavior: {fileID: 6701840750721492199}
   _areaManager: {fileID: 7683298792840207488}
   _yawTransforms: []

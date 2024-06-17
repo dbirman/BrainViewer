@@ -20,6 +20,7 @@ namespace Urchin.API
 
         #region Events
         public UnityEvent<string> IDChangedEvent;
+        public UnityEvent ConnectedEvent;
         #endregion
 
         #region variables
@@ -401,6 +402,8 @@ namespace Urchin.API
                 UpdateID(PlayerPrefs.GetString(ID_SAVE_KEY));
                 Debug.Log("Found ID in PlayerPrefs, setting to: " + ID);
             }
+
+            ConnectedEvent.Invoke();
         }
 
         public static void Log(string msg)

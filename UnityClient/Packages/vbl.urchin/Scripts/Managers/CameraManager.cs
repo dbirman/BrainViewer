@@ -1,5 +1,6 @@
 using BrainAtlas;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,9 +18,11 @@ namespace Urchin.Managers
         [SerializeField] private RenderTexture _renderTexture2;
         [SerializeField] private RenderTexture _renderTexture3;
         [SerializeField] private RenderTexture _renderTexture4;
-        [SerializeField] private CameraBehavior mainCamera;
+        [SerializeField] private CameraBehavior _mainCamera;
         [SerializeField] private LightBehavior _lightBehavior;
         [SerializeField] private AtlasManager _areaManager;
+        [SerializeField] private Canvas _mainCanvas;
+        [SerializeField] private Canvas _cameraCanvas;
 
         // Used for doing independent brain Yaw rotations
         [SerializeField] private List<Transform> _yawTransforms;
@@ -45,13 +48,18 @@ namespace Urchin.Managers
             textures.Push(_renderTexture2);
             textures.Push(_renderTexture1);
             _cameras = new();
-            _cameras.Add("CameraMain", mainCamera);
-
-            mainCamera.Name = "CameraMain";
         }
 
         private void Start()
         {
+            // Setup main camera
+            _cameras.Add("CameraMain", _mainCamera);
+
+            _mainCamera.Name = "CameraMain";
+            _mainCamera.Data.ID = "CameraMain";
+            _mainCamera.RequestCanvasEvent.AddListener(SetCanvasRenderCameras);
+
+            // Add events
             Client_SocketIO.UpdateCamera += UpdateData;
 
             Client_SocketIO.SetCameraLerpRotation += SetLerpStartEnd;
@@ -61,6 +69,11 @@ namespace Urchin.Managers
             Client_SocketIO.RequestScreenshot += RequestScreenshot;
 
             Client_SocketIO.DeleteCamera += DeleteCamera;
+        }
+
+        public void GetCameraData()
+        {
+            Client_SocketIO.Emit("urchin-loaded-callback", "");
         }
 
         #endregion
@@ -99,8 +112,7 @@ namespace Urchin.Managers
         {
             if (_cameras.ContainsKey(data.ID))
             {
-                _cameras[data.ID].Data = data;
-                _cameras[data.ID].UpdateSettings();
+                _cameras[data.ID].UpdateSettings(data);
             }
             else
             {
@@ -263,6 +275,14 @@ namespace Urchin.Managers
             foreach (Transform t in _yawTransforms)
                 t.rotation = Quaternion.Euler(0f, data.Value, 0f);
         }
+
+        public void SetCanvasRenderCameras(Camera _activeCamera)
+        {
+            if (_mainCanvas != null)
+                _mainCanvas.worldCamera = _activeCamera;
+            if (_cameraCanvas != null)
+                _cameraCanvas.worldCamera = _activeCamera;
+        }
         #endregion
 
         #region Public light functions
@@ -272,7 +292,7 @@ namespace Urchin.Managers
         /// </summary>
         public void SetLightCameraLink()
         {
-            _lightBehavior.SetCamera(mainCamera.gameObject);
+            _lightBehavior.SetCamera(_mainCamera.gameObject);
         }
 
         /// <summary>

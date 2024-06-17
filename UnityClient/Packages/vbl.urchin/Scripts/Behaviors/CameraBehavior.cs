@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BrainAtlas;
 using Urchin.API;
+using UnityEngine.Events;
 
 namespace Urchin.Behaviors
 {
@@ -19,6 +20,8 @@ namespace Urchin.Behaviors
         #endregion
 
         #region Properties
+        public UnityEvent<Camera> RequestCanvasEvent;
+
         public string Name;
         public RenderTexture RenderTexture
         {
@@ -57,13 +60,26 @@ namespace Urchin.Behaviors
         private RenderTexture _renderTexture;
         #endregion
 
+        #region Unity
+        private void Awake()
+        {
+            Data = new();
+            Data.Zoom = 16f;
+        }
+        #endregion
+
         #region Public functions
+        public void UpdateSettings(CameraModel newData)
+        {
+            Data = newData;
+            UpdateSettings();
+        }
         public void UpdateSettings()
         {
+            SetCameraMode(Data.Mode == CameraMode.orthographic);
             _cameraControl.UserControllable = Data.Controllable;
             _cameraControl.SetBrainAxisAngles(Data.Rotation);
             _cameraControl.SetZoom(Data.Zoom);
-            SetCameraMode(Data.Mode.Equals("orthographic"));
         }
 
         private void SetCameraMode(bool orthographic)
@@ -74,12 +90,17 @@ namespace Urchin.Behaviors
                 _perspectiveCamera.gameObject.SetActive(false);
 
                 _cameraControl.SetCamera(_orthoCamera);
+
+                // we also need to request that the UI get re-assigned;
+                RequestCanvasEvent.Invoke(_orthoCamera);
             }
             else
             {
                 _orthoCamera.gameObject.SetActive(false);
                 _perspectiveCamera.gameObject.SetActive(true);
                 _cameraControl.SetCamera(_perspectiveCamera);
+                // we also need to request that the UI get re-assigned;
+                RequestCanvasEvent.Invoke(_perspectiveCamera);
             }
         }
 

@@ -23,6 +23,9 @@ main = []
 
 PIL.Image.MAX_IMAGE_PIXELS = 22500000
 
+def _on_loaded():
+	main._update()
+
 # Handle receiving camera images back as screenshots
 def on_camera_img_meta(data_str):
 	"""Handler for receiving metadata about incoming images
