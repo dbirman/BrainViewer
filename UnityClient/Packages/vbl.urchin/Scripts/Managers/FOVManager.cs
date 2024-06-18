@@ -40,9 +40,6 @@ namespace Urchin.Managers
             Client_SocketIO.SetFOVTextureDataMeta += SetTextureMeta;
             Client_SocketIO.SetFOVTextureData += SetTextureData;
             Client_SocketIO.SetFOVVisibility += SetVisibility;
-            Client_SocketIO.ClearFOV += Clear;
-
-            //Test();
         }
 
         private async void Test()

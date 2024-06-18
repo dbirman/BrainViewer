@@ -68,10 +68,11 @@ def on_camera_img(data_str):
 
 ## Camera renderer
 counter = 0
+cameras = []
 
 class Camera:
 	def __init__(self, main = False):	
-		global counter
+		global counter, cameras
 		counter += 1	
 
 		self.data = CameraModel(
@@ -84,9 +85,15 @@ class Camera:
 		self.in_unity = True
 		self.image_received_event = asyncio.Event()
 		self.loop = asyncio.get_event_loop()
+		
+		cameras.append(self)
 
 	def _update(self):
 		client.sio.emit('urchin-camera-update', self.data.to_string())
+
+	def reset(self):
+		self.data = CameraModel(id = self.data.id, controllable=self.data.controllable)
+		self._update()
 
 	def delete(self):
 		"""Deletes camera
@@ -417,6 +424,15 @@ def set_brain_rotation(yaw):
 	"""
 
 	client.sio.emit('urchin-brain-yaw', FloatData(id='', value=yaw).to_string())
+
+def clear():
+	global cameras
+	
+	for camera in cameras:
+		if camera.data.id == "CameraMain":
+			camera.reset()
+		else:
+			camera.delete()
 
 def setup():
 	global main

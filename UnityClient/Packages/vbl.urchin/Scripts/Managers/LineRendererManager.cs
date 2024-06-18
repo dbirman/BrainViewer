@@ -27,8 +27,6 @@ namespace Urchin.Managers
         {
             Client_SocketIO.UpdateLine += UpdateData;
             Client_SocketIO.DeleteLine += Delete;
-
-            Client_SocketIO.ClearLines += Clear;
         }
         #endregion
 

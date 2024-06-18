@@ -1,5 +1,3 @@
-"""Text"""
-
 from . import client
 import warnings
 from . import utils
@@ -10,15 +8,20 @@ from vbl_aquarium.models.generic import IDData, IDListStringList, IDListColorLis
 ## Text renderer
 
 counter = 0
+texts = []
 
 def clear():
     """Clear all custom meshes
     """
-    client.sio.emit('Clear','text')
+    global texts
+    for text in texts:
+      text.delete()
+
+    texts = []
 
 class Text:
   def __init__(self, text = "", color = [1, 1, 1], font_size = 12, position = [0,0]):
-    global counter
+    global counter, texts
     counter +=1
 
     self.data = TextModel(
@@ -31,6 +34,8 @@ class Text:
 
     self._update()
     self.in_unity = True
+
+    texts.append(self)
 
   def _update(self):
     """Send serialized data to update this text object in Urchin

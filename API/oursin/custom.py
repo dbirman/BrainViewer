@@ -8,6 +8,7 @@ from vbl_aquarium.models.urchin import CustomMeshModel
 from vbl_aquarium.models.generic import IDData
 
 counter = 0
+customs = []
 
 class CustomMesh:
     """Custom 3D object
@@ -39,6 +40,8 @@ class CustomMesh:
 
         self._update()
         self.in_unity = True
+
+        customs.append(self)
 
     def _update(self):
         client.sio.emit('urchin-custommesh-update', self.data.to_string())
@@ -93,4 +96,9 @@ class CustomMesh:
 def clear():
     """Clear all custom meshes
     """
-    client.sio.emit('Clear','custom')
+    global customs
+
+    for custom in customs:
+        custom.delete()
+
+    customs = []

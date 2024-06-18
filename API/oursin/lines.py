@@ -8,6 +8,7 @@ from vbl_aquarium.models.urchin import LineModel
 from vbl_aquarium.models.generic import IDData
 
 counter = 0
+lines = []
 
 def clear():
     """Clear all custom meshes
@@ -27,6 +28,8 @@ class Line:
 
     self._update()
     self.in_unity = True
+
+    lines.append(line)
 
   def _update(self):
     client.sio.emit('urchin-line-update', self.data.to_string())
@@ -111,3 +114,13 @@ def delete (lines_list):
   
   for line in lines_list:
     line.delete()
+
+def clear():
+  """Clear all Line objects that have been created
+  """
+  global line
+
+  for line in lines:
+    line.delete()
+
+  lines = []

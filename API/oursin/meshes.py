@@ -14,6 +14,7 @@ def _neuron_callback(callback_data):
     callback(callback_data)
 
 counter = 0
+meshes = []
 
 ## Primitive Mesh Renderer
 class Mesh:
@@ -53,6 +54,8 @@ class Mesh:
 
     self._update()
     self.in_unity = True
+
+    meshes.append(self)
 
   def _update(self):
     """Serialize and update the data in the Urchin Renderer
@@ -161,7 +164,14 @@ class Mesh:
 
 
 def clear():
-  client.sio.emit('Clear', 'mesh')
+  """Clear all Mesh objects that have been created
+  """
+  global meshes
+
+  for mesh in meshes:
+    mesh.delete()
+
+  meshes = []
 
 def create(num_objects, position= [0.0,0.0,0.0], scale= [1,1,1], color=[1,1,1],
                material = 'default', interactive = False):

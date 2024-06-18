@@ -47,9 +47,6 @@ namespace Urchin.Managers
             Client_SocketIO.MeshSetScales += SetScales;
             Client_SocketIO.MeshSetColors += SetColors;
             Client_SocketIO.MeshSetMaterials += SetMaterials;
-
-            // clear
-            Client_SocketIO.ClearMeshes += Clear;
         }
 
         #endregion

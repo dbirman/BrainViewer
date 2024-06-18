@@ -10,6 +10,8 @@ from vbl_aquarium.models.urchin import ParticleSystemModel
 
 ## Particle system
 counter = 0
+systems = []
+
 class ParticleSystem:
 	"""Particle system
 	
@@ -28,7 +30,7 @@ class ParticleSystem:
 		n : int
 				Number of particles
 		"""
-		global counter
+		global counter, systems
 		counter += 1
 
 		self.data = ParticleSystemModel(
@@ -42,6 +44,8 @@ class ParticleSystem:
 
 		self._update()
 		self.in_unity = True
+		
+		systems.append(self)
 
 	def _update(self):
 		"""Push data to Urchin renderer
@@ -211,4 +215,8 @@ class ParticleSystem:
 def clear():
 	"""Clear all particle systems
 	"""
-	client.sio.emit('Clear', 'particles')
+	global systems
+	for system in systems:
+		system.delete()
+
+	systems = []

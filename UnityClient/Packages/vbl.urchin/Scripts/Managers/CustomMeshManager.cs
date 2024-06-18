@@ -29,8 +29,6 @@ namespace Urchin.Managers
 
             Client_SocketIO.CustomMeshUpdate += UpdateData;
             Client_SocketIO.CustomMeshDelete += Delete;
-
-            Client_SocketIO.ClearCustomMeshes += Clear;
         }
 
         #region Manager

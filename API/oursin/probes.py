@@ -1,5 +1,3 @@
-"""Probers"""
-
 from . import client
 import warnings
 from . import utils
@@ -9,16 +7,20 @@ from vbl_aquarium.models.generic import IDData, IDListVector3List, IDListColorLi
 
 ##Probes Renderer
 counter = 0
+probes = []
 
 def clear():
-    """Clear all custom meshes
-    """
-    client.sio.emit('Clear','probes')
+		"""Clear all Probe objects
+		"""
+		for probe in probes:
+			probe.delete()
+		
+		probes = []
 
 class Probe:
 	def __init__(self, color = 'FFFFFF', position = [0,0,0], angle = [0,0,0], style = 'line', scale = [0.070, 3.840, 0.020]):
 		
-		global counter
+		global counter, probes
 		counter +=1
 		
 		self.data = ProbeModel(
@@ -32,6 +34,8 @@ class Probe:
 
 		self._update()
 		self.in_unity = True
+		
+		probes.append(self)
 
 	def _update(self):
 		client.sio.emit('urchin-probe-update', self.data.to_string())

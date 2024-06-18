@@ -78,8 +78,6 @@ namespace Urchin.Managers
 
             Client_SocketIO.AtlasUpdate += UpdateData;
 
-            Client_SocketIO.ClearAreas += ClearAreas;
-
             Client_SocketIO.AtlasLoad += LoadAtlas;
             Client_SocketIO.AtlasLoadDefaults += LoadDefaultAreasVoid;
 

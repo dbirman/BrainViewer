@@ -74,12 +74,6 @@ namespace Urchin.API
             Start_FOV();
             Start_CustomMesh();
             Start_Dock();
-
-            _clearAll = new List<Action> { ClearProbes, ClearAreas, ClearVolumes,
-            ClearText, ClearParticles, ClearMeshes, ClearFOV, ClearCustomMeshes, ClearLines};
-
-            // Misc
-            manager.Socket.On<string>("Clear", Clear);
         }
 
         #region Socket setup by action group
@@ -297,69 +291,6 @@ namespace Urchin.API
             manager.Socket.On<string>("urchin-dock-data", x => DockData.Invoke(JsonUtility.FromJson<DockModel>(x)));
         }
 
-        #endregion
-
-        #region Clear
-
-        public static Action ClearProbes;
-        public static Action ClearAreas;
-        public static Action ClearVolumes;
-        public static Action ClearText;
-        public static Action ClearParticles;
-        public static Action ClearMeshes;
-        public static Action ClearFOV;
-        public static Action ClearCustomMeshes;
-        public static Action ClearLines;
-        public static List<Action> _clearAll;
-        private void Clear(string val)
-        {
-            switch (val)
-            {
-                case "all":
-                    for (int i = 0; i < _clearAll.Count; i++)
-                    {
-                        try
-                        {
-                            _clearAll[i].Invoke();
-                        }
-                        catch
-                        {
-                            Debug.Log(i);
-                        }
-                    }
-                    //foreach (var action in _clearAll)
-                    //    action.Invoke();
-                    break;
-                case "probes":
-                    ClearProbes.Invoke();
-                    break;
-                case "area":
-                    ClearAreas.Invoke();
-                    break;
-                case "volume":
-                    ClearVolumes.Invoke();
-                    break;
-                case "text":
-                    ClearText.Invoke();
-                    break;
-                case "particles":
-                    ClearParticles.Invoke();
-                    break;
-                case "mesh":
-                    ClearMeshes.Invoke();
-                    break;
-                case "texture":
-                    ClearFOV.Invoke();
-                    break;
-                case "custom":
-                    ClearCustomMeshes.Invoke();
-                    break;
-                case "lines":
-                    ClearLines.Invoke();
-                    break;
-                    
-            }
-        }
         #endregion
 
         ////

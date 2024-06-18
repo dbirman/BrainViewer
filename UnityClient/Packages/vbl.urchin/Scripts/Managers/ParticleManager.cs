@@ -48,8 +48,6 @@ public class ParticleManager : Manager
         Client_SocketIO.ParticlesSetSizes += SetSizes;
 
         //// Note to self: you can delete particles by setting lifetime to -1
-
-        Client_SocketIO.ClearParticles += Clear;
     }
     #endregion
 

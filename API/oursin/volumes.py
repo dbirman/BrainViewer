@@ -11,6 +11,7 @@ import base64
 from vbl_aquarium.models.urchin import VolumeMetaModel, VolumeDataChunk
 
 counter = 0
+volumes = []
 
 CHUNK_LIMIT = 1000000
 
@@ -59,7 +60,12 @@ def save_clicks(fpath):
 def clear():
 		"""Clear all custom meshes
 		"""
-		client.sio.emit('Clear','volume')
+		global volumes
+		
+		for volume in volumes:
+			volume.delete()
+
+		volumes = []
 
 class Volume:
 	"""Volumetric dataset represented in a compressed format by using a colormap to translate
@@ -77,7 +83,7 @@ class Volume:
 		colormap : _type_, optional
 			_description_, by default None
 		"""
-		global counter
+		global counter, volumes
 		self.id = f'volume{counter}'
 		counter += 1
 
@@ -117,6 +123,8 @@ class Volume:
 			client.sio.emit('SetVolumeData', chunk_data.to_string())
 
 			offset += chunk_size
+			
+		volumes.append(self)
 
 	def update(self):
 		client.sio.emit('UpdateVolume', self.data.to_string())

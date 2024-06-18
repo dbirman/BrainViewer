@@ -53,8 +53,6 @@ namespace Urchin.Managers
             Client_SocketIO.ProbeSetColors += SetColors;
             Client_SocketIO.ProbeSetPositions += SetPositions;
             Client_SocketIO.ProbeSetScales += SetScales;
-
-            Client_SocketIO.ClearProbes += ClearProbes;
         }
 
         #endregion

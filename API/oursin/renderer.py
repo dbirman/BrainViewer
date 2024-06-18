@@ -11,8 +11,7 @@ except ImportError:
 	# You are not running in a Jupyter Notebook
 	pass
 
-from . import client
-from . import camera
+from . import camera, client, custom, lines, meshes, particles, probes, text, texture, ui, utils, volumes
 
 def is_running_in_colab():
 	return notebook and 'google.colab' in str(get_ipython())
@@ -63,4 +62,12 @@ def setup(localhost = False, standalone = False, id = None):
 def clear():
 	"""Clear the renderer scene of all objects
 	"""
-	client.sio.emit('Clear', 'all')
+	camera.clear()
+	custom.clear()
+	lines.clear()
+	meshes.clear()
+	particles.clear()
+	probes.clear()
+	text.clear()
+	texture.clear()
+	volumes.clear()

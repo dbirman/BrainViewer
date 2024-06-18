@@ -67,8 +67,6 @@ namespace Urchin.Managers
             Client_SocketIO.SetVolumeData += SetData;
             Client_SocketIO.UpdateVolume += UpdateOrCreate;
             Client_SocketIO.DeleteVolume += Delete;
-
-            Client_SocketIO.ClearVolumes += Clear;
         }
 
         #endregion
