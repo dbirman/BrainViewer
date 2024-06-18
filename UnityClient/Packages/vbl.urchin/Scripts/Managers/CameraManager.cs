@@ -259,16 +259,16 @@ namespace Urchin.Managers
             }
         }
 
-        public void SetCameraPan(Dictionary<string, List<float>> cameraPanXY)
-        {
-            foreach (var kvp in cameraPanXY)
-            {
-                if (_cameras.ContainsKey(kvp.Key))
-                {
-                    _cameras[kvp.Key].SetCameraPan(kvp.Value);
-                }
-            }
-        }
+        //public void SetCameraPan(Dictionary<string, List<float>> cameraPanXY)
+        //{
+        //    foreach (var kvp in cameraPanXY)
+        //    {
+        //        if (_cameras.ContainsKey(kvp.Key))
+        //        {
+        //            //_cameras[kvp.Key].SetCameraPan(kvp.Value);
+        //        }
+        //    }
+        //}
 
         public void SetBrainYaw(FloatData data)
         {

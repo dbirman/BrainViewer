@@ -229,7 +229,7 @@ class Camera:
 		if mode == 'orthographic':
 				self.data.mode= CameraModel.CameraMode.orthographic
 		else:
-				self.data.mode= CameraModel.CameraMode.perspective
+				self.data.mode= CameraModel.Mode.perspective
 				
 		self._update()
 

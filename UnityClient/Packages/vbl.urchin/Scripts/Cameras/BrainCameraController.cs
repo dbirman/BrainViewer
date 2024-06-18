@@ -253,6 +253,11 @@ public class BrainCameraController : MonoBehaviour
         ApplyBrainCameraPositionAndRotation();
     }
 
+    public void SetPan(Vector2 newPan)
+    {
+        _mainCamera.transform.localPosition = newPan;
+    }
+
     public void SetCameraTarget(Vector3 newTarget)
     {
         Debug.Log("Setting camera target to: " + newTarget);

@@ -80,6 +80,7 @@ namespace Urchin.Behaviors
             _cameraControl.UserControllable = Data.Controllable;
             _cameraControl.SetBrainAxisAngles(Data.Rotation);
             _cameraControl.SetZoom(Data.Zoom);
+            _cameraControl.SetPan(Data.Pan);
         }
 
         private void SetCameraMode(bool orthographic)
@@ -214,10 +215,9 @@ namespace Urchin.Behaviors
             _cameraControl.SetCameraTarget(BrainAtlasManager.ActiveReferenceAtlas.Atlas2World(coordAtlas));
         }
 
-        public void SetCameraPan(List<float> panXY)
+        public void SetCameraPan(Vector2 panXY)
         {
-            throw new NotImplementedException();
-            //_cameraControl.SetP(new Vector2(panXY[0], panXY[1]));
+            _cameraControl.SetPan(panXY);
         }
         #endregion
     }

@@ -353,7 +353,11 @@ namespace Urchin.Managers
         {
             Debug.Log("(Client) Clearing areas");
             foreach (OntologyNode node in VisibleNodes)
+            {
+                node.ResetMaterial();
+                node.ResetColor();
                 node.SetVisibility(false, OntologyNode.OntologyNodeSide.All);
+            }
             VisibleNodes.Clear();
 
             if (_colormapEnabled)
