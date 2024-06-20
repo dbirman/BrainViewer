@@ -9,6 +9,8 @@ namespace Urchin.Utils
 {
     public class Utils : MonoBehaviour
     {
+        public static Vector3 REF_DEFAULT = Vector3.zero;
+
         public static Vector3 CCF_BREGMA = new Vector3(5.2f, 5.7f, 0.332f);
         public static Vector3 CCF_LAMBDA = new Vector3(9.35f, 5.7f, 0.332f);
 

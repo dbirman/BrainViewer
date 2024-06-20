@@ -1901,11 +1901,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _apiNames.Array.size
-      value: 6
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _atlasNames.Array.size
-      value: 6
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _apiNames.Array.data[0]
@@ -1932,6 +1932,14 @@ PrefabInstance:
       value: princeton20
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.data[6]
+      value: azba8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _apiNames.Array.data[7]
+      value: human500
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _atlasNames.Array.data[0]
       value: allen_mouse_25um
       objectReference: {fileID: 0}
@@ -1956,8 +1964,16 @@ PrefabInstance:
       value: princeton_mouse_20um
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.data[6]
+      value: azba_zfish_8um
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _atlasNames.Array.data[7]
+      value: allen_human_500um
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _availableOnWebGL.Array.size
-      value: 6
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _availableOnWebGL.Array.data[0]
@@ -1977,6 +1993,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
       propertyPath: _availableOnWebGL.Array.data[5]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _availableOnWebGL.Array.data[6]
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}
+      propertyPath: _availableOnWebGL.Array.data[7]
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7683298792840207488, guid: a0c57925ee59dae4ebf1f78ba70837a6, type: 3}

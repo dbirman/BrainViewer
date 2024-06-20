@@ -167,9 +167,13 @@ namespace Urchin.Managers
 
             await BrainAtlasManager.LoadAtlas(atlasName);
 
-            BrainAtlasManager.SetReferenceCoord(Utils.Utils.BregmaDefaults[BrainAtlasManager.ActiveReferenceAtlas.Name]);
+            if (Utils.Utils.BregmaDefaults.ContainsKey(BrainAtlasManager.ActiveReferenceAtlas.Name))
+                BrainAtlasManager.SetReferenceCoord(Utils.Utils.BregmaDefaults[BrainAtlasManager.ActiveReferenceAtlas.Name]);
+            else
+                BrainAtlasManager.SetReferenceCoord(Utils.Utils.REF_DEFAULT);
+
 #if UNITY_EDITOR
-            Debug.Log($"Reference coordinate set to {Utils.Utils.BregmaDefaults[BrainAtlasManager.ActiveReferenceAtlas.Name]}");
+            Debug.Log($"Reference coordinate set to {BrainAtlasManager.ActiveReferenceAtlas.AtlasSpace.ReferenceCoord}");
 
 #endif
             _loadSource.SetResult(true);
