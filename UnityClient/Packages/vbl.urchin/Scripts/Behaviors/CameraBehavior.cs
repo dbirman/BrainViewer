@@ -81,6 +81,7 @@ namespace Urchin.Behaviors
             _cameraControl.SetBrainAxisAngles(Data.Rotation);
             _cameraControl.SetZoom(Data.Zoom);
             _cameraControl.SetPan(Data.Pan);
+            SetBackgroundColor(Data.BackgroundColor);
         }
 
         private void SetCameraMode(bool orthographic)
