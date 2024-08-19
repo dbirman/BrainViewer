@@ -45,7 +45,7 @@ namespace Urchin.Managers
 
         #region Async
         private TaskCompletionSource<bool> _loadSource;
-        public Task LoadTask;
+        public override Task LoadTask => _loadSource.Task;
         #endregion
 
         #region Unity
@@ -68,7 +68,6 @@ namespace Urchin.Managers
             }
 
             _loadSource = new TaskCompletionSource<bool>();
-            LoadTask = _loadSource.Task;
         }
 
         private void Start()
@@ -141,6 +140,8 @@ namespace Urchin.Managers
 
         public async void LoadAtlas(AtlasModel data)
         {
+            _loadSource = new();
+
             if (!_apiNameMapping.ContainsKey(data.Name))
             {
                 Client_SocketIO.LogError($"Atlas {data.Name} does not exist.");

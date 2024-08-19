@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Urchin.API;
 
@@ -14,13 +15,17 @@ namespace Urchin.Managers
 
         //Keep a dictionary that maps string names to line renderer components 
         private Dictionary<string, LineBehavior> _lineBehaviors;
+        private TaskCompletionSource<bool> _loadSource;
 
         public override ManagerType Type => ManagerType.LineRendererManager;
+
+        public override Task LoadTask => _loadSource.Task;
 
         #region Unity
         private void Awake()
         {
             _lineBehaviors = new();
+            _loadSource = new();
         }
 
         private void Start()
@@ -42,10 +47,14 @@ namespace Urchin.Managers
 
         public override void FromSerializedData(string serializedData)
         {
+            _loadSource = new TaskCompletionSource<bool>();
+
             LineManagerModel lineManagerModel = JsonUtility.FromJson<LineManagerModel>(serializedData);
 
             foreach (var data in lineManagerModel.Data)
                 UpdateData(data);
+
+            _loadSource.SetResult(true);
         }
 
         private struct LineManagerModel

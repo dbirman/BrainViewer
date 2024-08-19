@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using Urchin.API;
@@ -18,8 +19,10 @@ namespace Urchin.Managers
         #region Private variables
         private Dictionary<string, TextModel> _textDatas;
         private Dictionary<string, GameObject> _textGOs;
+        private TaskCompletionSource<bool> _loadSource;
 
         public override ManagerType Type => ManagerType.TextManager;
+        public override Task LoadTask => _loadSource.Task;
         #endregion
 
         #region Unity
@@ -27,6 +30,7 @@ namespace Urchin.Managers
         {
             _textDatas = new Dictionary<string, TextModel>();
             _textGOs = new Dictionary<string, GameObject>();
+            _loadSource = new();
         }
 
         private void Start()
@@ -57,6 +61,8 @@ namespace Urchin.Managers
             {
                 UpdateData(data);
             }
+
+            _loadSource.SetResult(true);
         }
 
         private struct TextManagerModel

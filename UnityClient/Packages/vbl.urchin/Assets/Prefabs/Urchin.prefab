@@ -423,7 +423,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f4e09f8cb4ee4cbd0630b53cb148b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _client: {fileID: 2699667523703933131}
 --- !u!114 &2699667523703933131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -437,6 +436,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IDChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  ConnectedEvent:
     m_PersistentCalls:
       m_Calls: []
   localhost: 1
@@ -474,14 +476,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68ebc6bd38932624caaa142ffb9d73b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _atlasManager: {fileID: 7683298792840207488}
-  _cameraManager: {fileID: 756099984625368948}
-  _lineRendererManager: {fileID: 4390413428189988364}
-  _primitiveMeshManager: {fileID: 1366211727439126397}
-  _textManager: {fileID: 5167816034593033511}
-  _particleManager: {fileID: 6074828215876335387}
-  _customMeshManager: {fileID: 838043867918078182}
-  _probeManager: {fileID: 7747742223502542136}
+  _managerTypes: 0100000002000000060000000000000008000000090000000700000003000000
+  _managers:
+  - {fileID: 7683298792840207488}
+  - {fileID: 756099984625368948}
+  - {fileID: 4390413428189988364}
+  - {fileID: 1366211727439126397}
+  - {fileID: 7747742223502542136}
+  - {fileID: 5167816034593033511}
+  - {fileID: 6074828215876335387}
+  - {fileID: 838043867918078182}
+  _loadOrder: e703000000000000000000000000000000000000000000000000000000000000
   apiURL: 
 --- !u!1 &5012633055188078402
 GameObject:
@@ -622,6 +627,8 @@ MonoBehaviour:
   _mainCamera: {fileID: 3393775226113162772}
   _lightBehavior: {fileID: 6701840750721492199}
   _areaManager: {fileID: 7683298792840207488}
+  _mainCanvas: {fileID: 0}
+  _cameraCanvas: {fileID: 0}
   _yawTransforms: []
   _cameraUIGOs: []
 --- !u!1 &8426956946971419449

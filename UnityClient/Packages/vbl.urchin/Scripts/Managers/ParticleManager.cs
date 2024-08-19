@@ -2,6 +2,7 @@ using BrainAtlas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Urchin.API;
 using Urchin.Managers;
@@ -17,12 +18,14 @@ public class ParticleManager : Manager
 
     #region Variables
     private Dictionary<string, ParticleBehavior> _psystemMapping;
+    private TaskCompletionSource<bool> _loadSource;
     #endregion
 
     #region Properties
     public static Dictionary<string, Material> ParticleMaterials;
 
     public override ManagerType Type => ManagerType.ParticleManager;
+    public override Task LoadTask => _loadSource.Task;
     #endregion
 
     #region Unity
@@ -30,6 +33,7 @@ public class ParticleManager : Manager
     {
         _psystemMapping = new();
         ParticleMaterials = new();
+        _loadSource = new();
 
         if (_materialNames.Count != _materials.Count)
             throw new System.Exception("(ParticleManager) Material names list and material list must have the same length");
@@ -67,6 +71,8 @@ public class ParticleManager : Manager
 
         foreach (ParticleSystemModel model in particleManagerModel.Data)
             UpdateData(model);
+
+        _loadSource.SetResult(true);
     }
 
     private struct ParticleManagerModel

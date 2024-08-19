@@ -1,6 +1,7 @@
 using BrainAtlas;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Urchin.API;
 
@@ -17,11 +18,13 @@ namespace Urchin.Managers
         // Dictionary of string -> GO keeping track of probe style options
         private Dictionary<string, GameObject> _probeOpts;
         private GameObject _defaultPrefab;
+        private TaskCompletionSource<bool> _loadTask;
 
         // Actual objects
         private Dictionary<string, ProbeBehavior> _probes;
 
         public override ManagerType Type => ManagerType.ProbeManager;
+        public override Task LoadTask => _loadTask.Task;
         #endregion
 
         #region Unity
@@ -31,6 +34,7 @@ namespace Urchin.Managers
             // Initialize variables
             _probeOpts = new Dictionary<string, GameObject>();
             _probes = new();
+            _loadTask = new();
 
             _defaultPrefab = _probePrefabOptions[_probePrefabNames.IndexOf(_defaultProbeStyle)];
 
@@ -76,6 +80,7 @@ namespace Urchin.Managers
             {
                 UpdateData(data);
             }
+            _loadTask.SetResult(true);
         }
 
         public struct ProbeManagerModel

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Urchin.Managers
@@ -9,6 +10,7 @@ namespace Urchin.Managers
         public abstract string ToSerializedData();
         public abstract void FromSerializedData(string serializedData);
 
+        public abstract Task LoadTask { get; }
     }
 
     public enum ManagerType

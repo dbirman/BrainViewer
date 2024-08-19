@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Urchin.API;
+using System.Threading.Tasks;
 
 namespace Urchin.Managers
 {
@@ -19,15 +20,18 @@ namespace Urchin.Managers
         //Keeping a dictionary mapping names of objects to the game object in schene
         private Dictionary<string, MeshBehavior> _meshBehaviors;
         private Dictionary<string, Mesh> _meshOptions;
+        private TaskCompletionSource<bool> _loadSource;
 
         #region Properties
         public override ManagerType Type { get { return ManagerType.PrimitiveMeshManager; } }
+        public override Task LoadTask => _loadSource.Task;
         #endregion
 
         #region Unity
         private void Awake()
         {
             _meshBehaviors = new();
+            _loadSource = new();
 
             _meshOptions = new();
             for (int i = 0; i < meshNames.Count; i++)
@@ -143,12 +147,16 @@ namespace Urchin.Managers
         #region Manager
         public override void FromSerializedData(string serializedData)
         {
+            _loadSource = new();
+
             Clear();
 
             PrimitiveMeshModel data = JsonUtility.FromJson<PrimitiveMeshModel>(serializedData);
 
             foreach (MeshModel modelData in data.Data)
                 Create(modelData);
+
+            _loadSource.SetResult(true);
         }
 
         public override string ToSerializedData()

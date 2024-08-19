@@ -2,6 +2,7 @@ using BrainAtlas;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -17,20 +18,14 @@ public class DataManager : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void DownloadFile(string filename, string filedata);
 #endif
-
-    [SerializeField] AtlasManager _atlasManager;
-    [SerializeField] CameraManager _cameraManager;
-    [SerializeField] LineRendererManager _lineRendererManager;
-    [SerializeField] PrimitiveMeshManager _primitiveMeshManager;
-    [SerializeField] TextManager _textManager;
-    [SerializeField] ParticleManager _particleManager;
-    [SerializeField] CustomMeshManager _customMeshManager;
-    [SerializeField] ProbeManager _probeManager;
+    [SerializeField] List<ManagerType> _managerTypes;
+    [SerializeField] List<Manager> _managers;
+    [SerializeField] List<int> _loadOrder;
 
     [SerializeField] private string apiURL;
 
     #region Variables
-    private List<Manager> _managers;
+    //private List<Manager> _managers;
     private DockModel Data;
     #endregion
 
@@ -39,18 +34,6 @@ public class DataManager : MonoBehaviour
     private void Awake()
     {
         Data.DockUrl = apiURL;
-
-        _managers = new()
-        {
-            _atlasManager,
-            _primitiveMeshManager,
-            _cameraManager,
-            _lineRendererManager,
-            _textManager,
-            _particleManager,
-            _customMeshManager,
-            _probeManager
-        };
 
         Client_SocketIO.Save += x => StartCoroutine(Save(x));
         Client_SocketIO.Load += x => StartCoroutine(Load(x));
@@ -64,7 +47,7 @@ public class DataManager : MonoBehaviour
         Data = data;
     }
 
-    public IEnumerator Save(SaveRequest data)
+    public LoadModel GetAllData()
     {
         // Generate a LoadModel holding the data
         LoadModel allData = new LoadModel(new int[_managers.Count], new string[_managers.Count]);
@@ -75,21 +58,27 @@ public class DataManager : MonoBehaviour
             allData.Data[i] = _managers[i].ToSerializedData();
         }
 
+        return allData;
+    }
+
+    public IEnumerator Save(SaveRequest data)
+    {
+        LoadModel allData = GetAllData();
 
         if (data.Filename != "")
         {
             // Save data to a local file
-            //string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
+            string filePath = Path.Combine(Application.persistentDataPath, data.Filename);
             string serializedJson = JsonUtility.ToJson(allData);
 
             Debug.Log($"Sending save data: {serializedJson}");
             Client_SocketIO.Emit("urchin-dock-callback", serializedJson);
-//#if UNITY_WEBGL && !UNITY_EDITOR
-//            DownloadFile(data.Filename, serializedJson);
-//#else
-//            File.WriteAllText(filePath, serializedJson);
-//            Client_SocketIO.Log($"File saved to {filePath}, re-load this file by passing just the filename, not the full path.");
-//#endif
+#if UNITY_WEBGL && !UNITY_EDITOR
+            DownloadFile(data.Filename, serializedJson);
+#else
+            File.WriteAllText(filePath, serializedJson);
+            Client_SocketIO.Log($"File saved to {filePath}, re-load this file by passing just the filename, not the full path.");
+#endif
         }
         else
         {
@@ -123,6 +112,11 @@ public class DataManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Load the data using an external request, either to a local file or to the cloud server
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     public IEnumerator Load(LoadRequest data)
     {
         if (data.Filename != "")
@@ -154,29 +148,36 @@ public class DataManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Load data from an internal request
+    /// </summary>
+    /// <param name="allData"></param>
+    public void Load(LoadModel allData)
+    {
+        ParseLoadData(allData);
+    }
+
+    /// <summary>
+    /// Load all of the managers in priority order
+    /// </summary>
+    /// <param name="data"></param>
     private async void ParseLoadData(LoadModel data)
     {
-        // If any of the models are the atlas model, load that first
-        for (int i = 0; i < data.Types.Length; i++)
-        {
-            if ((ManagerType)data.Types[i] == ManagerType.AtlasManager)
-            {
-                _atlasManager.FromSerializedData(data.Data[i]);
-                await _atlasManager.LoadTask;
-            }
-        }
+        // Create pairs of string, type, and priority
+        var combined = data.Data
+            .Select((s, i) => new { Data = s, Type = data.Types[i], Priority = _loadOrder[_managerTypes.FindIndex(x => x == (ManagerType)data.Types[i])] })
+            .ToList();
 
-        // Then load everything else (these are all independent)
-        for (int i = 0; i < data.Types.Length; i++)
-        {
-            string managerData = data.Data[i];
+        // Sort by priority in descending order
+        var sortedCombined = combined
+            .OrderByDescending(c => c.Priority)
+            .ToList();
 
-            switch ((ManagerType)data.Types[i])
-            {
-                case ManagerType.PrimitiveMeshManager:
-                    _primitiveMeshManager.FromSerializedData(managerData);
-                    break;
-            }
+        for (int i = 0; i < sortedCombined.Count; i++)
+        {
+            Manager manager = _managers.Find(x => x.Type.Equals(sortedCombined[i].Type));
+            manager.FromSerializedData(sortedCombined[i].Data);
+            await manager.LoadTask;
         }
     }
 }

@@ -1,6 +1,7 @@
 using BrainAtlas;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Urchin.API;
 
@@ -12,7 +13,12 @@ namespace Urchin.Managers
         [SerializeField] private Transform _customMeshParentT;
         #endregion
 
+        #region Properties
+        public override Task LoadTask => _loadSource.Task;
+        #endregion
+
         #region Private
+        private TaskCompletionSource<bool> _loadSource;
         private Dictionary<string, CustomMeshModel> _customMeshModels;
         private Dictionary<string, GameObject> _customMeshGOs;
         private BlenderSpace _blenderSpace;
@@ -20,13 +26,17 @@ namespace Urchin.Managers
         public override ManagerType Type => ManagerType.CustomMeshManager;
         #endregion
 
-        private void Start()
+        private void Awake()
         {
+            _loadSource = new();
             _customMeshModels = new();
             _customMeshGOs = new();
 
             _blenderSpace = new();
+        }
 
+        private void Start()
+        {
             Client_SocketIO.CustomMeshUpdate += UpdateData;
             Client_SocketIO.CustomMeshDelete += Delete;
         }
@@ -48,6 +58,8 @@ namespace Urchin.Managers
 
             foreach (CustomMeshModel data in model.Data)
                 UpdateData(data);
+
+            _loadSource.SetResult(true);
         }
 
         private struct CMeshManagerModel

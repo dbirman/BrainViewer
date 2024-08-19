@@ -2,6 +2,7 @@ using BrainAtlas;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using Urchin.API;
@@ -37,7 +38,10 @@ namespace Urchin.Managers
         private Quaternion _startRotation;
         private Quaternion _endRotation;
 
+        private TaskCompletionSource<bool> _loadSource;
+
         public override ManagerType Type => ManagerType.CameraManager;
+        public override Task LoadTask => _loadSource.Task;
         #endregion
 
         #region Unity functions
@@ -98,6 +102,8 @@ namespace Urchin.Managers
 
             foreach (CameraModel data in cameraManagerModel.Data)
                 UpdateData(data);
+
+            _loadSource.SetResult(true);
         }
 
         private struct CameraManagerModel
