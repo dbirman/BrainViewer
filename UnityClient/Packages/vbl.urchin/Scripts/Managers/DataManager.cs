@@ -157,6 +157,15 @@ public class DataManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Load data from an internal serialized string
+    /// </summary>
+    /// <param name="serializedData"></param>
+    public void Load(string serializedData)
+    {
+        ParseLoadData(JsonUtility.FromJson<LoadModel>(serializedData));
+    }
+
+    /// <summary>
     /// Load all of the managers in priority order
     /// </summary>
     /// <param name="data"></param>
