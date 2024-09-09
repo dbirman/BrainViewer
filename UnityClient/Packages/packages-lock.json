@@ -195,8 +195,8 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.unity.collections": "2.4.2",
-        "com.unity.burst": "1.7.2"
+        "com.unity.burst": "1.7.2",
+        "com.unity.collections": "2.4.2"
       },
       "url": "https://packages.unity.com"
     },
@@ -282,7 +282,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "8a2dced53189236d0207f67e04ae31fce25b223f"
+      "hash": "d95427c01958f0e731dd96e2658e71fa3d672e2b"
     },
     "vbl.urchin": {
       "version": "file:vbl.urchin",
