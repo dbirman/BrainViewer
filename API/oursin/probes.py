@@ -38,7 +38,7 @@ class Probe:
 		probes.append(self)
 
 	def _update(self):
-		client.sio.emit('urchin-probe-update', self.data.to_string())
+		client.sio.emit('urchin-probe-update', self.data.to_json_string())
 
 	def delete(self):
 		"""Delete probe objects
@@ -51,7 +51,7 @@ class Probe:
 		--------
 		>>> p1.delete()
 		"""
-		client.sio.emit('urchin-probe-delete', IDData(id=self.data.id).to_string())
+		client.sio.emit('urchin-probe-delete', IDData(id=self.data.id).to_json_string())
 		self.in_unity = False
 
 	def set_color(self,color):
@@ -205,7 +205,7 @@ def set_colors(probes_list, colors_list):
 		values= [utils.formatted_color(x) for x in colors_list]
 	)
 
-	client.sio.emit('urchin-probe-colors', data.to_string())
+	client.sio.emit('urchin-probe-colors', data.to_json_string())
 
 def set_positions(probes_list, positions_list):
 	"""Set probe tip positions in AP/ML/DV coordinates in um relative to the zero point (front, left, top)
@@ -227,7 +227,7 @@ def set_positions(probes_list, positions_list):
 		values= [utils.formatted_vector3([pos[0]/1000, pos[1]/1000, pos[2]/1000]) for pos in positions_list]
 	)
 
-	client.sio.emit('urchin-probe-positions', data.to_string())
+	client.sio.emit('urchin-probe-positions', data.to_json_string())
 
 def set_angles(probes_list, angles_list):
 	"""Set probe azimuth/elevation/spin angles in degrees
@@ -253,7 +253,7 @@ def set_angles(probes_list, angles_list):
 		values= [utils.formatted_vector3(angle) for angle in angles_list]
 	)
 
-	client.sio.emit('urchin-probe-angles', data.to_string())
+	client.sio.emit('urchin-probe-angles', data.to_json_string())
 
 # def set_probe_styles(probes_list,styles_list):
 # 	"""Set probe rendering style
@@ -308,4 +308,4 @@ def set_scales(probes_list, scales_list):
 		values= [utils.formatted_vector3(scale) for scale in scales_list]
 	)
 
-	client.sio.emit('urchin-probe-scales', data.to_string())
+	client.sio.emit('urchin-probe-scales', data.to_json_string())

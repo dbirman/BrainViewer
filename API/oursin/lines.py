@@ -32,7 +32,7 @@ class Line:
     lines.append(line)
 
   def _update(self):
-    client.sio.emit('urchin-line-update', self.data.to_string())
+    client.sio.emit('urchin-line-update', self.data.to_json_string())
 
   def delete(self):
     """Deletes lines
@@ -40,7 +40,7 @@ class Line:
     Examples
     >>>l1.delete()
     """
-    client.sio.emit('urchin-line-delete', IDData(id=self.data.id).to_string())
+    client.sio.emit('urchin-line-delete', IDData(id=self.data.id).to_json_string())
     self.in_unity = False
 
   def set_positions(self, positions):

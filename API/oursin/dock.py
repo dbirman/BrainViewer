@@ -57,7 +57,7 @@ def create_bucket(bucket_name, password, api_url = api_url, token = test_token):
         dock_url=api_url
     )
 
-    client.sio.emit('urchin-dock-data', api_data.to_string())
+    client.sio.emit('urchin-dock-data', api_data.to_json_string())
 
     # Request new bucket
     create_url = f'{api_url}/create/{bucket_name}'
@@ -107,7 +107,7 @@ def save(filename = None, bucket_name = None, password = None):
         password= "" if password_hash is None else password_hash
     )
 
-    client.sio.emit('urchin-save', data.to_string())
+    client.sio.emit('urchin-save', data.to_json_string())
 
 def load(filename = None, bucket_name = None, password= None):
     """Load all data from a bucket
@@ -138,7 +138,7 @@ def load(filename = None, bucket_name = None, password= None):
             password= "" if password_hash is None else password_hash
         )
 
-        client.sio.emit('urchin-load', data.to_string())
+        client.sio.emit('urchin-load', data.to_json_string())
 
 def check_and_store(bucket_name, password):
     global active_bucket

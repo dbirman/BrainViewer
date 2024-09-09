@@ -120,14 +120,14 @@ class Volume:
 				bytes = compressed_data[offset : offset + chunk_size]
 
 			)
-			client.sio.emit('SetVolumeData', chunk_data.to_string())
+			client.sio.emit('SetVolumeData', chunk_data.to_json_string())
 
 			offset += chunk_size
 			
 		volumes.append(self)
 
 	def update(self):
-		client.sio.emit('UpdateVolume', self.data.to_string())
+		client.sio.emit('UpdateVolume', self.data.to_json_string())
 
 	def delete(self):
 		client.sio.emit('DeleteVolume', self.id)

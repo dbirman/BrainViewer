@@ -40,7 +40,7 @@ class Text:
   def _update(self):
     """Send serialized data to update this text object in Urchin
     """
-    client.sio.emit('urchin-text-update', self.data.to_string())
+    client.sio.emit('urchin-text-update', self.data.to_json_string())
   
   def delete(self):
     """Delete a text object
@@ -49,7 +49,7 @@ class Text:
     --------
     >>> t1.delete()
     """
-    client.sio.emit('urchin-text-delete', IDData(id=self.data.id).to_string())
+    client.sio.emit('urchin-text-delete', IDData(id=self.data.id).to_json_string())
     self.in_unity = False
 
   def set_text(self, text):
@@ -161,7 +161,7 @@ def set_texts(text_list, str_list):
     values= [string for string in str_list]
   )
 
-  client.sio.emit('urchin-text-texts', data.to_string())
+  client.sio.emit('urchin-text-texts', data.to_json_string())
 
 def set_positions(text_list, pos_list):
   """Set the positions of multiple text objects
@@ -185,7 +185,7 @@ def set_positions(text_list, pos_list):
     values = [text.data.position for text in text_list]
   )
 
-  client.sio.emit('urchin-text-positions', data.to_string())
+  client.sio.emit('urchin-text-positions', data.to_json_string())
 
 def set_font_sizes(text_list, font_size_list):
   """_summary_
@@ -208,7 +208,7 @@ def set_font_sizes(text_list, font_size_list):
     values= [text.data.font_size for text in text_list]
   )
   
-  client.sio.emit('urchin-text-sizes', data.to_string())
+  client.sio.emit('urchin-text-sizes', data.to_json_string())
 
 def set_colors(text_list, color_list):
   """_summary_
@@ -230,4 +230,4 @@ def set_colors(text_list, color_list):
     values= [text.data.color for text in text_list]
   )
   
-  client.sio.emit('urchin-text-colors', data.to_string())
+  client.sio.emit('urchin-text-colors', data.to_json_string())

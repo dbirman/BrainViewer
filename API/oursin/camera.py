@@ -89,7 +89,7 @@ class Camera:
 		cameras.append(self)
 
 	def _update(self):
-		client.sio.emit('urchin-camera-update', self.data.to_string())
+		client.sio.emit('urchin-camera-update', self.data.to_json_string())
 
 	def reset(self):
 		self.data = CameraModel(id = self.data.id, controllable=self.data.controllable)
@@ -105,7 +105,7 @@ class Camera:
 		if self.in_unity == False:
 			raise Exception("Camera is not created. Please create camera before calling method.")
 			
-		client.sio.emit('urchin-camera-delete', IDData(id = self.data.id).to_string())
+		client.sio.emit('urchin-camera-delete', IDData(id = self.data.id).to_json_string())
 		self.in_unity = False
 
 	def set_target_coordinate(self,camera_target_coordinate):
@@ -298,7 +298,7 @@ class Camera:
 			value= utils.formatted_vector2(size)
 		)
 		
-		client.sio.emit('urchin-camera-screenshot-request', data.to_string())
+		client.sio.emit('urchin-camera-screenshot-request', data.to_json_string())
 
 		while not self.image_received:
 			await asyncio.sleep(0.1)
@@ -361,7 +361,7 @@ class Camera:
 			client.sio.emit('urchin-camera-lerp-set', CameraRotationModel(
 				start_rotation=utils.formatted_vector3(start_rotation),
 				end_rotation=utils.formatted_vector3(end_rotation)
-			).to_string())
+			).to_json_string())
 
 		for frame in range(n_frames):
 
@@ -374,7 +374,7 @@ class Camera:
 				client.sio.emit('urchin-camera-lerp', FloatData(
 					id=self.data.id,
 					value=perc
-				).to_string())
+				).to_json_string())
 			
 			if not test:
 				img = await self.screenshot([size[0], size[1]])
@@ -423,7 +423,7 @@ def set_brain_rotation(yaw):
 		Yaw angle for the brain, independent of the camera
 	"""
 
-	client.sio.emit('urchin-brain-yaw', FloatData(id='', value=yaw).to_string())
+	client.sio.emit('urchin-brain-yaw', FloatData(id='', value=yaw).to_json_string())
 
 def clear():
 	global cameras

@@ -16,7 +16,7 @@ class CustomAtlas:
             resolution= utils.formatted_vector3(atlas_resolution)
         )
 
-        client.sio.emit('CustomAtlas', data.to_string())
+        client.sio.emit('CustomAtlas', data.to_json_string())
 
 class Atlas:
     def __init__(self, atlas_name):
@@ -56,7 +56,7 @@ class Atlas:
     def _update(self):
         """Internal helper function, push data to Unity and update all values
         """
-        client.sio.emit('urchin-atlas-update', self.data.to_string())
+        client.sio.emit('urchin-atlas-update', self.data.to_json_string())
 
     def load(self):
         """Load this atlas
@@ -65,7 +65,7 @@ class Atlas:
             print("(Warning) Atlas was already loaded, the renderer can have issues if you try to load an atlas twice.")
         
         self.loaded = True
-        client.sio.emit('urchin-atlas-load', self.data.to_string())
+        client.sio.emit('urchin-atlas-load', self.data.to_json_string())
 
     def clear(self):
         """Clear all visible areas

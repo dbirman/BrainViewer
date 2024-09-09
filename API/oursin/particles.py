@@ -50,12 +50,12 @@ class ParticleSystem:
 	def _update(self):
 		"""Push data to Urchin renderer
 		"""
-		client.sio.emit('urchin-particles-update', self.data.to_string())
+		client.sio.emit('urchin-particles-update', self.data.to_json_string())
 
 	def delete(self):
 		"""Delete this particle system and all its particles
 		"""
-		client.sio.emit('urchin-particles-delete', IDData(id= self.data.id).to_string())
+		client.sio.emit('urchin-particles-delete', IDData(id= self.data.id).to_json_string())
 		self.in_unity = False
 
 	def set_material(self, material):
@@ -120,7 +120,7 @@ class ParticleSystem:
 		if self.in_unity == False:
 			raise Exception("Particle system was deleted")
 		
-		client.sio.emit('urchin-particles-positions', positions.to_string())
+		client.sio.emit('urchin-particles-positions', positions.to_json_string())
 
 	def set_sizes(self, sizes):
 		"""Set the sizes of particles in um
@@ -164,7 +164,7 @@ class ParticleSystem:
 		if self.in_unity == False:
 			raise Exception("Particle system was deleted")
 		
-		client.sio.emit('urchin-particles-sizes', sizes.to_string())
+		client.sio.emit('urchin-particles-sizes', sizes.to_json_string())
 	
 	def set_colors(self, colors):
 		"""Set the colors of particles
@@ -210,7 +210,7 @@ class ParticleSystem:
 		if self.in_unity == False:
 			raise Exception("Particle system was deleted")
 		
-		client.sio.emit('urchin-particles-colors', colors.to_string())
+		client.sio.emit('urchin-particles-colors', colors.to_json_string())
 
 def clear():
 	"""Clear all particle systems

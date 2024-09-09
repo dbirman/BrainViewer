@@ -44,7 +44,7 @@ class CustomMesh:
         customs.append(self)
 
     def _update(self):
-        client.sio.emit('urchin-custommesh-update', self.data.to_string())
+        client.sio.emit('urchin-custommesh-update', self.data.to_json_string())
 
     def delete(self):
         """Destroy this object in the renderer scene
@@ -54,7 +54,7 @@ class CustomMesh:
             id = self.data.id
         )
 
-        client.sio.emit('urchin-custommesh-delete', data.to_string())
+        client.sio.emit('urchin-custommesh-delete', data.to_json_string())
         self.in_unity = False
 
     def set_position(self, position = [0,0,0], use_reference = True):
