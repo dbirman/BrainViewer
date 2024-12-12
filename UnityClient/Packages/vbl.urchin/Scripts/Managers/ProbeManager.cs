@@ -96,7 +96,7 @@ namespace Urchin.Managers
         {
             if (_probes.ContainsKey(data.ID))
             {
-                // update
+                _probes[data.ID].UpdateData(data);
             }
             else
                 CreateProbes(data);
