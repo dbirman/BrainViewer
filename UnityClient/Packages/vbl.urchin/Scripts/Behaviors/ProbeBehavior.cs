@@ -1,3 +1,4 @@
+using BrainAtlas;
 using UnityEngine;
 
 public class ProbeBehavior : MonoBehaviour
@@ -55,7 +56,7 @@ public class ProbeBehavior : MonoBehaviour
 
     private void _SetPosition()
     {
-        transform.localPosition = Data.Position;
+        transform.localPosition = BrainAtlasManager.T2World(Data.Position);
     }
     private void _SetAngles()
     {
